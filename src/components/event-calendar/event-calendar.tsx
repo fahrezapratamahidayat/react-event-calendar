@@ -17,7 +17,7 @@ import {
 } from '@/hooks/use-event-calendar';
 import { SearchMonthPicker } from './search-month-picker';
 import { SearchDayPicker } from './search-day-picker';
-import { DayCalendarView } from './day-calendar';
+import { DayCalendarView } from './calendar-day';
 import { EventTypes } from '@/types/event';
 
 interface EventCalendarProps {
