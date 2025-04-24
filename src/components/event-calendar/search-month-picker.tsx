@@ -127,7 +127,7 @@ export function SearchMonthPicker({
                       )}
                     />
                     <span className="flex-1">{month.label}</span>
-                    <span className="text-muted-foreground ml-2 text-xs">
+                    <span className="text-muted-foreground mr-2 text-xs">
                       {month.shortLabel}
                     </span>
                   </CommandItem>
