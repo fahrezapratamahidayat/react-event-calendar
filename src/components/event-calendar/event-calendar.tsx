@@ -17,13 +17,16 @@ import {
 } from '@/hooks/use-event-calendar';
 import { SearchMonthPicker } from './search-month-picker';
 import { SearchDayPicker } from './search-day-picker';
-import { DayCalendarView } from './calendar-day';
 import { EventTypes } from '@/types/event';
+import { EventsList } from './event-list';
+import { CalendarDay } from './day-calendar';
+import { CalendarWeek } from './calendar-week';
 
 interface EventCalendarProps {
   config: EventCalendarConfig;
   events: EventTypes[];
 }
+
 export function EventCalendar({ config, events }: EventCalendarProps) {
   const {
     currentDate,
@@ -77,6 +80,56 @@ export function EventCalendar({ config, events }: EventCalendarProps) {
     console.log('tets');
   };
 
+  const renderCalendarView = () => {
+    if (viewMode === 'list') {
+      return (
+        <EventsList
+          events={events}
+          onEventUpdate={onEventUpdate}
+          onEventDelete={onEventDelete}
+          locale={locale}
+          currentDate={currentDate}
+          timeFormat={timeFormat}
+        />
+      );
+    }
+
+    switch (currentView) {
+      case 'day':
+        return (
+          <CalendarDay
+            events={events}
+            currentDate={currentDate}
+            timeFormat={timeFormat}
+            locale={locale}
+            onEventUpdate={onEventUpdate}
+            onEventDelete={onEventDelete}
+          />
+        );
+      case 'week':
+        return (
+          <CalendarWeek
+            events={events}
+            currentDate={currentDate}
+            timeFormat={timeFormat}
+            locale={locale}
+            onEventUpdate={onEventUpdate}
+            onEventDelete={onEventDelete}
+          />
+        );
+      default:
+        return (
+          <CalendarDay
+            events={events}
+            currentDate={currentDate}
+            timeFormat={timeFormat}
+            locale={locale}
+            onEventUpdate={onEventUpdate}
+            onEventDelete={onEventDelete}
+          />
+        );
+    }
+  };
   return (
     <div className="mt-3 space-y-3 pb-8">
       <div className="bg-background block flex-row items-center gap-2 rounded-md border p-2 sm:flex sm:flex-col md:flex md:flex-col lg:flex-row">
@@ -154,14 +207,7 @@ export function EventCalendar({ config, events }: EventCalendarProps) {
       <Card className="w-full">
         <CardContent className="overflow-hidden p-4 sm:p-6 lg:p-8">
           <div className="h-[650px] w-full overflow-hidden">
-            <DayCalendarView
-              events={events}
-              currentDate={currentDate}
-              timeFormat={timeFormat}
-              locale={locale}
-              onEventUpdate={onEventUpdate}
-              onEventDelete={onEventDelete}
-            />
+            {renderCalendarView()}
           </div>
         </CardContent>
       </Card>
