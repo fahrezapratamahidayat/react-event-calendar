@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Button } from '../ui/button';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { CalendarViewType } from '@/hooks/use-event-calendar';
