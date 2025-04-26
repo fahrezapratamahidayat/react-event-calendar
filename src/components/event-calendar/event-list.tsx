@@ -70,7 +70,7 @@ const EventItem = memo(
         className={cn(
           'absolute inset-0 -z-10 rounded bg-red-500 transition-opacity',
           event.color,
-          'group-hover/event:opacity-50',
+          'group-hover/event:opacity-80',
         )}
       />
       <div className="flex w-full items-start justify-between gap-2 group-hover/event:opacity-50">
@@ -129,7 +129,7 @@ const EventGroup = memo(
       data-testid={`event-group-${timeKey}`}
     >
       <CardContent className="p-0">
-        <div className="divide-y">
+        <div className="divide-3 gap-1.3 flex flex-col gap-2">
           {events.map((event) => (
             <EventItem
               key={event.id}
