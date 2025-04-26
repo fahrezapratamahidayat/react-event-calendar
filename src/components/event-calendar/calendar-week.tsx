@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useCallback, memo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import {
   startOfWeek,
   addDays,
@@ -11,13 +11,14 @@ import {
 import { formatDate, formatTime } from '@/lib/date-fns';
 import { ScrollArea } from '../ui/scroll-area';
 import EventDialog from './event-dialog';
-import { cn } from '@/lib/utils';
 import { EventTypes } from '@/types/event';
 import { TimeFormatType } from '@/hooks/use-event-calendar';
 import { WeekHeader } from './week-calendar/week-header';
 import { TimeColumn } from './week-calendar/time-column';
 import { CurrentTimeIndicator } from './week-calendar/current-time-indicator';
 import { HoverTimeIndicator } from './week-calendar/hover-time-indicator';
+import { MultiDayEventSection } from './week-calendar/multi-day-event';
+import { TimeGrid } from './week-calendar/time-grid';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -378,138 +379,6 @@ function useMultiDayEventRows(
   }, [multiDayEvents, daysInWeek]);
 }
 
-/**
- * Time Grid component for week view
- */
-const TimeGrid = memo(
-  ({
-    timeSlots,
-    daysInWeek,
-    todayIndex,
-  }: {
-    timeSlots: Date[];
-    daysInWeek: Date[];
-    todayIndex: number;
-  }) => (
-    <div className="relative" data-testid="time-grid">
-      {timeSlots.map((time, timeIndex) => (
-        <div key={timeIndex} className="border-border flex h-16 border-t">
-          {daysInWeek.map((day, dayIndex) => (
-            <div
-              key={`${timeIndex}-${dayIndex}`}
-              data-testid={`time-cell-${timeIndex}-${dayIndex}`}
-              className={cn(
-                'relative flex flex-1 items-center justify-center border-r last:border-r-0',
-                todayIndex === dayIndex && 'bg-primary/5',
-              )}
-            ></div>
-          ))}
-        </div>
-      ))}
-    </div>
-  ),
-);
-
-TimeGrid.displayName = 'TimeGrid';
-
-/**
- * Section for multi-day events display
- */
-const MultiDayEvent = ({
-  event,
-  startIndex,
-  endIndex,
-  row,
-  onClick,
-}: {
-  event: EventTypes;
-  startIndex: number;
-  endIndex: number;
-  row: number;
-  onClick: (event: EventTypes) => void;
-}) => {
-  const dayWidth = 100 / DAYS_IN_WEEK;
-  const eventLeftPercent = startIndex * dayWidth;
-  const eventWidthPercent = (endIndex - startIndex + 1) * dayWidth;
-
-  return (
-    <div
-      className="border-primary/30 bg-primary/10 hover:bg-primary/20 absolute z-10 flex h-8 cursor-pointer items-center overflow-hidden rounded-md border px-2 transition-colors"
-      style={{
-        left: `${eventLeftPercent}%`,
-        width: `${eventWidthPercent}%`,
-        top: `${row * MULTI_DAY_ROW_HEIGHT}px`,
-      }}
-      onClick={() => onClick(event)}
-      data-testid={`multi-day-event-${event.id}`}
-    >
-      <div className="text-primary truncate text-xs font-medium">
-        {event.title}
-      </div>
-    </div>
-  );
-};
-
-MultiDayEvent.displayName = 'MultiDayEvent';
-
-/**
- * Section for multi-day events display
- */
-const MultiDayEventSection = memo(
-  ({
-    rows,
-    daysInWeek,
-    todayIndex,
-    showEventDetail,
-  }: {
-    rows: MultiDayEventRowType[];
-    daysInWeek: Date[];
-    todayIndex: number;
-    showEventDetail: (event: EventTypes) => void;
-  }) => {
-    // Calculate total rows needed for container
-    const totalRows =
-      rows.length > 0 ? Math.max(...rows.map((r) => r.row)) + 1 : 1;
-
-    return (
-      <>
-        <div
-          className="relative"
-          style={{
-            height: `${totalRows * MULTI_DAY_ROW_HEIGHT + 10}px`,
-            minHeight: '40px',
-          }}
-          data-testid="multi-day-events-container"
-        >
-          {rows.map(({ event, startIndex, endIndex, row }) => (
-            <MultiDayEvent
-              key={event.id}
-              event={event}
-              startIndex={startIndex}
-              endIndex={endIndex}
-              row={row}
-              onClick={showEventDetail}
-            />
-          ))}
-        </div>
-        <div className="flex h-2">
-          {daysInWeek.map((day, dayIndex) => (
-            <div
-              key={`header-${dayIndex}`}
-              className={cn(
-                'relative h-full flex-1 border-r last:border-r-0',
-                todayIndex === dayIndex && 'bg-primary/5',
-              )}
-            ></div>
-          ))}
-        </div>
-      </>
-    );
-  },
-);
-
-MultiDayEventSection.displayName = 'MultiDayEventSection';
-
 export function CalendarWeek({
   events,
   currentDate,
@@ -584,7 +453,7 @@ export function CalendarWeek({
       <ScrollArea className="h-full w-full rounded-md">
         <div className="mb-2 min-w-full">
           <div className="relative mb-2">
-            <div className="bg-accent border-border sticky top-0 z-30 flex flex-col items-center justify-center border-b">
+            <div className="bg-accent border-border sticky top-0 z-30 flex flex-col items-center justify-center border-b pr-4">
               <WeekHeader
                 weekNumber={weekNumber}
                 daysInWeek={daysInWeek}
@@ -592,25 +461,26 @@ export function CalendarWeek({
                 formatDate={formatDate}
                 locale={locale}
               />
-              <div className="relative w-full flex-1">
-                <div className="flex items-center justify-between">
-                  <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32">
-                    <h3 className="flex items-center gap-1 text-xs font-medium">
-                      Event Multi-Hari
-                    </h3>
-                  </div>
-                  <div className="relative flex-1">
-                    <MultiDayEventSection
-                      rows={multiDayEventRows}
-                      daysInWeek={daysInWeek}
-                      todayIndex={todayIndex}
-                      showEventDetail={showEventDetail}
-                    />
+              {multiDayEventRows.length ? (
+                <div className="relative w-full flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32">
+                      <span className="w-full truncate text-xs font-medium">
+                        Multi Day Events
+                      </span>
+                    </div>
+                    <div className="relative flex-1">
+                      <MultiDayEventSection
+                        rows={multiDayEventRows}
+                        daysInWeek={daysInWeek}
+                        showEventDetail={showEventDetail}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : null}
             </div>
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden pr-4">
               <TimeColumn
                 ref={sidebarRef}
                 timeSlots={timeSlots}
@@ -655,12 +525,15 @@ export function CalendarWeek({
                     if (!position) return null;
 
                     // Calculate width and horizontal position
+                    const OVERLAP_FACTOR = 0.5; // Nilai positif
                     const columnWidth =
-                      DAY_WIDTH_PERCENT / position.totalColumns;
+                      (DAY_WIDTH_PERCENT +
+                        OVERLAP_FACTOR / position.totalColumns) /
+                      position.totalColumns;
                     const leftPercent =
                       dayIndex * DAY_WIDTH_PERCENT +
-                      position.column *
-                        (DAY_WIDTH_PERCENT / position.totalColumns);
+                      position.column * columnWidth -
+                      OVERLAP_FACTOR / (position.totalColumns * 2);
                     const rightPercent = 100 - (leftPercent + columnWidth);
 
                     return (
