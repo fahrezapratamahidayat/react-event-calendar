@@ -33,7 +33,7 @@ export const EventTrigger = ({
   <DialogTrigger asChild>
     <Button
       className={cn(
-        'group g absolute flex cursor-pointer flex-col items-start justify-start gap-0 overflow-hidden rounded bg-transparent p-2 text-white hover:bg-transparent',
+        'group absolute flex cursor-pointer flex-col items-start justify-start gap-0 overflow-hidden rounded bg-transparent p-2 text-white hover:bg-transparent',
         'border-none shadow-none ring-0 focus:ring-0 focus:outline-none',
         'transition-colors',
       )}
