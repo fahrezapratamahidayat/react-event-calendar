@@ -256,7 +256,6 @@ export function EventsList({
           formatDateString={formatDate}
           timeFormat={timeFormat}
           getEventDurationText={getEventDuration}
-          showTrigger={false}
           locale={locale}
         />
       )}
