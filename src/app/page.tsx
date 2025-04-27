@@ -1,5 +1,5 @@
 'use client';
-import { EventCalendar } from '@/components/event-calendar/event-calendar';
+import { EventCalendar } from '@/components/event-calendar';
 import { ModeToggle } from '@/components/mode-toggel';
 import {
   CalendarViewType,
