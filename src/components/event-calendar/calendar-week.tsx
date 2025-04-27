@@ -25,7 +25,7 @@ const START_HOUR = 0; // 00:00
 const END_HOUR = 23; // 23:00
 const DAYS_IN_WEEK = 7;
 const DAY_WIDTH_PERCENT = 100 / DAYS_IN_WEEK;
-const MULTI_DAY_ROW_HEIGHT = 30;
+const MULTI_DAY_ROW_HEIGHT = 50;
 
 interface WeekCalendarViewProps {
   events: EventTypes[];
@@ -474,6 +474,7 @@ export function CalendarWeek({
                         rows={multiDayEventRows}
                         daysInWeek={daysInWeek}
                         showEventDetail={showEventDetail}
+                        multiDayRowHeight={MULTI_DAY_ROW_HEIGHT}
                       />
                     </div>
                   </div>
@@ -553,7 +554,6 @@ export function CalendarWeek({
                         formatDateString={formatDate}
                         timeFormat={timeFormat}
                         getEventDurationText={getEventDuration}
-                        showTrigger={true}
                       />
                     );
                   })}
