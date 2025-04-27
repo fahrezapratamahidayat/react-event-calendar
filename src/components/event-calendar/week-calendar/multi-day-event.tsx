@@ -26,6 +26,7 @@ interface MultiDayEventSectionProps {
   rows: MultiDayEventRowType[];
   daysInWeek: Date[];
   showEventDetail: (event: EventTypes) => void;
+  multiDayRowHeight: number;
 }
 
 /**
@@ -88,9 +89,13 @@ MultiDayEvent.displayName = 'MultiDayEvent';
  * Section for multi-day events display
  */
 export const MultiDayEventSection = memo(
-  ({ rows, daysInWeek, showEventDetail }: MultiDayEventSectionProps) => {
+  ({
+    rows,
+    daysInWeek,
+    showEventDetail,
+    multiDayRowHeight,
+  }: MultiDayEventSectionProps) => {
     const [isCollapsed, setIsCollapsed] = useState(true);
-    const multiDayRowHeight = 50;
 
     const totalRows =
       rows.length > 0 ? Math.max(...rows.map((r) => r.row)) + 1 : 1;
