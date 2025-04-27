@@ -126,7 +126,6 @@ interface EventDialogProps {
   ) => string;
   timeFormat: '12' | '24';
   getEventDurationText?: (event: EventTypes) => string;
-  showTrigger?: boolean;
 }
 
 type EventDetailsFormProps = {
@@ -490,7 +489,6 @@ export default function EventDialog({
   formatTimeString,
   timeFormat,
   getEventDurationText,
-  showTrigger = true,
 }: EventDialogProps) {
   const isMounted = useIsMounted();
 
@@ -521,18 +519,16 @@ export default function EventDialog({
       onOpenChange={onOpenChange}
       data-testid="event-dialog"
     >
-      {showTrigger && (
-        <EventTrigger
-          event={event}
-          onEventClick={onEventClick}
-          formatTimeString={formatTimeString}
-          timeFormat={timeFormat}
-          getEventDurationText={getEventDurationText}
-          position={position}
-          leftOffset={leftOffset}
-          rightOffset={rightOffset}
-        />
-      )}
+      <EventTrigger
+        event={event}
+        onEventClick={onEventClick}
+        formatTimeString={formatTimeString}
+        timeFormat={timeFormat}
+        getEventDurationText={getEventDurationText}
+        position={position}
+        leftOffset={leftOffset}
+        rightOffset={rightOffset}
+      />
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>Event Details</DialogTitle>
