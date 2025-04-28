@@ -2,13 +2,13 @@
 
 import { useState, useMemo, useRef, memo, useCallback } from 'react';
 import { ScrollArea } from '../ui/scroll-area';
-import { format, Locale } from 'date-fns';
+import { Locale } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { formatTime, formatTimeDisplay } from '@/lib/date-fns';
-import EventDialog from './event-dialog';
+import { formatTimeDisplay } from '@/lib/date-fns';
 import { cn } from '@/lib/utils';
 import { EventTypes } from '@/types/event';
 import { TimeFormatType } from '@/hooks/use-event-calendar';
+import { EventDialogTrigger } from '../event-dialog-trigger';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -261,7 +261,7 @@ function useEventPositions(events: EventTypes[]) {
   }, [events]);
 }
 
-export function DayCalendarView({
+export function CalendarDay({
   events,
   timeFormat,
   locale = id,
@@ -357,23 +357,12 @@ export function DayCalendarView({
                   COLUMN_WIDTH_TOTAL - (leftPercent + columnWidth);
 
                 return (
-                  <EventDialog
-                    key={event.id}
+                  <EventDialogTrigger
                     event={event}
-                    isOpen={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
-                    selectedEvent={selectedEvent}
-                    onEventUpdate={onEventUpdate}
-                    onEventDelete={onEventDelete}
+                    key={event.id}
                     position={position}
                     leftOffset={leftPercent}
                     rightOffset={rightPercent}
-                    onEventClick={showEventDetail}
-                    formatTimeString={formatTime}
-                    formatDateString={format}
-                    timeFormat={timeFormat}
-                    getEventDurationText={getEventDuration}
-                    locale={locale}
                   />
                 );
               })}
