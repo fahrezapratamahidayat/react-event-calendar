@@ -27,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { EventTrigger } from '@/components/event-trigger';
 import { DateSelector } from '@/components/date-selector';
 import { TimeSelector } from '@/components/time-selector';
 import { ColorOptionItem } from '@/components/color-option-item';
@@ -41,6 +40,7 @@ import type { FormatOptions, Locale } from 'date-fns';
 import { EventTypes } from '@/types/event';
 import { generateTimeOptions } from '@/lib/date-fns';
 import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/event-options';
+import { useEventDialogStore } from '@/hooks/use-event-dialog-store';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
@@ -355,22 +355,22 @@ const EventDetailsForm = memo(
   },
 );
 
-/**
- * Custom hook to handle event dialog logic
- */
-function useEventDialog({
-  selectedEvent,
-  onEventUpdate,
-  onEventDelete,
-  onOpenChange,
-}: {
-  selectedEvent: EventTypes | null;
-  onEventUpdate: (event: EventTypes) => void;
-  onEventDelete: (id: string) => void;
-  onOpenChange: (open: boolean) => void;
-}) {
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+EventDetailsForm.displayName = 'EventDetailsForm';
+
+export default function EventDialog() {
+  const {
+    selectedEvent,
+    isDialogOpen,
+    closeEventDialog,
+    updateEvent,
+    deleteEvent,
+    locale,
+    isSubmitting,
+  } = useEventDialogStore();
+
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState<boolean>(false);
+  const isMounted = useIsMounted();
+  const timeOptions = generateTimeOptions();
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -396,117 +396,38 @@ function useEventDialog({
           endTime: selectedEvent.endTime || DEFAULT_END_TIME,
           location: selectedEvent.location || '',
           color: selectedEvent.color || DEFAULT_COLOR,
+          eventType: 'day',
         });
       } catch (error) {
         console.error('Error resetting form with event data:', error);
-        toast.error('Terjadi kesalahan saat memuat data acara');
       }
     }
   }, [selectedEvent, form]);
 
-  // Form submission handler
   const handleSubmit = async (values: EventFormValues) => {
     if (!selectedEvent) return;
 
-    try {
-      setIsSubmitting(true);
+    const updatedEvent: EventTypes = {
+      ...selectedEvent,
+      title: values.title,
+      description: values.description || '',
+      startDate: values.startDate,
+      endDate: values.endDate,
+      startTime: values.startTime,
+      endTime: values.endTime,
+      location: values.location,
+      category: values.category,
+      color: values.color,
+    };
 
-      const updatedEvent: EventTypes = {
-        ...selectedEvent,
-        title: values.title,
-        description: values.description || '',
-        startDate: values.startDate,
-        endDate: values.endDate,
-        startTime: values.startTime,
-        endTime: values.endTime,
-        location: values.location,
-        category: values.category,
-        color: values.color,
-      };
-
-      await onEventUpdate(updatedEvent);
-      onOpenChange(false);
-      toast.success('Acara berhasil diubah');
-    } catch (error) {
-      console.error('Error updating event:', error);
-
-      // Specific error messages based on error type
-      if (error instanceof Error) {
-        toast.error(`Gagal mengubah acara: ${error.message}`);
-      } else {
-        toast.error('Gagal mengubah acara');
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    await updateEvent(updatedEvent);
   };
 
-  // Delete event handler
   const handleDeleteEvent = async () => {
     if (!selectedEvent) return;
-
-    try {
-      await onEventDelete(selectedEvent.id);
-      onOpenChange(false);
-      setIsDeleteAlertOpen(false);
-      toast.success('Acara berhasil dihapus');
-    } catch (error) {
-      console.error('Error deleting event:', error);
-
-      // Specific error messages based on error type
-      if (error instanceof Error) {
-        toast.error(`Gagal menghapus acara: ${error.message}`);
-      } else {
-        toast.error('Gagal menghapus acara');
-      }
-    }
+    await deleteEvent(selectedEvent.id);
+    setIsDeleteAlertOpen(false);
   };
-
-  return {
-    form,
-    isSubmitting,
-    isDeleteAlertOpen,
-    setIsDeleteAlertOpen,
-    handleSubmit,
-    handleDeleteEvent,
-  };
-}
-
-EventDetailsForm.displayName = 'EventDetailsForm';
-
-export default function EventDialog({
-  event,
-  isOpen,
-  onOpenChange,
-  selectedEvent,
-  onEventUpdate,
-  onEventDelete,
-  position,
-  locale = id,
-  leftOffset,
-  rightOffset,
-  onEventClick,
-  formatTimeString,
-  timeFormat,
-  getEventDurationText,
-}: EventDialogProps) {
-  const isMounted = useIsMounted();
-
-  const {
-    form,
-    isSubmitting,
-    isDeleteAlertOpen,
-    setIsDeleteAlertOpen,
-    handleSubmit,
-    handleDeleteEvent,
-  } = useEventDialog({
-    selectedEvent,
-    onEventUpdate,
-    onEventDelete,
-    onOpenChange,
-  });
-
-  const timeOptions = generateTimeOptions();
 
   if (!isMounted) {
     return null;
@@ -514,25 +435,16 @@ export default function EventDialog({
 
   return (
     <Dialog
-      key={event.id}
-      open={isOpen && selectedEvent?.id === event.id}
-      onOpenChange={onOpenChange}
+      open={isDialogOpen}
+      onOpenChange={closeEventDialog}
       data-testid="event-dialog"
     >
-      <EventTrigger
-        event={event}
-        onEventClick={onEventClick}
-        formatTimeString={formatTimeString}
-        timeFormat={timeFormat}
-        getEventDurationText={getEventDurationText}
-        position={position}
-        leftOffset={leftOffset}
-        rightOffset={rightOffset}
-      />
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>Event Details</DialogTitle>
-          <DialogDescription>Event details {event.title}</DialogDescription>
+          <DialogDescription>
+            Event details {selectedEvent?.title}
+          </DialogDescription>
         </DialogHeader>
         <ScrollArea className="h-[350px] w-full pr-4 sm:h-[500px] sm:pr-0">
           <EventDetailsForm
@@ -549,7 +461,7 @@ export default function EventDialog({
             onConfirm={handleDeleteEvent}
           />
           <FormFooter
-            onCancel={() => onOpenChange(false)}
+            onCancel={closeEventDialog}
             onSave={form.handleSubmit(handleSubmit)}
             isSubmitting={isSubmitting}
           />
