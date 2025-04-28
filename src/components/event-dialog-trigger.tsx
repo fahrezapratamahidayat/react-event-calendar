@@ -1,14 +1,10 @@
 import { EventTypes } from '@/types/event';
-import { DialogTrigger } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
+import { useEventDialogStore } from '@/hooks/use-event-dialog-store';
 
-type EventTriggerProps = {
+type EventDialogTriggerProps = {
   event: EventTypes;
-  onEventClick: (event: EventTypes) => void;
-  formatTimeString: (timeString: string, timeFormat: '12' | '24') => string;
-  timeFormat: '12' | '24';
-  getEventDurationText?: (event: EventTypes) => string;
   position?: {
     top: number;
     height: number;
@@ -20,24 +16,26 @@ type EventTriggerProps = {
   rightOffset?: number;
 };
 
-export const EventTrigger = ({
+export const EventDialogTrigger = ({
   event,
-  onEventClick,
-  formatTimeString,
-  timeFormat,
-  getEventDurationText,
   position,
   leftOffset,
   rightOffset,
-}: EventTriggerProps) => (
-  <DialogTrigger asChild>
+}: EventDialogTriggerProps) => {
+  const {
+    openEventDialog,
+    formatTimeString,
+    timeFormat,
+    getEventDurationText,
+  } = useEventDialogStore();
+  return (
     <Button
       className={cn(
         'group absolute flex cursor-pointer flex-col items-start justify-start gap-0 overflow-hidden rounded bg-transparent p-2 text-white hover:bg-transparent',
         'border-none shadow-none ring-0 focus:ring-0 focus:outline-none',
         'transition-colors',
       )}
-      onClick={() => onEventClick(event)}
+      onClick={() => openEventDialog(event, position, leftOffset, rightOffset)}
       style={{
         top: `${position?.top}px`,
         height: `${position?.height}px`,
@@ -64,5 +62,5 @@ export const EventTrigger = ({
         </div>
       )}
     </Button>
-  </DialogTrigger>
-);
+  );
+};
