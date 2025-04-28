@@ -19,6 +19,7 @@ import { CurrentTimeIndicator } from './week-calendar/current-time-indicator';
 import { HoverTimeIndicator } from './week-calendar/hover-time-indicator';
 import { MultiDayEventSection } from './week-calendar/multi-day-event';
 import { TimeGrid } from './week-calendar/time-grid';
+import { EventDialogTrigger } from '../event-dialog-trigger';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -538,22 +539,12 @@ export function CalendarWeek({
                     const rightPercent = 100 - (leftPercent + columnWidth);
 
                     return (
-                      <EventDialog
-                        key={event.id}
+                      <EventDialogTrigger
                         event={event}
-                        isOpen={isDialogOpen}
-                        onOpenChange={setIsDialogOpen}
-                        selectedEvent={selectedEvent}
-                        onEventUpdate={onEventUpdate}
-                        onEventDelete={onEventDelete}
+                        key={event.id}
                         position={position}
                         leftOffset={leftPercent}
                         rightOffset={rightPercent}
-                        onEventClick={showEventDetail}
-                        formatTimeString={formatTime}
-                        formatDateString={formatDate}
-                        timeFormat={timeFormat}
-                        getEventDurationText={getEventDuration}
                       />
                     );
                   })}
