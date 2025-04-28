@@ -19,8 +19,11 @@ import { SearchMonthPicker } from './search-month-picker';
 import { SearchDayPicker } from './search-day-picker';
 import { EventTypes } from '@/types/event';
 import { EventsList } from './event-list';
-import { CalendarDay } from './day-calendar';
+import { CalendarDay } from './calendar-day';
 import { CalendarWeek } from './calendar-week';
+import { useEventDialogStore } from '@/hooks/use-event-dialog-store';
+import { useEffect } from 'react';
+import EventDialog from './event-dialog';
 
 interface EventCalendarProps {
   config: EventCalendarConfig;
@@ -44,6 +47,14 @@ export function EventCalendar({ config, events }: EventCalendarProps) {
   } = useEventCalendar({
     config,
   });
+
+  const { setTimeFormat: setDialogTimeFormat, setLocale: setDialogLocale } =
+    useEventDialogStore();
+
+  useEffect(() => {
+    setDialogTimeFormat(timeFormat);
+    setDialogLocale(locale);
+  }, [timeFormat, locale, setDialogTimeFormat, setDialogLocale]);
 
   const _handleDateChange = (newDate: Date) => {
     setCurrentDate(newDate);
@@ -132,6 +143,7 @@ export function EventCalendar({ config, events }: EventCalendarProps) {
   };
   return (
     <div className="mt-3 space-y-3 pb-8">
+      <EventDialog />
       <div className="bg-background block flex-row items-center gap-2 rounded-md border p-2 sm:flex sm:flex-col md:flex md:flex-col lg:flex-row">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 md:mb-0">
           <div className={`flex w-full items-center justify-center gap-2`}>
