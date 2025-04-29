@@ -8,18 +8,22 @@ import {
   Locale,
   differenceInDays,
 } from 'date-fns';
-import { formatDate, formatTime } from '@/lib/date-fns';
+import {
+  convertTimeToMinutes,
+  formatDate,
+  generateTimeSlots,
+  isSameFullDay,
+} from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
-import EventDialog from './event-dialog';
 import { EventTypes } from '@/types/event';
 import { TimeFormatType } from '@/hooks/use-event-calendar';
-import { WeekHeader } from './week-calendar/week-header';
-import { TimeColumn } from './week-calendar/time-column';
-import { CurrentTimeIndicator } from './week-calendar/current-time-indicator';
-import { HoverTimeIndicator } from './week-calendar/hover-time-indicator';
-import { MultiDayEventSection } from './week-calendar/multi-day-event';
-import { TimeGrid } from './week-calendar/time-grid';
-import { EventDialogTrigger } from '../event-dialog-trigger';
+import { WeekHeader } from './ui/week-header';
+import { TimeColumn } from './ui/time-column';
+import { CurrentTimeIndicator } from './ui/current-time-indicator';
+import { HoverTimeIndicator } from './ui/hover-time-indicator';
+import { MultiDayEventSection } from './ui/multi-day-event';
+import { TimeGrid } from './ui/time-grid';
+import { EventDialogTrigger } from './ui/event-dialog-trigger';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -33,8 +37,6 @@ interface WeekCalendarViewProps {
   currentDate: Date;
   timeFormat: TimeFormatType;
   locale: Locale;
-  onEventUpdate: (event: EventTypes) => void;
-  onEventDelete: (eventId: string) => void;
 }
 
 interface EventPosition {
@@ -58,49 +60,6 @@ interface MultiDayEventRowType {
   endIndex: number;
   row: number;
 }
-
-/**
- * Converts time string to minutes
- */
-const convertTimeToMinutes = (timeString: string): number => {
-  const [hour, minute] = timeString.split(':').map(Number);
-  return hour * 60 + minute;
-};
-
-/**
- * Generates time slots for day view
- */
-const generateTimeSlots = (): Date[] => {
-  const slots = [];
-
-  for (let hour = START_HOUR; hour <= END_HOUR; hour++) {
-    const time = new Date();
-    time.setHours(hour, 0, 0, 0);
-    slots.push(time);
-  }
-
-  return slots;
-};
-
-/**
- * Calculates duration between start and end time
- */
-const calculateEventDuration = (startTime: string, endTime: string): number => {
-  const start = parseInt(startTime.split(':')[0]);
-  const end = parseInt(endTime.split(':')[0]);
-  return end - start;
-};
-
-/**
- * Checks if dates are the same day (using date, month, year)
- */
-const isSameFullDay = (date1: Date, date2: Date): boolean => {
-  return (
-    date1.getDate() === date2.getDate() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getFullYear() === date2.getFullYear()
-  );
-};
 
 /**
  * Hook for week days generation and current day tracking
@@ -385,11 +344,7 @@ export function CalendarWeek({
   currentDate,
   timeFormat,
   locale,
-  onEventUpdate,
-  onEventDelete,
 }: WeekCalendarViewProps) {
-  const [selectedEvent, setSelectedEvent] = useState<EventTypes | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [hoverPosition, setHoverPosition] = useState<HoverPositionType | null>(
     null,
   );
@@ -409,7 +364,7 @@ export function CalendarWeek({
   );
   const eventsPositions = useEventPositions(singleDayEvents, daysInWeek);
   const multiDayEventRows = useMultiDayEventRows(multiDayEvents, daysInWeek);
-  const timeSlots = useMemo(() => generateTimeSlots(), []);
+  const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
 
   // Current time values
   const now = new Date();
@@ -439,15 +394,7 @@ export function CalendarWeek({
     setHoverPosition(null);
   }, []);
 
-  const getEventDuration = useCallback((event: EventTypes) => {
-    const duration = calculateEventDuration(event.startTime, event.endTime);
-    return `${duration} jam`;
-  }, []);
-
-  const showEventDetail = useCallback((event: EventTypes) => {
-    setSelectedEvent(event);
-    setIsDialogOpen(true);
-  }, []);
+  const showEventDetail = useCallback((event: EventTypes) => {}, []);
 
   return (
     <div className="flex h-full flex-col">
