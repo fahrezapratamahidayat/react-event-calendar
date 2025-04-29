@@ -1,18 +1,25 @@
-'use client';
+import { create } from 'zustand';
 import { EventTypes } from '@/types/event';
 import {
   addDays,
   addMonths,
   addWeeks,
   addYears,
-  Locale,
   subDays,
   subMonths,
   subWeeks,
   subYears,
 } from 'date-fns';
-import { enUS } from 'date-fns/locale';
-import { useCallback, useMemo, useState } from 'react';
+import { Locale, enUS } from 'date-fns/locale';
+import { toast } from 'sonner';
+
+interface EventPosition {
+  top: number;
+  height: number;
+  column: number;
+  totalColumns: number;
+  dayIndex?: number;
+}
 
 export enum CalendarViewType {
   DAY = 'day',
@@ -25,6 +32,7 @@ export enum TimeFormatType {
   HOUR_12 = '12',
   HOUR_24 = '24',
 }
+
 export enum ViewModeType {
   CALENDAR = 'calendar',
   LIST = 'list',
@@ -35,270 +43,242 @@ export interface EventCalendarConfig {
   defaultTimeFormat?: TimeFormatType;
   defaultViewMode?: ViewModeType;
   locale?: Locale;
-  firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0=Weekend, 1=Sunday, etc
+  firstDayOfWeek?: number;
 }
 
-interface UseEventCalendarProps {
-  config?: EventCalendarConfig;
-  initialEvents?: EventTypes[];
-  initialDate?: Date;
-  isLoading?: boolean;
-  onEventAdd?: (event: EventTypes) => Promise<void>;
-  onEventUpdate?: (event: EventTypes) => Promise<void>;
-  onEventDelete?: (eventId: string) => Promise<void>;
-  onDateRangeChange?: (
+interface EventCalendarState {
+  events: EventTypes[];
+  currentDate: Date;
+  selectedEvent: EventTypes | null;
+  currentView: CalendarViewType;
+  viewMode: ViewModeType;
+  timeFormat: TimeFormatType;
+  locale: Locale;
+  firstDayOfWeek: number;
+  loading: boolean;
+  error: Error | null;
+  config: EventCalendarConfig;
+
+  isDialogOpen: boolean;
+  dialogPosition: EventPosition | null;
+  leftOffset?: number;
+  rightOffset?: number;
+  isSubmitting: boolean;
+
+  defaultConfig: EventCalendarConfig;
+
+  initialize: (
+    config?: EventCalendarConfig,
+    initialEvents?: EventTypes[],
+    initialDate?: Date,
+  ) => void;
+  addEvent: (event: EventTypes) => Promise<void>;
+  updateEvent: (event: EventTypes) => Promise<void>;
+  deleteEvent: (eventId: string) => Promise<void>;
+  handleDateRangeChange: (
     startDate: Date,
     endDate: Date,
     signal?: AbortSignal,
-  ) => Promise<void[]>;
+  ) => Promise<void>;
+
+  goToday: () => void;
+  navigateNext: () => void;
+  navigatePrevious: () => void;
+
+  setCurrentDate: (date: Date) => void;
+  setCurrentView: (view: CalendarViewType) => void;
+  setViewMode: (mode: ViewModeType) => void;
+  setTimeFormat: (format: TimeFormatType) => void;
+  setLocale: (locale: Locale) => void;
+  setFirstDayOfWeek: (day: number) => void;
+
+  openEventDialog: (
+    event: EventTypes,
+    position: EventPosition,
+    leftOffset: number,
+    rightOffset: number,
+  ) => void;
+  closeEventDialog: () => void;
 }
 
-export function useEventCalendar({
-  config = {},
-  initialEvents = [],
-  initialDate = new Date(),
-  isLoading = false,
-  onEventAdd,
-  onEventUpdate,
-  onEventDelete,
-  onDateRangeChange,
-}: UseEventCalendarProps = {}) {
-  const defaultConfig: EventCalendarConfig = useMemo(
-    () => ({
-      defaultView: CalendarViewType.DAY,
-      defaultTimeFormat: TimeFormatType.HOUR_24,
-      defaultViewMode: ViewModeType.CALENDAR,
-      firstDayOfWeek: 1, // monday
-      locale: enUS,
-    }),
-    [],
-  );
-
-  const mergedConfig = useMemo(
-    () => ({
-      ...defaultConfig,
-      ...config,
-    }),
-    [config, defaultConfig],
-  );
-
-  const [events, setEvents] = useState<EventTypes[]>(initialEvents);
-  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
-  const [selectedEvent, setSelectedEvent] = useState<EventTypes | null>(null);
-  const [currentView, setCurrentView] = useState<CalendarViewType>(
-    mergedConfig.defaultView ?? CalendarViewType.DAY,
-  );
-  const [viewMode, setViewMode] = useState<ViewModeType>(
-    mergedConfig.defaultViewMode ?? ViewModeType.CALENDAR,
-  );
-  const [timeFormat, setTimeFormat] = useState<TimeFormatType>(
-    mergedConfig.defaultTimeFormat ?? TimeFormatType.HOUR_24,
-  );
-  const [locale, setLocale] = useState<Locale>(mergedConfig.locale ?? enUS);
-  const [firstDayOfWeek, setFirstDayOfWeek] = useState<number>(
-    mergedConfig.firstDayOfWeek ?? 1,
-  );
-  const [loading, setLoading] = useState<boolean>(isLoading);
-  const [error, setError] = useState<Error | null>();
-
-  const finalConfig = useMemo(
-    () => ({
-      ...mergedConfig,
-      locale,
-      firstDayOfWeek,
-    }),
-    [mergedConfig, locale, firstDayOfWeek],
-  );
-
-  const addEvent = useCallback(
-    async (newEvent: EventTypes) => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        setEvents((prevEvents) => [...prevEvents, newEvent]);
-        if (onEventAdd) {
-          await onEventAdd(newEvent);
-        }
-        return newEvent;
-      } catch (err) {
-        setEvents((prevEvents) =>
-          prevEvents.filter((event) => event.id !== newEvent.id),
-        );
-
-        setError(err instanceof Error ? err : new Error('failed to add Event'));
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [onEventAdd],
-  );
-
-  const updateEvent = useCallback(
-    async (updateEvent: EventTypes) => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        setEvents((prev) =>
-          prev.map((event) =>
-            event.id === updateEvent.id ? updateEvent : event,
-          ),
-        );
-
-        if (onEventUpdate) {
-          await onEventUpdate(updateEvent);
-        }
-
-        return updateEvent;
-      } catch (err) {
-        setEvents(events);
-        setError(
-          err instanceof Error ? err : new Error('failed to update event'),
-        );
-      } finally {
-        setLoading(false);
-      }
-    },
-    [events, onEventUpdate],
-  );
-
-  const deleteEvent = useCallback(
-    async (eventId: string) => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        setEvents((prev) => prev.filter((event) => event.id !== eventId));
-
-        if (onEventDelete) {
-          await onEventDelete(eventId);
-        }
-
-        return eventId;
-      } catch (err) {
-        setError(
-          err instanceof Error ? err : new Error('Failed to delete event'),
-        );
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [onEventDelete],
-  );
-
-  const handleDateRangeChange = useCallback(
-    async (startDate: Date, endDate: Date) => {
-      const abortController = new AbortController();
-      try {
-        setLoading(true);
-        setError(null);
-
-        if (onDateRangeChange) {
-          const newEvents = await onDateRangeChange(
-            startDate,
-            endDate,
-            abortController.signal,
-          );
-          setEvents(newEvents as unknown as EventTypes[]);
-        }
-        setCurrentDate(startDate);
-      } catch (err) {
-        if (!abortController.signal.aborted) {
-          setError(
-            err instanceof Error ? err : new Error('failed to load events'),
-          );
-        }
-      } finally {
-        if (!abortController.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    },
-    [onDateRangeChange],
-  );
-
-  const changeLocale = useCallback((newLocale: Locale) => {
-    setLocale(newLocale);
-  }, []);
-
-  const changeFirstDayOfWeeks = useCallback(
-    (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) => {
-      setFirstDayOfWeek(day);
-    },
-    [],
-  );
-
-  const goToToday = useCallback(() => {
-    setCurrentDate(new Date());
-  }, []);
-
-  const navigateNext = useCallback(() => {
-    setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      switch (currentView) {
-        case CalendarViewType.DAY:
-          return addDays(newDate, 1);
-        case CalendarViewType.WEEK:
-          return addWeeks(newDate, 1);
-        case CalendarViewType.MONTH:
-          return addMonths(newDate, 1);
-        case CalendarViewType.YEAR:
-          return addYears(newDate, 1);
-        default:
-          return addMonths(newDate, 1);
-      }
-    });
-  }, [currentView]);
-
-  const navigatePrevious = useCallback(() => {
-    setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      switch (currentView) {
-        case CalendarViewType.DAY:
-          return subDays(newDate, 1);
-        case CalendarViewType.WEEK:
-          return subWeeks(newDate, 1);
-        case CalendarViewType.MONTH:
-          return subMonths(newDate, 1);
-        case CalendarViewType.YEAR:
-          return subYears(newDate, 1);
-        default:
-          return subMonths(newDate, 1);
-      }
-    });
-  }, [currentView]);
+export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
+  const defaultConfig: EventCalendarConfig = {
+    defaultView: CalendarViewType.DAY,
+    defaultTimeFormat: TimeFormatType.HOUR_24,
+    defaultViewMode: ViewModeType.CALENDAR,
+    firstDayOfWeek: 1,
+    locale: enUS,
+  };
 
   return {
-    events,
-    currentDate,
-    selectedEvent,
-    currentView,
-    viewMode,
-    timeFormat,
-    locale,
-    firstDayOfWeek,
-    loading,
-    error,
-    config: finalConfig,
+    events: [],
+    currentDate: new Date(),
+    selectedEvent: null,
+    currentView: defaultConfig.defaultView!,
+    viewMode: defaultConfig.defaultViewMode!,
+    timeFormat: defaultConfig.defaultTimeFormat!,
+    locale: defaultConfig.locale!,
+    firstDayOfWeek: defaultConfig.firstDayOfWeek!,
+    loading: false,
+    error: null,
+    config: defaultConfig,
 
-    addEvent,
-    updateEvent,
-    deleteEvent,
-    handleDateRangeChange,
+    isDialogOpen: false,
+    dialogPosition: null,
+    isSubmitting: false,
 
-    goToToday,
-    navigateNext,
-    navigatePrevious,
+    defaultConfig,
 
-    setCurrentDate,
-    setCurrentView,
-    setViewMode,
-    setTimeFormat,
+    initialize: (config, initialEvents = [], initialDate = new Date()) => {
+      const mergedConfig = { ...defaultConfig, ...config };
+      set({
+        config: mergedConfig,
+        events: initialEvents,
+        currentDate: initialDate,
+        currentView: mergedConfig.defaultView || defaultConfig.defaultView!,
+        viewMode:
+          mergedConfig.defaultViewMode || defaultConfig.defaultViewMode!,
+        timeFormat:
+          mergedConfig.defaultTimeFormat || defaultConfig.defaultTimeFormat!,
+        locale: mergedConfig.locale || defaultConfig.locale!,
+        firstDayOfWeek:
+          mergedConfig.firstDayOfWeek || defaultConfig.firstDayOfWeek!,
+      });
+    },
 
-    setLocale: changeLocale,
-    setFirstDayOfWeek: changeFirstDayOfWeeks,
+    addEvent: async (newEvent) => {
+      try {
+        set({ loading: true, error: null });
+
+        set((state) => ({ events: [...state.events, newEvent] }));
+      } catch (err) {
+        set({
+          error: err instanceof Error ? err : new Error('Failed to add event'),
+        });
+        throw err;
+      } finally {
+        set({ loading: false });
+      }
+    },
+
+    updateEvent: async (updatedEvent) => {
+      try {
+        set({ loading: true, error: null, isSubmitting: true });
+        set((state) => ({
+          events: state.events.map((event) =>
+            event.id === updatedEvent.id ? updatedEvent : event,
+          ),
+        }));
+        toast.success('Event updated successfully');
+      } catch (err) {
+        set({
+          error:
+            err instanceof Error ? err : new Error('Failed to update event'),
+        });
+        throw err;
+      } finally {
+        set({ loading: false, isSubmitting: false, isDialogOpen: false });
+      }
+    },
+
+    deleteEvent: async (eventId) => {
+      try {
+        set({ loading: true, error: null, isSubmitting: true });
+        set((state) => ({
+          events: state.events.filter((event) => event.id !== eventId),
+        }));
+        toast.success('Event deleted successfully');
+      } catch (err) {
+        set({
+          error:
+            err instanceof Error ? err : new Error('Failed to delete event'),
+        });
+        throw err;
+      } finally {
+        set({ loading: false, isSubmitting: false, isDialogOpen: false });
+      }
+    },
+
+    handleDateRangeChange: async (startDate, endDate) => {
+      try {
+        set({ loading: true, error: null });
+        set({ currentDate: startDate });
+      } catch (err) {
+        set({
+          error:
+            err instanceof Error ? err : new Error('Failed to load events'),
+        });
+      } finally {
+        set({ loading: false });
+      }
+    },
+
+    goToday: () => set({ currentDate: new Date() }),
+    navigateNext: () => {
+      const { currentDate, currentView } = get();
+      let newDate = new Date(currentDate);
+      switch (currentView) {
+        case CalendarViewType.DAY:
+          newDate = addDays(newDate, 1);
+          break;
+        case CalendarViewType.WEEK:
+          newDate = addWeeks(newDate, 1);
+          break;
+        case CalendarViewType.MONTH:
+          newDate = addMonths(newDate, 1);
+          break;
+        case CalendarViewType.YEAR:
+          newDate = addYears(newDate, 1);
+          break;
+      }
+
+      set({ currentDate: newDate });
+    },
+    navigatePrevious: () => {
+      const { currentDate, currentView } = get();
+      let newDate = new Date(currentDate);
+
+      switch (currentView) {
+        case CalendarViewType.DAY:
+          newDate = subDays(newDate, 1);
+          break;
+        case CalendarViewType.WEEK:
+          newDate = subWeeks(newDate, 1);
+          break;
+        case CalendarViewType.MONTH:
+          newDate = subMonths(newDate, 1);
+          break;
+        case CalendarViewType.YEAR:
+          newDate = subYears(newDate, 1);
+          break;
+      }
+
+      set({ currentDate: newDate });
+    },
+
+    openEventDialog: (event, position, leftOffset, rightOffset) => {
+      set({
+        selectedEvent: event,
+        isDialogOpen: true,
+        dialogPosition: position,
+        leftOffset,
+        rightOffset,
+      });
+    },
+
+    closeEventDialog: () => {
+      set({
+        isDialogOpen: false,
+        selectedEvent: null,
+        dialogPosition: null,
+      });
+    },
+
+    setCurrentDate: (date) => set({ currentDate: date }),
+    setCurrentView: (view) => set({ currentView: view }),
+    setViewMode: (mode) => set({ viewMode: mode }),
+    setTimeFormat: (format) => set({ timeFormat: format }),
+    setLocale: (locale) => set({ locale }),
+    setFirstDayOfWeek: (day) => set({ firstDayOfWeek: day }),
   };
-}
+});
