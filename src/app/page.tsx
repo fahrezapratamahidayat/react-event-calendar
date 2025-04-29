@@ -1,13 +1,6 @@
 'use client';
 import { EventCalendar } from '@/components/event-calendar';
 import { ModeToggle } from '@/components/mode-toggel';
-import {
-  CalendarViewType,
-  EventCalendarConfig,
-  TimeFormatType,
-  useEventCalendar,
-  ViewModeType,
-} from '@/hooks/use-event-calendar';
 
 const dummyEvents = [
   {
@@ -193,37 +186,13 @@ const dummyEvents = [
 ];
 
 export default function Home() {
-  const config: EventCalendarConfig = {
-    defaultView: CalendarViewType.DAY,
-    defaultTimeFormat: TimeFormatType.HOUR_24,
-    defaultViewMode: ViewModeType.CALENDAR,
-    firstDayOfWeek: 1,
-  };
-
-  const {} = useEventCalendar({
-    config: config,
-    initialEvents: dummyEvents,
-    onEventAdd: async (event) => {
-      console.log(event);
-    },
-    onEventUpdate: async (event) => {
-      console.log(event);
-    },
-    onEventDelete: async (eventId) => {
-      console.log(eventId);
-    },
-    onDateRangeChange: async (startDate, endDate, signal) => {
-      console.log(startDate, endDate, signal);
-      return [];
-    },
-  });
   return (
     <div className="mx-auto max-w-7xl">
       <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex items-center justify-between border-b px-6 py-4 backdrop-blur">
         <h1 className="text-2xl font-bold">Event Calendar</h1>
         <ModeToggle />
       </header>
-      <EventCalendar config={config} events={dummyEvents} />
+      <EventCalendar events={dummyEvents} />
     </div>
   );
 }
