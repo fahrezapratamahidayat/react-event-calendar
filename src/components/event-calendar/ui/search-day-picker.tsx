@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/command';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ScrollArea, ScrollBar } from '../ui/scroll-area';
+import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
 
 interface SearchDayPickerProps {
   currentDate: Date;

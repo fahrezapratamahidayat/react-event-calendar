@@ -1,5 +1,5 @@
 import { TimeFormatType } from '@/hooks/use-event-calendar';
-import { formatTimeDisplay } from '@/lib/date-fns';
+import { formatTimeDisplay } from '@/lib/date';
 
 interface HoverTimeIndicatorProps {
   hour: number;
@@ -21,7 +21,7 @@ export const HoverTimeIndicator = ({
       }}
     >
       <div className="absolute -top-6 left-0 rounded-md bg-blue-400 px-2 py-0.5 text-xs text-white shadow-sm">
-        {formatTimeDisplay(hour, minute, timeFormat)}
+        {formatTimeDisplay(hour, timeFormat, minute)}
       </div>
     </div>
   );

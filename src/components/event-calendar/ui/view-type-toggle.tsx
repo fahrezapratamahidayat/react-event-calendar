@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import { AnimatePresence, motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';

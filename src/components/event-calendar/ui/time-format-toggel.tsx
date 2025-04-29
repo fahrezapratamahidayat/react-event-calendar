@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import { Clock } from 'lucide-react';
 import {
   Tooltip,

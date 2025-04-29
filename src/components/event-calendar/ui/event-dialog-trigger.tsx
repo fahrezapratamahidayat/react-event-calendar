@@ -1,19 +1,20 @@
 import { EventTypes } from '@/types/event';
 import { cn } from '@/lib/utils';
-import { Button } from './ui/button';
-import { useEventDialogStore } from '@/hooks/use-event-dialog-store';
+import { Button } from '../../ui/button';
+import { calculateEventDuration, formatTime } from '@/lib/date';
+import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 type EventDialogTriggerProps = {
   event: EventTypes;
-  position?: {
+  position: {
     top: number;
     height: number;
     column: number;
     totalColumns: number;
     dayIndex?: number;
   };
-  leftOffset?: number;
-  rightOffset?: number;
+  leftOffset: number;
+  rightOffset: number;
 };
 
 export const EventDialogTrigger = ({
@@ -22,12 +23,7 @@ export const EventDialogTrigger = ({
   leftOffset,
   rightOffset,
 }: EventDialogTriggerProps) => {
-  const {
-    openEventDialog,
-    formatTimeString,
-    timeFormat,
-    getEventDurationText,
-  } = useEventDialogStore();
+  const { openEventDialog } = useEventCalendarStore();
   return (
     <Button
       className={cn(
@@ -53,12 +49,11 @@ export const EventDialogTrigger = ({
       />
       <div className="text-xs font-medium sm:truncate">{event.title}</div>
       <div className="text-xs sm:truncate">
-        {formatTimeString(event.startTime, timeFormat)} -{' '}
-        {formatTimeString(event.endTime, timeFormat)}
+        {formatTime(event.startTime, '12')} - {formatTime(event.endTime, '12')}
       </div>
       {position?.height && position.height > 40 && (
         <div className="mt-1 text-xs sm:truncate">
-          {getEventDurationText?.(event)}
+          {calculateEventDuration?.(event.startTime, event.endTime)} Hour
         </div>
       )}
     </Button>

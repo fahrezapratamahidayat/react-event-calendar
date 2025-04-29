@@ -1,5 +1,5 @@
 import { TimeFormatType } from '@/hooks/use-event-calendar';
-import { formatTimeDisplay } from '@/lib/date-fns';
+import { formatTimeDisplay } from '@/lib/date';
 
 interface CurrentTimeIndicatorProps {
   currentHour: number;
@@ -21,7 +21,7 @@ export const CurrentTimeIndicator = ({
       }}
     >
       <div className="absolute -top-6 left-0 rounded-md bg-red-500 px-2 py-0.5 text-xs text-white shadow-sm">
-        {formatTimeDisplay(currentHour, currentMinute, timeFormat)}
+        {formatTimeDisplay(currentHour, timeFormat, currentMinute)}
       </div>
     </div>
   );

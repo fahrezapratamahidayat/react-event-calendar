@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/command';
 import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ScrollArea, ScrollBar } from '../ui/scroll-area';
+import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
 
 interface SearchableMonthPickerProps {
   date: Date;
