@@ -27,20 +27,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DateSelector } from '@/components/date-selector';
-import { TimeSelector } from '@/components/time-selector';
-import { ColorOptionItem } from '@/components/color-option-item';
-import { DeleteAlert } from '@/components/delete-alert';
-import { FormFooter } from '@/components/form-footer';
+import { DateSelector } from '@/components/event-calendar/ui/date-selector';
+import { TimeSelector } from '@/components/event-calendar/ui/time-selector';
+import { ColorOptionItem } from '@/components/event-calendar/ui/color-option-item';
+import { DeleteAlert } from '@/components/event-calendar/ui/delete-alert';
+import { FormFooter } from '@/components/event-calendar/ui/form-footer';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 import { z } from 'zod';
-import { id } from 'date-fns/locale';
-import type { FormatOptions, Locale } from 'date-fns';
+import type { Locale } from 'date-fns';
 import { EventTypes } from '@/types/event';
-import { generateTimeOptions } from '@/lib/date-fns';
+import { generateTimeOptions } from '@/lib/date';
 import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/event-options';
-import { useEventDialogStore } from '@/hooks/use-event-dialog-store';
+import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
@@ -99,34 +97,6 @@ const DEFAULT_FORM_VALUES: EventFormValues = {
   color: DEFAULT_COLOR,
   eventType: 'day',
 };
-
-interface EventDialogProps {
-  event: EventTypes;
-  selectedEvent: EventTypes | null;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onEventUpdate: (event: EventTypes) => void;
-  onEventDelete: (eventId: string) => void;
-  onEventClick: (event: EventTypes) => void;
-  position?: {
-    top: number;
-    height: number;
-    column: number;
-    totalColumns: number;
-    dayIndex?: number;
-  };
-  leftOffset?: number;
-  rightOffset?: number;
-  locale?: Locale;
-  formatTimeString: (timeString: string, timeFormat: '12' | '24') => string;
-  formatDateString: (
-    date: Date,
-    format: string,
-    options?: FormatOptions,
-  ) => string;
-  timeFormat: '12' | '24';
-  getEventDurationText?: (event: EventTypes) => string;
-}
 
 type EventDetailsFormProps = {
   form: UseFormReturn<EventFormValues>;
@@ -366,7 +336,7 @@ export default function EventDialog() {
     deleteEvent,
     locale,
     isSubmitting,
-  } = useEventDialogStore();
+  } = useEventCalendarStore();
 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState<boolean>(false);
   const isMounted = useIsMounted();
