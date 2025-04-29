@@ -3,58 +3,43 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
-import { TimeFormatToggle } from './time-format-toggel';
-import { TodayButton } from './today-button';
-import { ViewModeToggle } from './view-mode-toggle';
-import { ViewTypeToggle } from './view-type-toggle';
-import { SearchYearPicker } from './search-year-picker';
-import {
-  useEventCalendar,
-  CalendarViewType,
-  TimeFormatType,
-  ViewModeType,
-  EventCalendarConfig,
-} from '@/hooks/use-event-calendar';
-import { SearchMonthPicker } from './search-month-picker';
-import { SearchDayPicker } from './search-day-picker';
-import { EventTypes } from '@/types/event';
+import { TimeFormatToggle } from './ui/time-format-toggel';
+import { TodayButton } from './ui/today-button';
+import { ViewModeToggle } from './ui/view-mode-toggle';
+import { ViewTypeToggle } from './ui/view-type-toggle';
+import { SearchYearPicker } from './ui/search-year-picker';
+import { SearchMonthPicker } from './ui/search-month-picker';
+import { SearchDayPicker } from './ui/search-day-picker';
 import { EventsList } from './event-list';
 import { CalendarDay } from './calendar-day';
 import { CalendarWeek } from './calendar-week';
-import { useEventDialogStore } from '@/hooks/use-event-dialog-store';
-import { useEffect } from 'react';
 import EventDialog from './event-dialog';
+import {
+  CalendarViewType,
+  TimeFormatType,
+  useEventCalendarStore,
+  ViewModeType,
+} from '@/hooks/use-event-calendar';
+import { EventTypes } from '@/types/event';
 
 interface EventCalendarProps {
-  config: EventCalendarConfig;
   events: EventTypes[];
 }
-
-export function EventCalendar({ config, events }: EventCalendarProps) {
+export function EventCalendar({ events }: EventCalendarProps) {
   const {
+    viewMode,
+    locale,
     currentDate,
     timeFormat,
-    viewMode,
     currentView,
-    locale,
-    goToToday,
+    goToday,
     navigateNext,
     navigatePrevious,
     setCurrentDate,
     setCurrentView,
-    setViewMode,
     setTimeFormat,
-  } = useEventCalendar({
-    config,
-  });
-
-  const { setTimeFormat: setDialogTimeFormat, setLocale: setDialogLocale } =
-    useEventDialogStore();
-
-  useEffect(() => {
-    setDialogTimeFormat(timeFormat);
-    setDialogLocale(locale);
-  }, [timeFormat, locale, setDialogTimeFormat, setDialogLocale]);
+    setViewMode,
+  } = useEventCalendarStore();
 
   const _handleDateChange = (newDate: Date) => {
     setCurrentDate(newDate);
@@ -113,8 +98,6 @@ export function EventCalendar({ config, events }: EventCalendarProps) {
             currentDate={currentDate}
             timeFormat={timeFormat}
             locale={locale}
-            onEventUpdate={onEventUpdate}
-            onEventDelete={onEventDelete}
           />
         );
       case 'week':
@@ -124,8 +107,6 @@ export function EventCalendar({ config, events }: EventCalendarProps) {
             currentDate={currentDate}
             timeFormat={timeFormat}
             locale={locale}
-            onEventUpdate={onEventUpdate}
-            onEventDelete={onEventDelete}
           />
         );
       default:
@@ -135,8 +116,6 @@ export function EventCalendar({ config, events }: EventCalendarProps) {
             currentDate={currentDate}
             timeFormat={timeFormat}
             locale={locale}
-            onEventUpdate={onEventUpdate}
-            onEventDelete={onEventDelete}
           />
         );
     }
@@ -201,7 +180,7 @@ export function EventCalendar({ config, events }: EventCalendarProps) {
 
             <TodayButton
               currentDate={currentDate}
-              goToday={goToToday}
+              goToday={goToday}
               viewType={currentView}
             />
 
