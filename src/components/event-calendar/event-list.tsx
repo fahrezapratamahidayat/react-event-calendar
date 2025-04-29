@@ -1,13 +1,12 @@
 'use client';
-import { useState, useMemo, useCallback, memo } from 'react';
+import { useMemo, useCallback, memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { MapPin, Calendar, Clock } from 'lucide-react';
-import EventDialog from './event-dialog';
 import { format, isSameDay, Locale } from 'date-fns';
-import { formatDate, formatTime } from '@/lib/date-fns';
+import { formatTime } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import { EventTypes } from '@/types/event';
 import { TimeFormatType } from '@/hooks/use-event-calendar';
@@ -147,15 +146,6 @@ const EventGroup = memo(
 EventGroup.displayName = 'EventGroup';
 
 /**
- * Utility function to calculate event duration
- */
-const calculateEventDuration = (startTime: string, endTime: string): number => {
-  const start = parseInt(startTime.split(':')[0]);
-  const end = parseInt(endTime.split(':')[0]);
-  return end - start;
-};
-
-/**
  * Hook for filtering and grouping events
  */
 function useFilteredEvents(events: EventTypes[], currentDate: Date) {
@@ -205,23 +195,10 @@ export function EventsList({
   currentDate,
   timeFormat,
   locale,
-  onEventUpdate,
-  onEventDelete,
 }: EventListProps) {
-  const [selectedEvent, setSelectedEvent] = useState<EventTypes | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-
   const { groupedEvents } = useFilteredEvents(events, currentDate);
 
-  const getEventDuration = useCallback((event: EventTypes) => {
-    const duration = calculateEventDuration(event.startTime, event.endTime);
-    return `${duration} jam`;
-  }, []);
-
-  const showScheduleDetail = useCallback((event: EventTypes) => {
-    setSelectedEvent(event);
-    setIsDialogOpen(true);
-  }, []);
+  const showScheduleDetail = useCallback((event: EventTypes) => {}, []);
 
   if (groupedEvents.length === 0) {
     return <NoEvents currentDate={currentDate} locale={locale} />;
@@ -242,23 +219,6 @@ export function EventsList({
           ))}
         </div>
       </ScrollArea>
-
-      {selectedEvent && (
-        <EventDialog
-          event={selectedEvent}
-          isOpen={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          selectedEvent={selectedEvent}
-          onEventClick={showScheduleDetail}
-          onEventUpdate={onEventUpdate}
-          onEventDelete={onEventDelete}
-          formatTimeString={formatTime}
-          formatDateString={formatDate}
-          timeFormat={timeFormat}
-          getEventDurationText={getEventDuration}
-          locale={locale}
-        />
-      )}
     </div>
   );
 }
