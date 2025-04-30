@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useState, useEffect } from 'react';
-import { TimeFormatType } from '@/hooks/use-event-calendar';
+import { TimeFormatType } from '@/types/event';
 
 interface TimeFormatToggleProps {
   format: TimeFormatType;

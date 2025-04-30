@@ -10,7 +10,7 @@ import {
 import { CalendarDays, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'motion/react';
-import { ViewModeType } from '@/hooks/use-event-calendar';
+import { ViewModeType } from '@/types/event';
 
 interface ViewModeToggleProps {
   mode: ViewModeType;

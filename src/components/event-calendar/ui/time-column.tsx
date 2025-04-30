@@ -1,5 +1,5 @@
-import { TimeFormatType } from '@/hooks/use-event-calendar';
 import { cn } from '@/lib/utils';
+import { TimeFormatType } from '@/types/event';
 import React, { forwardRef } from 'react';
 
 interface TimeColumnProps {

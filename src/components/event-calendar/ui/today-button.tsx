@@ -4,7 +4,7 @@ import { CalendarIcon } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { useEffect, useState } from 'react';
 import { isToday, isThisWeek, isThisMonth, isThisYear } from 'date-fns';
-import { CalendarViewType } from '@/hooks/use-event-calendar';
+import { CalendarViewType } from '@/types/event';
 
 interface TodayButtonProps {
   currentDate: Date;

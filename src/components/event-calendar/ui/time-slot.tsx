@@ -1,6 +1,6 @@
-import { TimeFormatType } from '@/hooks/use-event-calendar';
 import { formatTimeDisplay } from '@/lib/date';
 import { cn } from '@/lib/utils';
+import { TimeFormatType } from '@/types/event';
 import { memo } from 'react';
 
 export const TimeSlot = memo(

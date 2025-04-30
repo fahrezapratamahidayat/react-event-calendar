@@ -11,7 +11,7 @@ import { Button } from '../../ui/button';
 import { AnimatePresence, motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import { CalendarViewType } from '@/hooks/use-event-calendar';
+import { CalendarViewType } from '@/types/event';
 
 interface ViewTypeToggleProps {
   viewType: CalendarViewType;

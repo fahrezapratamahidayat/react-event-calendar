@@ -1,5 +1,5 @@
-import { TimeFormatType } from '@/hooks/use-event-calendar';
 import { formatTimeDisplay } from '@/lib/date';
+import { TimeFormatType } from '@/types/event';
 
 interface HoverTimeIndicatorProps {
   hour: number;
