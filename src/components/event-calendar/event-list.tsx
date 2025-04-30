@@ -4,12 +4,19 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
-import { MapPin, Calendar, Clock } from 'lucide-react';
-import { format, isSameDay, Locale } from 'date-fns';
+import { MapPin, Clock } from 'lucide-react';
+import {
+  format,
+  isSameDay,
+  isSameMonth,
+  isSameWeek,
+  isSameYear,
+  Locale,
+} from 'date-fns';
 import { formatTime } from '@/lib/date';
 import { cn } from '@/lib/utils';
-import { EventTypes } from '@/types/event';
-import { TimeFormatType } from '@/hooks/use-event-calendar';
+import { CalendarViewType, EventTypes, TimeFormatType } from '@/types/event';
+import { NoEvents } from './ui/no-events';
 
 const CONTAINER_HEIGHT = 'calc(100vh-12rem)';
 
@@ -17,30 +24,9 @@ interface EventListProps {
   events: EventTypes[];
   currentDate: Date;
   timeFormat: TimeFormatType;
+  viewType: CalendarViewType;
   locale?: Locale;
-  onEventUpdate: (event: EventTypes) => void;
-  onEventDelete: (eventId: string) => void;
 }
-
-/**
- * Component to display when there are no events
- */
-const NoEvents = memo(
-  ({ currentDate, locale }: { currentDate: Date; locale?: Locale }) => (
-    <div
-      className="text-muted-foreground flex h-[calc(100vh-12rem)] flex-col items-center justify-center"
-      data-testid="no-events-message"
-    >
-      <Calendar className="mb-2 h-12 w-12 opacity-20" />
-      <p>
-        Tidak ada acara pada{' '}
-        {format(currentDate, 'EEEE, d MMMM yyyy', { locale })}
-      </p>
-    </div>
-  ),
-);
-
-NoEvents.displayName = 'NoEvents';
 
 /**
  * Component to display event info with badge, time and location
@@ -148,43 +134,80 @@ EventGroup.displayName = 'EventGroup';
 /**
  * Hook for filtering and grouping events
  */
-function useFilteredEvents(events: EventTypes[], currentDate: Date) {
-  // Filter events for current day and sort by start time
-  const dayEvents = useMemo(() => {
-    return events
-      .filter((event) => {
-        try {
-          const eventDate =
-            event.startDate instanceof Date
-              ? event.startDate
-              : new Date(event.startDate);
-          return isSameDay(eventDate, currentDate);
-        } catch (error) {
-          console.error('Error checking if same day:', error);
-          return false;
+function useFilteredEvents(
+  events: EventTypes[],
+  currentDate: Date,
+  viewType: CalendarViewType,
+  locale?: Locale,
+) {
+  // Filter events based on view type
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) => {
+      try {
+        const eventDate =
+          event.startDate instanceof Date
+            ? event.startDate
+            : new Date(event.startDate);
+
+        switch (viewType) {
+          case CalendarViewType.DAY:
+            return isSameDay(eventDate, currentDate);
+          case CalendarViewType.WEEK:
+            return isSameWeek(eventDate, currentDate, { locale });
+          case CalendarViewType.MONTH:
+            return isSameMonth(eventDate, currentDate);
+          case CalendarViewType.YEAR:
+            return isSameYear(eventDate, currentDate);
+          default:
+            return true;
         }
-      })
-      .sort((a, b) => a.startTime.localeCompare(b.startTime));
-  }, [events, currentDate]);
-
-  // Group events by start time
-  const groupedEvents = useMemo(() => {
-    const groups: Record<string, EventTypes[]> = {};
-
-    dayEvents.forEach((event) => {
-      const timeKey = event.startTime;
-      if (!groups[timeKey]) {
-        groups[timeKey] = [];
+      } catch (error) {
+        console.error('Error filtering events:', error);
+        return false;
       }
-      groups[timeKey].push(event);
     });
+  }, [events, currentDate, viewType, locale]);
 
-    return Object.entries(groups).sort(([timeA], [timeB]) =>
-      timeA.localeCompare(timeB),
-    );
-  }, [dayEvents]);
+  // Group events differently based on view type
+  const groupedEvents = useMemo(() => {
+    if (viewType === CalendarViewType.DAY) {
+      // Group by time for day view
+      const timeGroups: Record<string, EventTypes[]> = {};
+      filteredEvents.forEach((event) => {
+        const timeKey = event.startTime;
+        if (!timeGroups[timeKey]) {
+          timeGroups[timeKey] = [];
+        }
+        timeGroups[timeKey].push(event);
+      });
+      return Object.entries(timeGroups).sort(([timeA], [timeB]) =>
+        timeA.localeCompare(timeB),
+      );
+    } else {
+      // Group by date for week/month/year views
+      const dateGroups: Record<string, EventTypes[]> = {};
+      filteredEvents.forEach((event) => {
+        const eventDate =
+          event.startDate instanceof Date
+            ? event.startDate
+            : new Date(event.startDate);
+        const dateKey = format(eventDate, 'yyyy-MM-dd');
 
-  return { dayEvents, groupedEvents };
+        if (!dateGroups[dateKey]) {
+          dateGroups[dateKey] = [];
+        }
+        dateGroups[dateKey].push(event);
+      });
+
+      // Sort groups by date
+      return Object.entries(dateGroups).sort(
+        ([dateA], [dateB]) =>
+          new Date(dateA).getTime() - new Date(dateB).getTime(),
+      );
+    }
+  }, [filteredEvents, viewType]);
+
+  return { filteredEvents, groupedEvents };
 }
 
 /**
@@ -194,29 +217,50 @@ export function EventsList({
   events,
   currentDate,
   timeFormat,
+  viewType,
   locale,
 }: EventListProps) {
-  const { groupedEvents } = useFilteredEvents(events, currentDate);
+  const { groupedEvents } = useFilteredEvents(
+    events,
+    currentDate,
+    viewType,
+    locale,
+  );
 
   const showScheduleDetail = useCallback((event: EventTypes) => {}, []);
 
   if (groupedEvents.length === 0) {
-    return <NoEvents currentDate={currentDate} locale={locale} />;
+    return (
+      <NoEvents currentDate={currentDate} viewType={viewType} locale={locale} />
+    );
   }
 
   return (
     <div className="h-full w-full space-y-4" data-testid="events-list">
       <ScrollArea className={`h-[${CONTAINER_HEIGHT}] pr-3`}>
         <div className="space-y-3">
-          {groupedEvents.map(([timeKey, eventGroup]) => (
-            <EventGroup
-              key={timeKey}
-              timeKey={timeKey}
-              events={eventGroup}
-              timeFormat={timeFormat}
-              onClick={showScheduleDetail}
-            />
-          ))}
+          {groupedEvents.map(([groupKey, eventGroup]) => {
+            // For day view, groupKey is time (e.g., "08:00")
+            // For other views, groupKey is date (e.g., "2023-10-15")
+            const isDayView = viewType === CalendarViewType.DAY;
+            const groupTitle = isDayView
+              ? formatTime(groupKey, timeFormat)
+              : format(new Date(groupKey), 'EEEE, d MMMM yyyy', { locale });
+
+            return (
+              <div key={groupKey} className="space-y-2">
+                <h3 className="text-muted-foreground text-sm font-medium">
+                  {groupTitle}
+                </h3>
+                <EventGroup
+                  timeKey={groupKey}
+                  events={eventGroup}
+                  timeFormat={timeFormat}
+                  onClick={showScheduleDetail}
+                />
+              </div>
+            );
+          })}
         </div>
       </ScrollArea>
     </div>
