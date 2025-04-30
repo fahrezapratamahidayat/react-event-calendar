@@ -15,12 +15,12 @@ import { CalendarDay } from './calendar-day';
 import { CalendarWeek } from './calendar-week';
 import EventDialog from './event-dialog';
 import {
+  EventTypes,
   CalendarViewType,
   TimeFormatType,
-  useEventCalendarStore,
   ViewModeType,
-} from '@/hooks/use-event-calendar';
-import { EventTypes } from '@/types/event';
+} from '@/types/event';
+import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 interface EventCalendarProps {
   events: EventTypes[];
