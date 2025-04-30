@@ -1,5 +1,11 @@
 import { create } from 'zustand';
-import { EventTypes } from '@/types/event';
+import {
+  CalendarViewType,
+  EventPosition,
+  EventTypes,
+  TimeFormatType,
+  ViewModeType,
+} from '@/types/event';
 import {
   addDays,
   addMonths,
@@ -12,31 +18,6 @@ import {
 } from 'date-fns';
 import { Locale, enUS } from 'date-fns/locale';
 import { toast } from 'sonner';
-
-interface EventPosition {
-  top: number;
-  height: number;
-  column: number;
-  totalColumns: number;
-  dayIndex?: number;
-}
-
-export enum CalendarViewType {
-  DAY = 'day',
-  WEEK = 'week',
-  MONTH = 'month',
-  YEAR = 'year',
-}
-
-export enum TimeFormatType {
-  HOUR_12 = '12',
-  HOUR_24 = '24',
-}
-
-export enum ViewModeType {
-  CALENDAR = 'calendar',
-  LIST = 'list',
-}
 
 export interface EventCalendarConfig {
   defaultView?: CalendarViewType;
