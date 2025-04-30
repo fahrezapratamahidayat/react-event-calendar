@@ -1,5 +1,3 @@
-import { Locale } from 'date-fns';
-
 export interface EventTypes {
   id: string;
   title: string;
@@ -31,6 +29,7 @@ export interface MultiDayEventRowType {
 }
 
 export interface EventPosition {
+  id: string;
   top: number;
   height: number;
   column: number;
