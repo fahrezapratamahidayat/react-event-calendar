@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { ScrollArea } from '../ui/scroll-area';
-import { Locale } from 'date-fns';
+import { isSameDay, Locale } from 'date-fns';
 import { generateTimeSlots } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import { EventTypes, HoverPositionType, TimeFormatType } from '@/types/event';
@@ -24,12 +24,30 @@ interface DayCalendarViewProps {
   locale: Locale;
 }
 
-export function CalendarDay({ events, timeFormat }: DayCalendarViewProps) {
+export function CalendarDay({
+  events,
+  currentDate,
+  timeFormat,
+}: DayCalendarViewProps) {
   const [hoverPosition, setHoverPosition] = useState<HoverPositionType | null>(
     null,
   );
 
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) => {
+      const eventStartDate = new Date(event.startDate);
+      const eventEndDate = new Date(event.endDate);
+
+      // Check if currentDate is between start and end dates
+      return (
+        isSameDay(eventStartDate, currentDate) ||
+        isSameDay(eventEndDate, currentDate) ||
+        (currentDate > eventStartDate && currentDate < eventEndDate)
+      );
+    });
+  }, [events, currentDate]);
 
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
   const eventsPositions = useDayEventPositions(events, HOUR_HEIGHT);
@@ -87,7 +105,7 @@ export function CalendarDay({ events, timeFormat }: DayCalendarViewProps) {
                   className={cn('border-border h-16 border-t')}
                 />
               ))}
-              {events.map((event) => {
+              {filteredEvents.map((event) => {
                 const position = eventsPositions[event.id];
                 if (!position) return null;
 
