@@ -1,13 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback } from 'react';
-import {
-  startOfWeek,
-  addDays,
-  getWeek,
-  Locale,
-  differenceInDays,
-} from 'date-fns';
+import { Locale } from 'date-fns';
 import {
   convertTimeToMinutes,
   formatDate,
@@ -15,8 +9,7 @@ import {
   isSameFullDay,
 } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
-import { EventTypes } from '@/types/event';
-import { TimeFormatType } from '@/hooks/use-event-calendar';
+import { EventTypes, HoverPositionType, TimeFormatType } from '@/types/event';
 import { WeekHeader } from './ui/week-header';
 import { TimeColumn } from './ui/time-column';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
@@ -24,6 +17,12 @@ import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { MultiDayEventSection } from './ui/multi-day-event';
 import { TimeGrid } from './ui/time-grid';
 import { EventDialogTrigger } from './ui/event-dialog-trigger';
+import {
+  useEventPositions,
+  useFilteredEvents,
+  useMultiDayEventRows,
+  useWeekDays,
+} from '@/lib/event-utils';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -32,311 +31,11 @@ const DAYS_IN_WEEK = 7;
 const DAY_WIDTH_PERCENT = 100 / DAYS_IN_WEEK;
 const MULTI_DAY_ROW_HEIGHT = 50;
 
-interface WeekCalendarViewProps {
+export interface WeekCalendarViewProps {
   events: EventTypes[];
   currentDate: Date;
   timeFormat: TimeFormatType;
   locale: Locale;
-}
-
-interface EventPosition {
-  id: string;
-  top: number;
-  height: number;
-  column: number;
-  totalColumns: number;
-  dayIndex: number;
-}
-
-interface HoverPositionType {
-  hour: number;
-  minute: number;
-  dayIndex: number;
-}
-
-interface MultiDayEventRowType {
-  event: EventTypes;
-  startIndex: number;
-  endIndex: number;
-  row: number;
-}
-
-/**
- * Hook for week days generation and current day tracking
- */
-function useWeekDays(currentDate: Date, locale?: Locale) {
-  // Get week start
-  const weekStart = useMemo(
-    () => startOfWeek(currentDate, { locale }),
-    [currentDate, locale],
-  );
-
-  // Get week number
-  const weekNumber = useMemo(
-    () => getWeek(currentDate, { locale }),
-    [currentDate, locale],
-  );
-
-  // Generate days in week
-  const daysInWeek = useMemo(() => {
-    const days = [];
-    for (let i = 0; i < DAYS_IN_WEEK; i++) {
-      days.push(addDays(weekStart, i));
-    }
-    return days;
-  }, [weekStart]);
-
-  // Find today's index in the week
-  const now = new Date();
-  const todayIndex = daysInWeek.findIndex((day) => isSameFullDay(day, now));
-
-  return {
-    weekStart,
-    weekNumber,
-    daysInWeek,
-    todayIndex,
-  };
-}
-
-/**
- * Hooks for filtering events into single-day and multi-day categories
- */
-function useFilteredEvents(events: EventTypes[], daysInWeek: Date[]) {
-  return useMemo(() => {
-    const singleDay: EventTypes[] = [];
-    const multiDay: EventTypes[] = [];
-
-    events.forEach((event) => {
-      // Get dates from event
-      const startDate = new Date(event.startDate);
-      const endDate = new Date(event.endDate);
-
-      // Measure day difference
-      const dayDifference = differenceInDays(endDate, startDate);
-
-      if (dayDifference <= 1) {
-        singleDay.push(event);
-      } else {
-        // Filter only multi-day events visible this week
-        const firstDayOfWeek = daysInWeek[0];
-        const lastDayOfWeek = daysInWeek[6];
-
-        // Event must overlap with this week to be displayed
-        if (
-          // Start date is within this week
-          (startDate >= firstDayOfWeek && startDate <= lastDayOfWeek) ||
-          // End date is within this week
-          (endDate >= firstDayOfWeek && endDate <= lastDayOfWeek) ||
-          // Event spans across this week
-          (startDate < firstDayOfWeek && endDate > lastDayOfWeek)
-        ) {
-          multiDay.push(event);
-        }
-      }
-    });
-
-    return {
-      singleDayEvents: singleDay,
-      multiDayEvents: multiDay,
-    };
-  }, [events, daysInWeek]);
-}
-
-/**
- * Hook for calculating event positions
- */
-function useEventPositions(singleDayEvents: EventTypes[], daysInWeek: Date[]) {
-  return useMemo(() => {
-    const positions: Record<string, EventPosition> = {};
-    const dayEvents: Record<
-      number,
-      Array<Array<{ event: EventTypes; start: number; end: number }>>
-    > = {};
-
-    // Initialize array for each day
-    for (let i = 0; i < DAYS_IN_WEEK; i++) {
-      dayEvents[i] = [];
-    }
-
-    // Group events by day
-    singleDayEvents.forEach((event) => {
-      const eventDate = new Date(event.startDate);
-
-      // Find day index in week (0-6)
-      const dayIndex = daysInWeek.findIndex((day) =>
-        isSameFullDay(day, eventDate),
-      );
-
-      if (dayIndex !== -1) {
-        // Convert to minutes for easier comparison
-        const start = convertTimeToMinutes(event.startTime);
-        const end = convertTimeToMinutes(event.endTime);
-
-        // Add to today's event array
-        if (!dayEvents[dayIndex][0]) {
-          dayEvents[dayIndex][0] = [];
-        }
-
-        dayEvents[dayIndex][0].push({ event, start, end });
-      }
-    });
-
-    // For each day, calculate event positions
-    Object.entries(dayEvents).forEach(([dayIndexStr, dayEventsList]) => {
-      const dayIndex = parseInt(dayIndexStr);
-
-      dayEventsList.forEach((eventsList) => {
-        // Sort by start time
-        eventsList.sort((a, b) => a.start - b.start);
-
-        // Algorithm to determine columns (prevent overlap)
-        const columns: number[][] = []; // Store end times for each column
-
-        eventsList.forEach(({ event, start, end }) => {
-          let eventColumnIndex = 0;
-
-          while (true) {
-            if (!columns[eventColumnIndex]) {
-              columns[eventColumnIndex] = [];
-            }
-
-            // Check if this column is available
-            const available = !columns[eventColumnIndex].some(
-              (endTime) => start < endTime,
-            );
-
-            if (available) {
-              // Add end time to this column
-              columns[eventColumnIndex].push(end);
-
-              // Calculate position and size
-              const top = (start / 60) * HOUR_HEIGHT;
-              const height = ((end - start) / 60) * HOUR_HEIGHT;
-
-              positions[`${dayIndex}-${event.id}`] = {
-                id: event.id,
-                top,
-                height,
-                column: eventColumnIndex,
-                totalColumns: 0, // Will be updated later
-                dayIndex,
-              };
-              break;
-            }
-
-            eventColumnIndex++;
-          }
-        });
-
-        // Update totalColumns for all events in this day
-        const totalColumns = columns.length;
-        Object.keys(positions).forEach((key) => {
-          if (key.startsWith(`${dayIndex}-`)) {
-            positions[key].totalColumns = totalColumns;
-          }
-        });
-      });
-    });
-
-    return positions;
-  }, [singleDayEvents, daysInWeek]);
-}
-
-/**
- * Hook for calculating multi-day event rows
- */
-function useMultiDayEventRows(
-  multiDayEvents: EventTypes[],
-  daysInWeek: Date[],
-) {
-  return useMemo(() => {
-    const rows: MultiDayEventRowType[] = [];
-
-    // Set reference for weekly date range
-    const weekStart = daysInWeek[0];
-    const weekEnd = daysInWeek[6];
-
-    // Set time to noon for better comparison
-    const weekStartTime = new Date(weekStart);
-    weekStartTime.setHours(12, 0, 0, 0);
-
-    const weekEndTime = new Date(weekEnd);
-    weekEndTime.setHours(12, 0, 0, 0);
-
-    // Process all multiDayEvents and allocate rows
-    multiDayEvents.forEach((event) => {
-      const startDate = new Date(event.startDate);
-      const endDate = new Date(event.endDate);
-
-      // Normalize time for comparison
-      startDate.setHours(12, 0, 0, 0);
-      endDate.setHours(12, 0, 0, 0);
-
-      // Ensure only events overlapping with this week are displayed
-      if (
-        (startDate >= weekStartTime && startDate <= weekEndTime) || // Starts within week range
-        (endDate >= weekStartTime && endDate <= weekEndTime) || // Ends within week range
-        (startDate < weekStartTime && endDate > weekEndTime) // Spans entire week
-      ) {
-        // Find positions of start and end days in daysInWeek
-        let startDayIndex = daysInWeek.findIndex((day) =>
-          isSameFullDay(day, startDate),
-        );
-        let endDayIndex = daysInWeek.findIndex((day) =>
-          isSameFullDay(day, endDate),
-        );
-
-        // If startDate is before this week, set to start of week
-        if (startDayIndex === -1 && startDate < weekStartTime) {
-          startDayIndex = 0;
-        }
-
-        // If endDate is after this week, set to end of week
-        if (endDayIndex === -1 && endDate > weekEndTime) {
-          endDayIndex = 6;
-        }
-
-        // Only process if event is visible in this week
-        if (startDayIndex !== -1 || endDayIndex !== -1) {
-          // Calculate visible day indices in the calendar
-          const visibleStartIndex = startDayIndex === -1 ? 0 : startDayIndex;
-          const visibleEndIndex = endDayIndex === -1 ? 6 : endDayIndex;
-
-          // Find available row
-          let rowIndex = 0;
-          let foundRow = false;
-
-          while (!foundRow) {
-            // Check for overlap with other events in this row
-            const hasOverlap = rows.some(
-              (r) =>
-                r.row === rowIndex &&
-                !(
-                  visibleEndIndex < r.startIndex ||
-                  visibleStartIndex > r.endIndex
-                ),
-            );
-
-            if (!hasOverlap) {
-              foundRow = true;
-            } else {
-              rowIndex++;
-            }
-          }
-
-          // Add event to available row
-          rows.push({
-            event,
-            startIndex: visibleStartIndex,
-            endIndex: visibleEndIndex,
-            row: rowIndex,
-          });
-        }
-      }
-    });
-
-    return rows;
-  }, [multiDayEvents, daysInWeek]);
 }
 
 export function CalendarWeek({
@@ -354,16 +53,21 @@ export function CalendarWeek({
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Hooks for data processing
-  const { weekStart, weekNumber, daysInWeek, todayIndex } = useWeekDays(
+  const { weekStart, weekNumber, weekDays, todayIndex } = useWeekDays(
     currentDate,
+    DAYS_IN_WEEK,
     locale,
   );
   const { singleDayEvents, multiDayEvents } = useFilteredEvents(
     events,
-    daysInWeek,
+    weekDays,
   );
-  const eventsPositions = useEventPositions(singleDayEvents, daysInWeek);
-  const multiDayEventRows = useMultiDayEventRows(multiDayEvents, daysInWeek);
+  const eventsPositions = useEventPositions(
+    singleDayEvents,
+    weekDays,
+    HOUR_HEIGHT,
+  );
+  const multiDayEventRows = useMultiDayEventRows(multiDayEvents, weekDays);
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
 
   // Current time values
@@ -404,7 +108,7 @@ export function CalendarWeek({
             <div className="bg-accent border-border sticky top-0 z-30 flex flex-col items-center justify-center border-b pr-4">
               <WeekHeader
                 weekNumber={weekNumber}
-                daysInWeek={daysInWeek}
+                daysInWeek={weekDays}
                 todayIndex={todayIndex}
                 formatDate={formatDate}
                 locale={locale}
@@ -420,7 +124,7 @@ export function CalendarWeek({
                     <div className="relative flex-1">
                       <MultiDayEventSection
                         rows={multiDayEventRows}
-                        daysInWeek={daysInWeek}
+                        daysInWeek={weekDays}
                         showEventDetail={showEventDetail}
                         multiDayRowHeight={MULTI_DAY_ROW_HEIGHT}
                       />
@@ -458,13 +162,13 @@ export function CalendarWeek({
                 )}
                 <TimeGrid
                   timeSlots={timeSlots}
-                  daysInWeek={daysInWeek}
+                  daysInWeek={weekDays}
                   todayIndex={todayIndex}
                 />
                 <div className="absolute inset-0">
                   {singleDayEvents.map((event) => {
                     const eventDate = new Date(event.startDate);
-                    const dayIndex = daysInWeek.findIndex((day) =>
+                    const dayIndex = weekDays.findIndex((day) =>
                       isSameFullDay(day, eventDate),
                     );
 
