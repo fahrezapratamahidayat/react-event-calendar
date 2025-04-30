@@ -81,11 +81,10 @@ export function EventCalendar({ events }: EventCalendarProps) {
       return (
         <EventsList
           events={events}
-          onEventUpdate={onEventUpdate}
-          onEventDelete={onEventDelete}
-          locale={locale}
           currentDate={currentDate}
           timeFormat={timeFormat}
+          viewType={currentView}
+          locale={locale}
         />
       );
     }
