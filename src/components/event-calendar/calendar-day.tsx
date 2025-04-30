@@ -3,14 +3,14 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Locale } from 'date-fns';
-import { convertTimeToMinutes, generateTimeSlots } from '@/lib/date';
+import { generateTimeSlots } from '@/lib/date';
 import { cn } from '@/lib/utils';
-import { EventTypes } from '@/types/event';
-import { TimeFormatType } from '@/hooks/use-event-calendar';
+import { EventTypes, HoverPositionType, TimeFormatType } from '@/types/event';
 import { EventDialogTrigger } from './ui/event-dialog-trigger';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { TimeSlot } from './ui/time-slot';
+import { useDayEventPositions } from '@/lib/event-utils';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -24,91 +24,6 @@ interface DayCalendarViewProps {
   locale: Locale;
 }
 
-interface SchedulePosition {
-  id: string;
-  top: number;
-  height: number;
-  column: number;
-  totalColumns: number;
-}
-
-interface SchedulePosition {
-  id: string;
-  top: number;
-  height: number;
-  column: number;
-  totalColumns: number;
-}
-
-interface HoverPositionType {
-  hour: number;
-  minute: number;
-}
-
-/**
- * Hook for managing event positions
- */
-function useEventPositions(events: EventTypes[]) {
-  return useMemo(() => {
-    const positions: Record<string, SchedulePosition> = {};
-
-    // Convert event times to minutes for easier comparison
-    const timeRanges = events.map((event) => {
-      const start = convertTimeToMinutes(event.startTime);
-      const end = convertTimeToMinutes(event.endTime);
-      return { event, start, end };
-    });
-
-    // Sort by start time
-    timeRanges.sort((a, b) => a.start - b.start);
-
-    // Algorithm to determine columns (prevent overlap)
-    const columns: number[][] = []; // Store end times for each column
-
-    timeRanges.forEach(({ event, start, end }) => {
-      let columnIndex = 0;
-
-      while (true) {
-        if (!columns[columnIndex]) {
-          columns[columnIndex] = [];
-        }
-
-        // Check if this column is available
-        const available = !columns[columnIndex].some(
-          (endTime) => start < endTime,
-        );
-
-        if (available) {
-          // Add end time to this column
-          columns[columnIndex].push(end);
-
-          // Calculate position and size
-          const top = (start / 60) * HOUR_HEIGHT;
-          const height = ((end - start) / 60) * HOUR_HEIGHT;
-
-          positions[event.id] = {
-            id: event.id,
-            top,
-            height,
-            column: columnIndex,
-            totalColumns: 0, // Will be updated later
-          };
-          break;
-        }
-        columnIndex++;
-      }
-    });
-
-    // Update totalColumns for all events
-    const totalColumns = columns.length;
-    Object.values(positions).forEach((pos) => {
-      pos.totalColumns = totalColumns;
-    });
-
-    return positions;
-  }, [events]);
-}
-
 export function CalendarDay({ events, timeFormat }: DayCalendarViewProps) {
   const [hoverPosition, setHoverPosition] = useState<HoverPositionType | null>(
     null,
@@ -117,25 +32,15 @@ export function CalendarDay({ events, timeFormat }: DayCalendarViewProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
-  const eventsPositions = useEventPositions(events);
+  const eventsPositions = useDayEventPositions(events, HOUR_HEIGHT);
 
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
 
-  const handleTimeHover = useCallback(
-    (hour: number, index: number, e: React.MouseEvent<HTMLDivElement>) => {
-      if (!sidebarRef.current) return;
-
-      const rect = e.currentTarget.getBoundingClientRect();
-      const relativeY = e.clientY - rect.top;
-      const minute = Math.floor((relativeY / rect.height) * 60);
-      const validMinute = Math.max(0, Math.min(59, minute));
-
-      setHoverPosition({ hour, minute: validMinute });
-    },
-    [],
-  );
+  const handleTimeHover = useCallback((hour: number) => {
+    setHoverPosition({ hour, minute: 0, dayIndex: -1 });
+  }, []);
 
   const handleTimeLeave = useCallback(() => {
     setHoverPosition(null);
