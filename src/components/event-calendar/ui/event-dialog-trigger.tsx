@@ -1,4 +1,4 @@
-import { EventTypes } from '@/types/event';
+import { EventPosition, EventTypes } from '@/types/event';
 import { cn } from '@/lib/utils';
 import { Button } from '../../ui/button';
 import { calculateEventDuration, formatTime } from '@/lib/date';
@@ -6,13 +6,7 @@ import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 type EventDialogTriggerProps = {
   event: EventTypes;
-  position: {
-    top: number;
-    height: number;
-    column: number;
-    totalColumns: number;
-    dayIndex?: number;
-  };
+  position: EventPosition;
   leftOffset: number;
   rightOffset: number;
 };
