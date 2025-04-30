@@ -2,12 +2,7 @@
 
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { Locale } from 'date-fns';
-import {
-  convertTimeToMinutes,
-  formatDate,
-  generateTimeSlots,
-  isSameFullDay,
-} from '@/lib/date';
+import { formatDate, generateTimeSlots, isSameFullDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
 import { EventTypes, HoverPositionType, TimeFormatType } from '@/types/event';
 import { WeekHeader } from './ui/week-header';
@@ -48,11 +43,9 @@ export function CalendarWeek({
     null,
   );
 
-  // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // Hooks for data processing
   const { weekStart, weekNumber, weekDays, todayIndex } = useWeekDays(
     currentDate,
     DAYS_IN_WEEK,
@@ -70,12 +63,10 @@ export function CalendarWeek({
   const multiDayEventRows = useMultiDayEventRows(multiDayEvents, weekDays);
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
 
-  // Current time values
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
 
-  // Event handlers
   const handleTimeHover = useCallback((hour: number) => {
     setHoverPosition({ hour, minute: 0, dayIndex: -1 });
   }, []);
