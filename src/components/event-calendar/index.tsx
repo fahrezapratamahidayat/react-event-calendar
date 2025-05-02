@@ -21,6 +21,8 @@ import {
   ViewModeType,
 } from '@/types/event';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import EventFormDialog from './event-create-dialog';
+import { CalendarMonth } from './calendar-month';
 
 interface EventCalendarProps {
   events: EventTypes[];
@@ -29,6 +31,7 @@ export function EventCalendar({ events }: EventCalendarProps) {
   const {
     viewMode,
     locale,
+    firstDayOfWeek,
     currentDate,
     timeFormat,
     currentView,
@@ -69,13 +72,6 @@ export function EventCalendar({ events }: EventCalendarProps) {
     setCurrentView(viewType);
   };
 
-  const onEventUpdate = () => {
-    console.log('tets');
-  };
-  const onEventDelete = () => {
-    console.log('tets');
-  };
-
   const renderCalendarView = () => {
     if (viewMode === 'list') {
       return (
@@ -106,6 +102,16 @@ export function EventCalendar({ events }: EventCalendarProps) {
             currentDate={currentDate}
             timeFormat={timeFormat}
             locale={locale}
+          />
+        );
+      case 'month':
+        return (
+          <CalendarMonth
+            events={events}
+            currentDate={currentDate}
+            timeFormat={timeFormat}
+            locale={locale}
+            firstDayOfWeek={firstDayOfWeek}
           />
         );
       default:
@@ -192,7 +198,9 @@ export function EventCalendar({ events }: EventCalendarProps) {
             />
           </div>
         </div>
-        <div className="mt-2 flex w-full items-center justify-center sm:mt-0 lg:w-auto"></div>
+        <div className="mt-2 flex w-full items-center justify-center sm:mt-0 lg:w-auto">
+          <EventFormDialog />
+        </div>
       </div>
       <Card className="w-full">
         <CardContent className="overflow-hidden p-4 sm:p-6 lg:p-8">
