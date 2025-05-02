@@ -35,7 +35,7 @@ interface EventCalendarState {
   viewMode: ViewModeType;
   timeFormat: TimeFormatType;
   locale: Locale;
-  firstDayOfWeek: number;
+  firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   loading: boolean;
   error: Error | null;
   config: EventCalendarConfig;
