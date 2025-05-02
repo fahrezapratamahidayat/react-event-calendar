@@ -169,3 +169,39 @@ export const isSameFullDay = (date1: Date, date2: Date): boolean => {
     date1.getFullYear() === date2.getFullYear()
   );
 };
+
+export const validateTimeDifference = (data: {
+  startTime: string;
+  endTime: string;
+}): boolean => {
+  const startHour = parseInt(data.startTime.split(':')[0]);
+  const endHour = parseInt(data.endTime.split(':')[0]);
+  return endHour > startHour;
+};
+
+export const validateDateDifference = (data: {
+  startDate: Date;
+  endDate: Date;
+}): boolean => {
+  return data.startDate.getTime() !== data.endDate.getTime();
+};
+
+/**
+ * Convert any date representation to Date object
+ * @param dateValue - Date value which could be string or Date
+ * @returns {Date} - Date object
+ */
+export function ensureDate(dateValue: Date | string | undefined): Date {
+  if (!dateValue) return new Date();
+
+  if (typeof dateValue === 'string') {
+    try {
+      return new Date(dateValue);
+    } catch (e) {
+      console.error('Error parsing date string:', e);
+      return new Date();
+    }
+  }
+
+  return dateValue;
+}
