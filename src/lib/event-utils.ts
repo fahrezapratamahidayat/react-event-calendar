@@ -8,6 +8,7 @@ import {
 import { useMemo } from 'react';
 import { convertTimeToMinutes, isSameFullDay } from './date';
 import { EventPosition, EventTypes, MultiDayEventRowType } from '@/types/event';
+import { CATEGORY_OPTIONS } from '@/constants/event-options';
 
 /**
  * Custom hook for generating the list of days in the current week,
@@ -386,4 +387,28 @@ export function useDayEventPositions(events: EventTypes[], hourHeight: number) {
 
     return positions;
   }, [events, hourHeight]);
+}
+
+/**
+ * Determines a contrasting text color (black or white) based on the background color.
+ *
+ * @param {string} hexColor - The background color in hexadecimal format (e.g., "#ffffff").
+ * @returns {string} - Returns "#000000" (black) if the background is light,
+ *                     or "#ffffff" (white) if the background is dark.
+ *
+ * @example
+ * getContrastColor("#ffffff"); // "#000000"
+ * getContrastColor("#222222"); // "#ffffff"
+ */
+export function getContrastColor(hexColor: string): string {
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#ffffff';
+}
+
+export function getCategoryLabel(categoryValue: string) {
+  const category = CATEGORY_OPTIONS.find((c) => c.value === categoryValue);
+  return category ? category.label : categoryValue;
 }
