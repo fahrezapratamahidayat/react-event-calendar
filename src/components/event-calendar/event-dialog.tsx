@@ -36,52 +36,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Locale } from 'date-fns';
 import { EventTypes } from '@/types/event';
-import { generateTimeOptions } from '@/lib/date';
+import { ensureDate, generateTimeOptions } from '@/lib/date';
 import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/event-options';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { eventFormSchema } from '@/schemas/event-schema';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
-const DEFAULT_COLOR = '#2196F3';
+const DEFAULT_COLOR = 'bg-red-600';
 const DEFAULT_CATEGORY = 'workshop';
-
-const validateTimeDifference = (data: {
-  startTime: string;
-  endTime: string;
-}): boolean => {
-  const startHour = parseInt(data.startTime.split(':')[0]);
-  const endHour = parseInt(data.endTime.split(':')[0]);
-  return endHour > startHour;
-};
-
-const validateDateDifference = (data: {
-  startDate: Date;
-  endDate: Date;
-}): boolean => {
-  return data.startDate.getTime() !== data.endDate.getTime();
-};
-
-const eventFormSchema = z
-  .object({
-    title: z.string().min(1, { message: 'Judul acara wajib diisi' }),
-    description: z.string().optional(),
-    startDate: z.date({ required_error: 'Tanggal wajib diisi' }),
-    endDate: z.date({ required_error: 'Tanggal wajib diisi' }),
-    category: z.string({ required_error: 'Kategori wajib diisi' }),
-    startTime: z.string({ required_error: 'Waktu mulai wajib diisi' }),
-    endTime: z.string({ required_error: 'Waktu selesai wajib diisi' }),
-    location: z.string().min(1, { message: 'Lokasi wajib diisi' }),
-    color: z.string(),
-    eventType: z.enum(['day', 'week']),
-  })
-  .refine(validateTimeDifference, {
-    message: 'Waktu selesai harus lebih besar dari waktu mulai',
-    path: ['endTime'],
-  })
-  .refine(validateDateDifference, {
-    message: 'Tanggal selesai harus berbeda dengan tanggal mulai',
-    path: ['endDate'],
-  });
 
 type EventFormValues = z.infer<typeof eventFormSchema>;
 
@@ -114,26 +77,6 @@ function useIsMounted() {
   }, []);
 
   return isMounted;
-}
-
-/**
- * Convert any date representation to Date object
- * @param dateValue - Date value which could be string or Date
- * @returns {Date} - Date object
- */
-function ensureDate(dateValue: Date | string | undefined): Date {
-  if (!dateValue) return new Date();
-
-  if (typeof dateValue === 'string') {
-    try {
-      return new Date(dateValue);
-    } catch (e) {
-      console.error('Error parsing date string:', e);
-      return new Date();
-    }
-  }
-
-  return dateValue;
 }
 
 /**
