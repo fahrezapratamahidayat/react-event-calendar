@@ -41,9 +41,12 @@ export const formatDate = (
   formatStr: string,
   options?: FormatOptions,
 ) => {
-  return format(date, formatStr, options);
-};
+  if (options?.locale) {
+    return format(date, formatStr, { locale: options.locale });
+  }
 
+  return format(date, formatStr); // fallback aman tanpa options
+};
 /**
  * Generates selectable time options in 30-minute intervals (e.g., "00:00", "00:30", "01:00", etc.).
  *
