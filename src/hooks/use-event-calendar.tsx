@@ -24,7 +24,7 @@ export interface EventCalendarConfig {
   defaultTimeFormat?: TimeFormatType;
   defaultViewMode?: ViewModeType;
   locale?: Locale;
-  firstDayOfWeek?: number;
+  firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 interface EventCalendarState {
@@ -71,15 +71,23 @@ interface EventCalendarState {
   setViewMode: (mode: ViewModeType) => void;
   setTimeFormat: (format: TimeFormatType) => void;
   setLocale: (locale: Locale) => void;
-  setFirstDayOfWeek: (day: number) => void;
+  setFirstDayOfWeek: (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) => void;
 
   openEventDialog: (
     event: EventTypes,
-    position: EventPosition,
-    leftOffset: number,
-    rightOffset: number,
+    position?: EventPosition,
+    leftOffset?: number,
+    rightOffset?: number,
   ) => void;
   closeEventDialog: () => void;
+
+  dayEventsDialog: {
+    open: boolean;
+    date: Date | null;
+    events: EventTypes[];
+  };
+  openDayEventsDialog: (date: Date, events: EventTypes[]) => void;
+  closeDayEventsDialog: () => void;
 }
 
 export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
@@ -236,7 +244,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
 
       set({ currentDate: newDate });
     },
-
     openEventDialog: (event, position, leftOffset, rightOffset) => {
       set({
         selectedEvent: event,
@@ -255,11 +262,26 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
       });
     },
 
+    dayEventsDialog: {
+      open: false,
+      date: null,
+      events: [],
+    },
+    openDayEventsDialog: (date, events) =>
+      set({
+        dayEventsDialog: { open: true, date, events },
+      }),
+    closeDayEventsDialog: () =>
+      set({
+        dayEventsDialog: { open: false, date: null, events: [] },
+      }),
+
     setCurrentDate: (date) => set({ currentDate: date }),
     setCurrentView: (view) => set({ currentView: view }),
     setViewMode: (mode) => set({ viewMode: mode }),
     setTimeFormat: (format) => set({ timeFormat: format }),
     setLocale: (locale) => set({ locale }),
-    setFirstDayOfWeek: (day) => set({ firstDayOfWeek: day }),
+    setFirstDayOfWeek: (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
+      set({ firstDayOfWeek: day }),
   };
 });
