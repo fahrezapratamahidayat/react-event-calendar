@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   format,
   startOfMonth,
@@ -21,6 +21,8 @@ import { Clock, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatTime } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 interface MonthCalendarViewProps {
   events: EventTypes[];
@@ -41,7 +43,10 @@ export function CalendarMonth({
   onDayClick,
   onAddEventClick,
 }: MonthCalendarViewProps) {
+  const { openDayEventsDialog, openEventDialog } = useEventCalendarStore();
   const today = new Date();
+  const daysContainerRef = useRef<HTMLDivElement>(null);
+  const [focusedDate, setFocusedDate] = useState<Date | null>(null);
 
   // Calculate dynamic week start
   const dynamicWeekStartsOn = useMemo(() => {
@@ -91,13 +96,40 @@ export function CalendarMonth({
     return grouped;
   }, [events, visibleDays]);
 
+  useHotkeys('arrowup', () => navigateDays(-7), { preventDefault: true });
+  useHotkeys('arrowdown', () => navigateDays(7), { preventDefault: true });
+  useHotkeys('arrowleft', () => navigateDays(-1), { preventDefault: true });
+  useHotkeys('arrowright', () => navigateDays(1), { preventDefault: true });
+  useHotkeys(
+    'enter',
+    () => {
+      if (focusedDate) handleDayClick(focusedDate);
+    },
+    { preventDefault: true },
+  );
+
+  const navigateDays = (days: number) => {
+    if (!focusedDate) {
+      setFocusedDate(today);
+      return;
+    }
+    const newDate = addDays(focusedDate, days);
+    setFocusedDate(newDate);
+  };
+
   const handleDayClick = (day: Date) => {
+    setFocusedDate(day);
     onDayClick?.(day);
   };
 
   const handleAddEventClick = (day: Date, e: React.MouseEvent) => {
     e.stopPropagation();
     onAddEventClick?.(day);
+  };
+
+  const handleShowDayEvents = (date: Date) => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    openDayEventsDialog(date, eventsByDate[dateKey] || []);
   };
 
   return (
@@ -113,7 +145,11 @@ export function CalendarMonth({
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1 sm:gap-2">
+        <div
+          ref={daysContainerRef}
+          className="grid grid-cols-7 gap-1 p-5 sm:gap-2"
+          role="grid"
+        >
           {visibleDays.map((day, index) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayEvents = eventsByDate[dateKey] || [];
@@ -121,17 +157,30 @@ export function CalendarMonth({
             const isCurrentMonth = isSameMonth(day, currentDate);
             const hasEvents = dayEvents.length > 0;
             const firstEvent = dayEvents[0];
+            const isFocused = focusedDate && isSameDay(day, focusedDate);
+            const isEmpty = dayEvents.length === 0;
+
             return (
               <div
-                key={index}
+                key={`day-${index}`}
+                data-date={dateKey}
                 role="gridcell"
+                tabIndex={0}
                 aria-label={format(day, 'EEEE, MMMM do yyyy', { locale })}
                 className={cn(
-                  'group relative flex h-[80px] cursor-pointer flex-col rounded border p-1 transition-colors sm:h-[130px] sm:p-2',
-                  'hover:border-primary hover:shadow-sm',
+                  'group relative flex h-[80px] cursor-pointer flex-col rounded border p-1 transition-all sm:h-[130px] sm:p-2',
+                  'hover:border-primary focus:ring-primary hover:shadow-sm focus:ring-2 focus:outline-none',
                   !isCurrentMonth && 'bg-muted/20 opacity-50',
                   isToday && 'border-primary border-2',
+                  isFocused && 'ring-primary ring-2',
                 )}
+                onClick={() => handleDayClick(day)}
+                onFocus={() => setFocusedDate(day)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleDayClick(day);
+                  }
+                }}
               >
                 <div className="mb-1 flex items-center justify-between">
                   <span
@@ -148,13 +197,14 @@ export function CalendarMonth({
                   </span>
                 </div>
                 {isCurrentMonth && (
-                  <div className="flex flex-1 flex-col gap-1 overflow-hidden">
+                  <div className="item flex flex-1 flex-col justify-center gap-1 overflow-hidden">
                     {hasEvents && (
-                      <div
+                      <button
                         className={cn(
-                          'relative z-0 flex flex-col rounded p-1 text-xs',
+                          'flex-start relative z-0 flex cursor-pointer flex-col justify-start rounded p-1 text-left text-xs',
                           'transition-colors hover:opacity-90',
                         )}
+                        onClick={() => openEventDialog(firstEvent)}
                       >
                         <div
                           className={cn(
@@ -173,14 +223,14 @@ export function CalendarMonth({
                             {formatTime(firstEvent.endTime, timeFormat)}
                           </span>
                         </div>
-                      </div>
+                      </button>
                     )}
                     {dayEvents.length > 1 ? (
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="mt-auto h-6 w-full gap-1 truncate px-1 text-xs"
-                        onClick={(e) => handleDayClick(day)}
+                        className="mt-auto h-5 w-full gap-1 truncate p-5 px-1 text-xs"
+                        onClick={() => handleShowDayEvents(day)}
                       >
                         <Plus className="h-3 w-3" />
                         <span>{dayEvents.length - 1} more</span>
@@ -189,7 +239,12 @@ export function CalendarMonth({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="mt-auto h-6 w-full gap-1 truncate px-1 text-xs opacity-0 group-hover:opacity-100"
+                        className={cn(
+                          'w-full cursor-pointer gap-1 truncate p-5 px-1 text-xs opacity-0 group-hover:opacity-100',
+                          isEmpty
+                            ? 'h-full bg-transparent hover:!bg-transparent'
+                            : 'h-5',
+                        )}
                         onClick={(e) => handleAddEventClick(day, e)}
                       >
                         <Plus className="h-3 w-3" />
