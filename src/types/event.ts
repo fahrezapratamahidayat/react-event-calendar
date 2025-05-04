@@ -18,7 +18,7 @@ export interface EventTypes {
 export interface HoverPositionType {
   hour: number;
   minute: number;
-  dayIndex: number;
+  dayIndex?: number;
 }
 
 export interface MultiDayEventRowType {
@@ -35,6 +35,12 @@ export interface EventPosition {
   column: number;
   totalColumns: number;
   dayIndex?: number;
+}
+
+export interface QuickAddDialogData {
+  date: Date | null;
+  time?: string;
+  position?: HoverPositionType;
 }
 
 export enum CalendarViewType {
