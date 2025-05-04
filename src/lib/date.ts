@@ -177,9 +177,35 @@ export const validateTimeDifference = (data: {
   startTime: string;
   endTime: string;
 }): boolean => {
-  const startHour = parseInt(data.startTime.split(':')[0]);
-  const endHour = parseInt(data.endTime.split(':')[0]);
-  return endHour > startHour;
+  const [startHour, startMinute] = data.startTime.split(':').map(Number);
+  const [endHour, endMinute] = data.endTime.split(':').map(Number);
+
+  const startTotalMinutes = startHour * 60 + startMinute;
+  const endTotalMinutes = endHour * 60 + endMinute;
+
+  return endTotalMinutes > startTotalMinutes;
+};
+
+export const validateDateTimeOrder = (data: {
+  startDate: Date;
+  endDate: Date;
+  startTime: string;
+  endTime: string;
+}): boolean => {
+  const isSameDay =
+    data.startDate.toDateString() === data.endDate.toDateString();
+
+  if (isSameDay) {
+    const [startHour, startMinute] = data.startTime.split(':').map(Number);
+    const [endHour, endMinute] = data.endTime.split(':').map(Number);
+
+    const startTotal = startHour * 60 + startMinute;
+    const endTotal = endHour * 60 + endMinute;
+
+    return endTotal > startTotal;
+  }
+
+  return data.endDate > data.startDate;
 };
 
 export const validateDateDifference = (data: {
@@ -207,4 +233,18 @@ export function ensureDate(dateValue: Date | string | undefined): Date {
   }
 
   return dateValue;
+}
+
+export function add30Minutes(timeStr: string) {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes + 30);
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+export function combineDateAndTime(date: Date, timeStr: string) {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const newDate = new Date(date);
+  newDate.setHours(hours, minutes, 0, 0);
+  return newDate;
 }
