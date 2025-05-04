@@ -15,7 +15,7 @@ import { FormFooter } from '@/components/event-calendar/ui/form-footer';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { EventTypes } from '@/types/event';
-import { ensureDate, generateTimeOptions } from '@/lib/date';
+import { ensureDate } from '@/lib/date';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { eventFormSchema } from '@/schemas/event-schema';
 import { EventDetailsForm } from './event-detail-form';
@@ -64,7 +64,6 @@ export default function EventDialog() {
 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState<boolean>(false);
   const isMounted = useIsMounted();
-  const timeOptions = generateTimeOptions();
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -145,7 +144,6 @@ export default function EventDialog() {
             form={form}
             onSubmit={handleSubmit}
             locale={locale}
-            timeOptions={timeOptions}
           />
         </ScrollArea>
         <DialogFooter className="mt-2 flex flex-row">
