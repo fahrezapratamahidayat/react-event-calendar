@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { TimeFormatToggle } from './ui/time-format-toggel';
@@ -21,9 +21,9 @@ import {
   ViewModeType,
 } from '@/types/event';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
-import EventFormDialog from './event-create-dialog';
 import { CalendarMonth } from './calendar-month';
 import { MonthDayEventsDialog } from './month-day-events-dialog';
+import EventCreateDialog from './event-create-dialog';
 
 interface EventCalendarProps {
   events: EventTypes[];
@@ -43,6 +43,7 @@ export function EventCalendar({ events }: EventCalendarProps) {
     setCurrentView,
     setTimeFormat,
     setViewMode,
+    openQuickAddDialog,
   } = useEventCalendarStore();
 
   const _handleDateChange = (newDate: Date) => {
@@ -130,6 +131,7 @@ export function EventCalendar({ events }: EventCalendarProps) {
     <>
       <EventDialog />
       <MonthDayEventsDialog />
+      <EventCreateDialog />
       <div className="mt-3 space-y-3 pb-8">
         <div className="bg-background block flex-row items-center gap-2 rounded-md border p-2 sm:flex sm:flex-col md:flex md:flex-col lg:flex-row">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2 md:mb-0">
@@ -202,7 +204,17 @@ export function EventCalendar({ events }: EventCalendarProps) {
             </div>
           </div>
           <div className="mt-2 flex w-full items-center justify-center sm:mt-0 lg:w-auto">
-            <EventFormDialog />
+            <Button
+              size={'sm'}
+              onClick={() =>
+                openQuickAddDialog({
+                  date: new Date(),
+                })
+              }
+            >
+              <Plus className="h-4 w-4" />
+              Add Event
+            </Button>
           </div>
         </div>
         <Card className="w-full">
