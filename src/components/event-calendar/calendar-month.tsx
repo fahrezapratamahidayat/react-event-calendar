@@ -40,10 +40,9 @@ export function CalendarMonth({
   timeFormat,
   locale,
   firstDayOfWeek,
-  onDayClick,
-  onAddEventClick,
 }: MonthCalendarViewProps) {
-  const { openDayEventsDialog, openEventDialog } = useEventCalendarStore();
+  const { openDayEventsDialog, openEventDialog, openQuickAddDialog } =
+    useEventCalendarStore();
   const today = new Date();
   const daysContainerRef = useRef<HTMLDivElement>(null);
   const [focusedDate, setFocusedDate] = useState<Date | null>(null);
@@ -66,7 +65,7 @@ export function CalendarMonth({
   }, [locale, dynamicWeekStartsOn]);
 
   // Calculate visible days in month
-  const { daysInMonth, visibleDays } = useMemo(() => {
+  const { visibleDays } = useMemo(() => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const startDate = startOfWeek(monthStart, {
@@ -119,12 +118,13 @@ export function CalendarMonth({
 
   const handleDayClick = (day: Date) => {
     setFocusedDate(day);
-    onDayClick?.(day);
   };
 
   const handleAddEventClick = (day: Date, e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddEventClick?.(day);
+    openQuickAddDialog({
+      date: day,
+    });
   };
 
   const handleShowDayEvents = (date: Date) => {
@@ -166,19 +166,34 @@ export function CalendarMonth({
                 data-date={dateKey}
                 role="gridcell"
                 tabIndex={0}
-                aria-label={format(day, 'EEEE, MMMM do yyyy', { locale })}
+                aria-label={`${format(day, 'EEEE, MMMM do')}. Press Enter to ${dayEvents.length === 0 ? 'add new event' : 'view events'}`}
                 className={cn(
-                  'group relative flex h-[80px] cursor-pointer flex-col rounded border p-1 transition-all sm:h-[130px] sm:p-2',
+                  'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border p-1 transition-all sm:h-[130px] sm:p-2',
                   'hover:border-primary focus:ring-primary hover:shadow-sm focus:ring-2 focus:outline-none',
                   !isCurrentMonth && 'bg-muted/20 opacity-50',
                   isToday && 'border-primary border-2',
-                  isFocused && 'ring-primary ring-2',
+                  isFocused && 'ring-2 ring-blue-500',
                 )}
-                onClick={() => handleDayClick(day)}
+                onClick={() => {
+                  openQuickAddDialog({
+                    date: day,
+                  });
+                  setFocusedDate(day);
+                }}
                 onFocus={() => setFocusedDate(day)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+                  if (e.key === 'Enter') {
+                    if (dayEvents.length === 0) {
+                      openQuickAddDialog({
+                        date: day,
+                      });
+                    } else {
+                      handleDayClick(day);
+                    }
+                    e.preventDefault();
+                  } else if (e.key === ' ') {
                     handleDayClick(day);
+                    e.preventDefault();
                   }
                 }}
               >
@@ -242,7 +257,7 @@ export function CalendarMonth({
                         className={cn(
                           'w-full cursor-pointer gap-1 truncate p-5 px-1 text-xs opacity-0 group-hover:opacity-100',
                           isEmpty
-                            ? 'h-full bg-transparent hover:!bg-transparent'
+                            ? 'mb-2 bg-transparent !ring-0 hover:!bg-transparent'
                             : 'h-5',
                         )}
                         onClick={(e) => handleAddEventClick(day, e)}
