@@ -3,12 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
-import { generateTimeOptions } from '@/lib/date';
+import { add30Minutes, combineDateAndTime } from '@/lib/date';
 import { eventFormSchema } from '@/schemas/event-schema';
 import { EventTypes } from '@/types/event';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Save } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { addDays } from 'date-fns';
+import { Save } from 'lucide-react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -19,7 +20,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '../ui/dialog';
 import { ScrollArea } from '../ui/scroll-area';
 import { EventDetailsForm } from './event-detail-form';
@@ -45,10 +45,17 @@ const DEFAULT_FORM_VALUES: EventFormValues = {
   eventType: 'day',
 };
 
-export default function EventFormDialog() {
-  const { currentView, locale, timeFormat, addEvent, isSubmitting } =
-    useEventCalendarStore();
-  const [activeTab, setActiveTab] = useState<string>('edit');
+export default function EventCreateDialog() {
+  const {
+    isDialogAddOpen,
+    closeQuickAddDialog,
+    currentView,
+    locale,
+    timeFormat,
+    addEvent,
+    isSubmitting,
+    quickAddDialogData,
+  } = useEventCalendarStore();
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -58,46 +65,59 @@ export default function EventFormDialog() {
 
   const watchedValues = form.watch();
 
-  const timeOptions = generateTimeOptions();
-
   const handleSubmit = async (values: EventFormValues) => {
+    const startDateTime = combineDateAndTime(
+      values.startDate,
+      values.startTime,
+    );
+    const endDateTime = combineDateAndTime(values.endDate, values.endTime);
+
     const newEvent: EventTypes = {
-      id: `event-${Date.now}`,
+      id: `event-${Date.now()}`,
       title: values.title,
       description: values.description || '',
-      startDate: values.startDate,
-      endDate: values.endDate,
+      startDate: startDateTime,
+      endDate: endDateTime,
       startTime: values.startTime,
       endTime: values.endTime,
       location: values.location,
       category: values.category,
       color: values.color,
     };
+
     await addEvent(newEvent);
     form.reset();
-    setActiveTab('edit');
+    closeQuickAddDialog();
     toast.success('Acara berhasil dibuat');
   };
 
   useEffect(() => {
     const startDate = form.getValues('startDate');
-    if (currentView === 'week') {
-      const weekLater = new Date(startDate);
-      weekLater.setDate(weekLater.getDate() + 7);
-      form.setValue('endDate', weekLater);
-    } else {
-      form.setValue('endDate', startDate);
-    }
+    const endDate = currentView === 'week' ? addDays(startDate, 7) : startDate;
+    form.setValue('endDate', endDate);
   }, [currentView, form]);
 
+  useEffect(() => {
+    if (isDialogAddOpen && quickAddDialogData.date) {
+      const defaultTime = quickAddDialogData.position
+        ? `${String(quickAddDialogData.position.hour).padStart(2, '0')}:${String(quickAddDialogData.position.minute).padStart(2, '0')}`
+        : '12:00';
+
+      form.reset({
+        ...DEFAULT_FORM_VALUES,
+        startDate: quickAddDialogData.date,
+        endDate: quickAddDialogData.date,
+        startTime: defaultTime,
+        endTime: add30Minutes(defaultTime),
+      });
+    }
+  }, [isDialogAddOpen, quickAddDialogData, form]);
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button size="sm">
-          <Plus className="h-4 w-4" />
-          Add Event
-        </Button>
-      </DialogTrigger>
+    <Dialog
+      open={isDialogAddOpen}
+      onOpenChange={(open) => !open && closeQuickAddDialog()}
+    >
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>Add New Event</DialogTitle>
@@ -105,7 +125,7 @@ export default function EventFormDialog() {
             Fill in the event details to add it to the calendar
           </DialogDescription>
         </DialogHeader>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="edit">Edit</TabsTrigger>
             <TabsTrigger value="preview">Preview</TabsTrigger>
@@ -116,7 +136,6 @@ export default function EventFormDialog() {
                 form={form}
                 onSubmit={handleSubmit}
                 locale={locale}
-                timeOptions={timeOptions}
               />
             </ScrollArea>
           </TabsContent>
@@ -131,15 +150,6 @@ export default function EventFormDialog() {
           </TabsContent>
         </Tabs>
         <DialogFooter className="mt-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              form.reset();
-              setActiveTab('edit');
-            }}
-          >
-            Batal
-          </Button>
           <Button
             onClick={form.handleSubmit(handleSubmit)}
             className="cursor-pointer"
