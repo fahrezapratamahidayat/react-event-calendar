@@ -31,14 +31,13 @@ type EventDetailsFormProps = {
   form: UseFormReturn<EventFormValues>;
   onSubmit: (values: EventFormValues) => void;
   locale: Locale;
-  timeOptions: { value: string; label: string }[];
 };
 
 /**
  * EventDetailsForm - Separated form component
  */
 export const EventDetailsForm = memo(
-  ({ form, onSubmit, locale, timeOptions }: EventDetailsFormProps) => {
+  ({ form, onSubmit, locale }: EventDetailsFormProps) => {
     return (
       <Form {...form}>
         <form
@@ -101,9 +100,7 @@ export const EventDetailsForm = memo(
                 <TimeSelector
                   value={field.value}
                   onChange={field.onChange}
-                  options={timeOptions}
                   label="Start Time"
-                  placeholder="Select start time"
                   required
                 />
               )}
@@ -131,9 +128,7 @@ export const EventDetailsForm = memo(
                 <TimeSelector
                   value={field.value}
                   onChange={field.onChange}
-                  options={timeOptions}
                   label="End Time"
-                  placeholder="Select end time"
                   required
                 />
               )}
