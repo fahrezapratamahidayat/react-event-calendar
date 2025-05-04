@@ -9,8 +9,9 @@ import { EventTypes, HoverPositionType, TimeFormatType } from '@/types/event';
 import { EventDialogTrigger } from './ui/event-dialog-trigger';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
-import { TimeSlot } from './ui/time-slot';
 import { useDayEventPositions } from '@/lib/event-utils';
+import { TimeColumn } from './ui/time-column';
+import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -29,9 +30,10 @@ export function CalendarDay({
   currentDate,
   timeFormat,
 }: DayCalendarViewProps) {
-  const [hoverPosition, setHoverPosition] = useState<HoverPositionType | null>(
-    null,
-  );
+  const { openQuickAddDialog } = useEventCalendarStore();
+  const [hoverPosition, setHoverPosition] = useState<
+    HoverPositionType | undefined
+  >(undefined);
 
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -60,9 +62,30 @@ export function CalendarDay({
     setHoverPosition({ hour, minute: 0, dayIndex: -1 });
   }, []);
 
+  const handleMinuteHover = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, hour: number) => {
+      if (!sidebarRef.current) return;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const relativeY = e.clientY - rect.top;
+      const minute = Math.floor((relativeY / rect.height) * 60);
+      const validMinute = Math.max(0, Math.min(59, minute));
+
+      setHoverPosition({ hour, minute: validMinute, dayIndex: -1 });
+    },
+    [],
+  );
+
   const handleTimeLeave = useCallback(() => {
-    setHoverPosition(null);
+    setHoverPosition(undefined);
   }, []);
+
+  const handleTimeClick = useCallback(() => {
+    openQuickAddDialog({
+      date: currentDate,
+      position: hoverPosition,
+    });
+  }, [currentDate, hoverPosition, openQuickAddDialog]);
 
   return (
     <div className="flex h-full flex-col">
@@ -70,18 +93,16 @@ export function CalendarDay({
         <div className="mb-2 min-w-full">
           <div className="relative mt-2 mb-2">
             <div className="absolute left-0 z-10 w-16">
-              <div ref={sidebarRef} className="cursor-pointer">
-                {timeSlots.map((time, index) => (
-                  <TimeSlot
-                    key={index}
-                    time={time}
-                    timeFormat={timeFormat}
-                    onHover={handleTimeHover}
-                    onLeave={handleTimeLeave}
-                    index={index}
-                  />
-                ))}
-              </div>
+              <TimeColumn
+                ref={sidebarRef}
+                timeSlots={timeSlots}
+                timeFormat={timeFormat}
+                onHover={handleTimeHover}
+                onHoverMinute={handleMinuteHover}
+                onLeave={handleTimeLeave}
+                variant="day"
+                onClick={handleTimeClick}
+              />
             </div>
             <div className="relative ml-16">
               <CurrentTimeIndicator
