@@ -1,19 +1,53 @@
 import { cn } from '@/lib/utils';
 import { TimeFormatType } from '@/types/event';
+import { cva, type VariantProps } from 'class-variance-authority';
 import React, { forwardRef } from 'react';
 
-interface TimeColumnProps {
+const timeColumnVariants = cva(
+  'flex h-16 w-full cursor-pointer items-center text-xs sm:text-sm',
+  {
+    variants: {
+      variant: {
+        day: 'text-muted-foreground pr-2 text-right justify-end',
+        week: 'text-muted-foreground justify-center border-r border-border px-2',
+      },
+    },
+    defaultVariants: {
+      variant: 'week',
+    },
+  },
+);
+
+interface TimeColumnProps extends VariantProps<typeof timeColumnVariants> {
   timeSlots: Date[];
   timeFormat: TimeFormatType;
   onHover: (hour: number) => void;
-  onHoverMinute: (e: React.MouseEvent<HTMLDivElement>, hour: number) => void;
+  onHoverMinute: (e: React.MouseEvent<HTMLButtonElement>, hour: number) => void;
   onLeave: () => void;
+  onClick?: () => void;
 }
 
 export const TimeColumn = forwardRef<HTMLDivElement, TimeColumnProps>(
-  ({ timeSlots, timeFormat, onHover, onHoverMinute, onLeave }, ref) => {
+  (
+    {
+      timeSlots,
+      timeFormat,
+      onHover,
+      onHoverMinute,
+      onLeave,
+      onClick,
+      variant = 'week',
+    },
+    ref,
+  ) => {
     return (
-      <div ref={ref} className="z-20 w-14 flex-shrink-0 shadow-sm sm:w-32">
+      <div
+        ref={ref}
+        className={cn(
+          'z-20 flex-shrink-0 shadow-sm',
+          variant === 'week' ? 'w-14 sm:w-32' : 'w-16',
+        )}
+      >
         {timeSlots.map((time, index) => {
           const hours = time.getHours();
           let displayTime;
@@ -27,17 +61,16 @@ export const TimeColumn = forwardRef<HTMLDivElement, TimeColumnProps>(
           }
 
           return (
-            <div
+            <button
               key={index}
-              className={cn(
-                'text-muted-foreground border-border flex h-16 w-full cursor-pointer items-center justify-center border-r pr-0 text-center text-xs sm:pr-2 sm:text-sm',
-              )}
+              className={timeColumnVariants({ variant })}
+              onClick={onClick}
               onMouseEnter={() => onHover(hours)}
               onMouseMove={(e) => onHoverMinute(e, hours)}
               onMouseLeave={onLeave}
             >
               {displayTime}
-            </div>
+            </button>
           );
         })}
       </div>
