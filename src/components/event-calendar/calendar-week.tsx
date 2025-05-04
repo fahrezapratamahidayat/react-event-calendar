@@ -72,7 +72,7 @@ export function CalendarWeek({
   }, []);
 
   const handleMinuteHover = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>, hour: number) => {
+    (e: React.MouseEvent<HTMLButtonElement>, hour: number) => {
       if (!sidebarRef.current) return;
 
       const rect = e.currentTarget.getBoundingClientRect();
