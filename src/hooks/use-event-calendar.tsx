@@ -3,6 +3,7 @@ import {
   CalendarViewType,
   EventPosition,
   EventTypes,
+  QuickAddDialogData,
   TimeFormatType,
   ViewModeType,
 } from '@/types/event';
@@ -45,7 +46,13 @@ interface EventCalendarState {
   leftOffset?: number;
   rightOffset?: number;
   isSubmitting: boolean;
-
+  dayEventsDialog: {
+    open: boolean;
+    date: Date | null;
+    events: EventTypes[];
+  };
+  quickAddDialogData: QuickAddDialogData;
+  isDialogAddOpen: boolean;
   defaultConfig: EventCalendarConfig;
 
   initialize: (
@@ -80,14 +87,10 @@ interface EventCalendarState {
     rightOffset?: number,
   ) => void;
   closeEventDialog: () => void;
-
-  dayEventsDialog: {
-    open: boolean;
-    date: Date | null;
-    events: EventTypes[];
-  };
   openDayEventsDialog: (date: Date, events: EventTypes[]) => void;
   closeDayEventsDialog: () => void;
+  openQuickAddDialog: (data: QuickAddDialogData) => void;
+  closeQuickAddDialog: () => void;
 }
 
 export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
@@ -115,8 +118,19 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
     isDialogOpen: false,
     dialogPosition: null,
     isSubmitting: false,
-
     defaultConfig,
+    dayEventsDialog: {
+      open: false,
+      date: null,
+      events: [],
+    },
+    quickAddDialogData: {
+      date: null,
+      time: undefined,
+      hour: undefined,
+      minute: undefined,
+    },
+    isDialogAddOpen: false,
 
     initialize: (config, initialEvents = [], initialDate = new Date()) => {
       const mergedConfig = { ...defaultConfig, ...config };
@@ -135,6 +149,7 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
       });
     },
 
+    // setter
     addEvent: async (newEvent) => {
       try {
         set({ loading: true, error: null });
@@ -149,7 +164,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         set({ loading: false });
       }
     },
-
     updateEvent: async (updatedEvent) => {
       try {
         set({ loading: true, error: null, isSubmitting: true });
@@ -169,7 +183,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         set({ loading: false, isSubmitting: false, isDialogOpen: false });
       }
     },
-
     deleteEvent: async (eventId) => {
       try {
         set({ loading: true, error: null, isSubmitting: true });
@@ -187,7 +200,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         set({ loading: false, isSubmitting: false, isDialogOpen: false });
       }
     },
-
     handleDateRangeChange: async (startDate, endDate) => {
       try {
         set({ loading: true, error: null });
@@ -244,6 +256,7 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
 
       set({ currentDate: newDate });
     },
+
     openEventDialog: (event, position, leftOffset, rightOffset) => {
       set({
         selectedEvent: event,
@@ -253,7 +266,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         rightOffset,
       });
     },
-
     closeEventDialog: () => {
       set({
         isDialogOpen: false,
@@ -262,11 +274,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
       });
     },
 
-    dayEventsDialog: {
-      open: false,
-      date: null,
-      events: [],
-    },
     openDayEventsDialog: (date, events) =>
       set({
         dayEventsDialog: { open: true, date, events },
@@ -276,6 +283,26 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         dayEventsDialog: { open: false, date: null, events: [] },
       }),
 
+    openQuickAddDialog: (data) => {
+      const timeStr = data.position
+        ? `${String(data.position.hour).padStart(2, '0')}:${String(data.position.minute).padStart(2, '0')}`
+        : data.time;
+      set({
+        quickAddDialogData: {
+          date: data.date,
+          time: timeStr,
+          position: data.position,
+        },
+        isDialogAddOpen: true,
+      });
+    },
+    closeQuickAddDialog: () =>
+      set({
+        quickAddDialogData: {
+          date: null,
+        },
+        isDialogAddOpen: false,
+      }),
     setCurrentDate: (date) => set({ currentDate: date }),
     setCurrentView: (view) => set({ currentView: view }),
     setViewMode: (mode) => set({ viewMode: mode }),
