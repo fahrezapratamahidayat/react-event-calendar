@@ -192,7 +192,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold">Event Calendar</h1>
         <ModeToggle />
       </header>
-      <EventCalendar events={dummyEvents} />
+      <EventCalendar />
     </div>
   );
 }
