@@ -83,7 +83,7 @@ export function SearchMonthPicker({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            'w-[160px] justify-between font-normal',
+            'w-[130px] justify-between font-normal',
             !selectedMonth && 'text-muted-foreground',
             className,
           )}
