@@ -130,7 +130,7 @@ export function SearchDayPicker({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            'w-[180px] justify-between font-normal',
+            'w-[130px] justify-between font-normal',
             !selectedDay && 'text-muted-foreground',
             className,
           )}
@@ -152,7 +152,7 @@ export function SearchDayPicker({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
+      <PopoverContent className="w-[130px] p-0" align="start">
         <Command shouldFilter={false}>
           <CommandInput
             placeholder="Cari hari..."
