@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { Locale } from 'date-fns';
 import { formatDate, generateTimeSlots, isSameFullDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
-import { EventTypes, HoverPositionType, TimeFormatType } from '@/types/event';
+import { EventTypes, HoverPositionType } from '@/types/event';
 import { WeekHeader } from './ui/week-header';
 import { TimeColumn } from './ui/time-column';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
@@ -18,6 +17,7 @@ import {
   useMultiDayEventRows,
   useWeekDays,
 } from '@/lib/event-utils';
+import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -26,27 +26,24 @@ const DAYS_IN_WEEK = 7;
 const DAY_WIDTH_PERCENT = 100 / DAYS_IN_WEEK;
 const MULTI_DAY_ROW_HEIGHT = 50;
 
-export interface WeekCalendarViewProps {
-  events: EventTypes[];
-  currentDate: Date;
-  timeFormat: TimeFormatType;
-  locale: Locale;
-}
-
-export function CalendarWeek({
-  events,
-  currentDate,
-  timeFormat,
-  locale,
-}: WeekCalendarViewProps) {
-  const [hoverPosition, setHoverPosition] = useState<HoverPositionType | null>(
-    null,
-  );
+export function CalendarWeek() {
+  const {
+    events,
+    currentDate,
+    timeFormat,
+    locale,
+    firstDayOfWeek,
+    viewConfigs,
+    openQuickAddDialog,
+  } = useEventCalendarStore();
+  const [hoverPosition, setHoverPosition] = useState<
+    HoverPositionType | undefined
+  >(undefined);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  const { weekStart, weekNumber, weekDays, todayIndex } = useWeekDays(
+  const { weekNumber, weekDays, todayIndex } = useWeekDays(
     currentDate,
     DAYS_IN_WEEK,
     locale,
@@ -86,13 +83,26 @@ export function CalendarWeek({
   );
 
   const handleTimeLeave = useCallback(() => {
-    setHoverPosition(null);
+    setHoverPosition(undefined);
   }, []);
+
+  const handleTimeClick = useCallback(() => {
+    if (!viewConfigs.day.onTimeIndicatorClick) return;
+    openQuickAddDialog({
+      date: currentDate,
+      position: hoverPosition,
+    });
+  }, [
+    viewConfigs.day.onTimeIndicatorClick,
+    openQuickAddDialog,
+    currentDate,
+    hoverPosition,
+  ]);
 
   const showEventDetail = useCallback((event: EventTypes) => {}, []);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="py- flex h-[650px] flex-col rounded-md border">
       <ScrollArea className="h-full w-full rounded-md">
         <div className="mb-2 min-w-full">
           <div className="relative mb-2">
@@ -103,6 +113,7 @@ export function CalendarWeek({
                 todayIndex={todayIndex}
                 formatDate={formatDate}
                 locale={locale}
+                firstDayOfWeek={firstDayOfWeek}
               />
               {multiDayEventRows.length ? (
                 <div className="relative w-full flex-1">
@@ -129,6 +140,7 @@ export function CalendarWeek({
                 ref={sidebarRef}
                 timeSlots={timeSlots}
                 timeFormat={timeFormat}
+                onClick={handleTimeClick}
                 onHover={handleTimeHover}
                 onHoverMinute={handleMinuteHover}
                 onLeave={handleTimeLeave}
@@ -137,13 +149,15 @@ export function CalendarWeek({
                 ref={containerRef}
                 className="relative flex-1 overflow-y-auto"
               >
-                <CurrentTimeIndicator
-                  currentHour={currentHour}
-                  currentMinute={currentMinute}
-                  timeFormat={timeFormat}
-                  hourHeight={HOUR_HEIGHT}
-                />
-                {hoverPosition && (
+                {viewConfigs.week.showCurrentTimeIndicator && (
+                  <CurrentTimeIndicator
+                    currentHour={currentHour}
+                    currentMinute={currentMinute}
+                    timeFormat={timeFormat}
+                    hourHeight={HOUR_HEIGHT}
+                  />
+                )}
+                {hoverPosition && viewConfigs.week.showHoverTimeIndicator && (
                   <HoverTimeIndicator
                     hour={hoverPosition.hour}
                     minute={hoverPosition.minute}
