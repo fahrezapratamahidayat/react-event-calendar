@@ -14,25 +14,16 @@ import { EventsList } from './event-list';
 import { CalendarDay } from './calendar-day';
 import { CalendarWeek } from './calendar-week';
 import EventDialog from './event-dialog';
-import {
-  EventTypes,
-  CalendarViewType,
-  TimeFormatType,
-  ViewModeType,
-} from '@/types/event';
+import { CalendarViewType, TimeFormatType, ViewModeType } from '@/types/event';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { CalendarMonth } from './calendar-month';
 import { MonthDayEventsDialog } from './month-day-events-dialog';
 import EventCreateDialog from './event-create-dialog';
 
-interface EventCalendarProps {
-  events: EventTypes[];
-}
-export function EventCalendar({ events }: EventCalendarProps) {
+export function EventCalendar() {
   const {
     viewMode,
     locale,
-    firstDayOfWeek,
     currentDate,
     timeFormat,
     currentView,
@@ -76,57 +67,21 @@ export function EventCalendar({ events }: EventCalendarProps) {
 
   const renderCalendarView = () => {
     if (viewMode === 'list') {
-      return (
-        <EventsList
-          events={events}
-          currentDate={currentDate}
-          timeFormat={timeFormat}
-          viewType={currentView}
-          locale={locale}
-        />
-      );
+      return <EventsList />;
     }
 
     switch (currentView) {
       case 'day':
-        return (
-          <CalendarDay
-            events={events}
-            currentDate={currentDate}
-            timeFormat={timeFormat}
-            locale={locale}
-          />
-        );
+        return <CalendarDay />;
       case 'week':
-        return (
-          <CalendarWeek
-            events={events}
-            currentDate={currentDate}
-            timeFormat={timeFormat}
-            locale={locale}
-          />
-        );
+        return <CalendarWeek />;
       case 'month':
-        return (
-          <CalendarMonth
-            events={events}
-            currentDate={currentDate}
-            timeFormat={timeFormat}
-            locale={locale}
-            firstDayOfWeek={firstDayOfWeek}
-          />
-        );
+        return <CalendarMonth />;
       default:
-        return (
-          <CalendarDay
-            events={events}
-            currentDate={currentDate}
-            timeFormat={timeFormat}
-            locale={locale}
-          />
-        );
+        return <CalendarDay />;
     }
   };
+
   return (
     <>
       <EventDialog />
@@ -211,6 +166,7 @@ export function EventCalendar({ events }: EventCalendarProps) {
                   date: new Date(),
                 })
               }
+              className='"gap-1 h-10 w-full'
             >
               <Plus className="h-4 w-4" />
               Add Event
