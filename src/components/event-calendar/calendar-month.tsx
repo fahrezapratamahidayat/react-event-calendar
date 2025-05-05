@@ -13,9 +13,8 @@ import {
   endOfWeek,
   setDay,
   getDay,
-  Locale,
 } from 'date-fns';
-import { EventTypes, TimeFormatType } from '@/types/event';
+import { EventTypes } from '@/types/event';
 import { Button } from '@/components/ui/button';
 import { Clock, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -24,25 +23,18 @@ import { ScrollArea } from '../ui/scroll-area';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
-interface MonthCalendarViewProps {
-  events: EventTypes[];
-  currentDate: Date;
-  timeFormat: TimeFormatType;
-  locale: Locale;
-  firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  onDayClick?: (date: Date) => void;
-  onAddEventClick?: (date: Date) => void;
-}
-
-export function CalendarMonth({
-  events,
-  currentDate,
-  timeFormat,
-  locale,
-  firstDayOfWeek,
-}: MonthCalendarViewProps) {
-  const { openDayEventsDialog, openEventDialog, openQuickAddDialog } =
-    useEventCalendarStore();
+export function CalendarMonth() {
+  const {
+    events,
+    currentDate,
+    timeFormat,
+    locale,
+    firstDayOfWeek,
+    viewConfigs,
+    openDayEventsDialog,
+    openEventDialog,
+    openQuickAddDialog,
+  } = useEventCalendarStore();
   const today = new Date();
   const daysContainerRef = useRef<HTMLDivElement>(null);
   const [focusedDate, setFocusedDate] = useState<Date | null>(null);
@@ -133,13 +125,13 @@ export function CalendarMonth({
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <ScrollArea className="h-full w-full rounded-md px-4">
+    <div className="flex h-[650px] flex-col rounded-md border py-2">
+      <ScrollArea className="h-full w-full rounded-md">
         <div className="mb-1 grid grid-cols-7 gap-1">
           {weekDays.map((day, index) => (
             <div
               key={index}
-              className="text-muted-foreground py-2 text-center text-sm font-medium"
+              className="text-primary py-2 text-center text-sm font-medium"
             >
               {day}
             </div>
@@ -170,8 +162,10 @@ export function CalendarMonth({
                 className={cn(
                   'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border p-1 transition-all sm:h-[130px] sm:p-2',
                   'hover:border-primary focus:ring-primary hover:shadow-sm focus:ring-2 focus:outline-none',
-                  !isCurrentMonth && 'bg-muted/20 opacity-50',
-                  isToday && 'border-primary border-2',
+                  !isCurrentMonth &&
+                    (viewConfigs.month.hideOutsideDays
+                      ? 'hidden'
+                      : 'bg-muted/20 opacity-50'),
                   isFocused && 'ring-2 ring-blue-500',
                 )}
                 onClick={() => {
@@ -201,7 +195,7 @@ export function CalendarMonth({
                   <span
                     className={cn(
                       'flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium',
-                      isToday && 'bg-primary text-primary-foreground',
+                      isToday && 'text-primary bg-blue-500',
                       !isCurrentMonth && 'text-muted-foreground',
                     )}
                   >
