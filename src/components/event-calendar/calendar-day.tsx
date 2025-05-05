@@ -2,10 +2,10 @@
 
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { ScrollArea } from '../ui/scroll-area';
-import { isSameDay, Locale } from 'date-fns';
+import { isSameDay } from 'date-fns';
 import { generateTimeSlots } from '@/lib/date';
 import { cn } from '@/lib/utils';
-import { EventTypes, HoverPositionType, TimeFormatType } from '@/types/event';
+import { HoverPositionType } from '@/types/event';
 import { EventDialogTrigger } from './ui/event-dialog-trigger';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
@@ -18,19 +18,9 @@ const START_HOUR = 0; // 00:00
 const END_HOUR = 23; // 23:00
 const COLUMN_WIDTH_TOTAL = 99.5; // Total width percentage for columns
 
-interface DayCalendarViewProps {
-  events: EventTypes[];
-  currentDate: Date;
-  timeFormat: TimeFormatType;
-  locale: Locale;
-}
-
-export function CalendarDay({
-  events,
-  currentDate,
-  timeFormat,
-}: DayCalendarViewProps) {
-  const { openQuickAddDialog } = useEventCalendarStore();
+export function CalendarDay() {
+  const { events, currentDate, timeFormat, viewConfigs, openQuickAddDialog } =
+    useEventCalendarStore();
   const [hoverPosition, setHoverPosition] = useState<
     HoverPositionType | undefined
   >(undefined);
@@ -81,14 +71,20 @@ export function CalendarDay({
   }, []);
 
   const handleTimeClick = useCallback(() => {
+    if (!viewConfigs.day.onTimeIndicatorClick) return;
     openQuickAddDialog({
       date: currentDate,
       position: hoverPosition,
     });
-  }, [currentDate, hoverPosition, openQuickAddDialog]);
+  }, [
+    currentDate,
+    hoverPosition,
+    openQuickAddDialog,
+    viewConfigs.day.onTimeIndicatorClick,
+  ]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="py- flex h-[650px] flex-col">
       <ScrollArea className="h-full w-full rounded-md px-4">
         <div className="mb-2 min-w-full">
           <div className="relative mt-2 mb-2">
@@ -105,13 +101,15 @@ export function CalendarDay({
               />
             </div>
             <div className="relative ml-16">
-              <CurrentTimeIndicator
-                currentHour={currentHour}
-                currentMinute={currentMinute}
-                timeFormat={timeFormat}
-                hourHeight={HOUR_HEIGHT}
-              />
-              {hoverPosition && (
+              {viewConfigs.day.showCurrentTimeIndicator && (
+                <CurrentTimeIndicator
+                  currentHour={currentHour}
+                  currentMinute={currentMinute}
+                  timeFormat={timeFormat}
+                  hourHeight={HOUR_HEIGHT}
+                />
+              )}
+              {hoverPosition && viewConfigs.day.showHoverTimeIndicator && (
                 <HoverTimeIndicator
                   hour={hoverPosition.hour}
                   minute={hoverPosition.minute}
