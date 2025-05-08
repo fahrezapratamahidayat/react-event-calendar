@@ -21,6 +21,7 @@ const COLUMN_WIDTH_TOTAL = 99.5; // Total width percentage for columns
 export function CalendarDay() {
   const { events, currentDate, timeFormat, viewConfigs, openQuickAddDialog } =
     useEventCalendarStore();
+
   const [hoverPosition, setHoverPosition] = useState<
     HoverPositionType | undefined
   >(undefined);
