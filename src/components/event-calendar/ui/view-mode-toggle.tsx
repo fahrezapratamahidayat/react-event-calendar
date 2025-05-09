@@ -27,7 +27,12 @@ export function ViewModeToggle({
 }: ViewModeToggleProps) {
   return (
     <TooltipProvider delayDuration={tooltipDelay}>
-      <div className={cn('flex overflow-hidden rounded-md border', className)}>
+      <motion.div
+        className={cn('flex overflow-hidden rounded-md border', className)}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -40,19 +45,37 @@ export function ViewModeToggle({
               onClick={() => onChange(ViewModeType.CALENDAR)}
               aria-label="Calendar view"
             >
-              <CalendarDays className="h-4 w-4" />
-              <AnimatePresence>
-                {mode === ViewModeType.CALENDAR && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    className="ml-2 overflow-hidden text-xs whitespace-nowrap"
-                  >
-                    Calendar
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              <motion.div
+                className="flex items-center"
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <CalendarDays className="h-4 w-4" />
+                <AnimatePresence mode="wait">
+                  {mode === ViewModeType.CALENDAR && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0, x: -5 }}
+                      animate={{ opacity: 1, width: 'auto', x: 0 }}
+                      exit={{ opacity: 0, width: 0, x: -5 }}
+                      transition={{ duration: 0.3 }}
+                      className="ml-2 overflow-hidden text-xs whitespace-nowrap"
+                    >
+                      Calendar
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {mode === ViewModeType.CALENDAR && (
+                <motion.div
+                  className="bg-secondary/20 absolute inset-0 rounded-l-md"
+                  layoutId="viewModeHighlight"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center">
@@ -71,26 +94,44 @@ export function ViewModeToggle({
               onClick={() => onChange(ViewModeType.LIST)}
               aria-label="List view"
             >
-              <List className="h-4 w-4" />
-              <AnimatePresence>
-                {mode === ViewModeType.LIST && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    className="ml-2 overflow-hidden text-xs whitespace-nowrap"
-                  >
-                    List
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              <motion.div
+                className="flex items-center"
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <List className="h-4 w-4" />
+                <AnimatePresence mode="wait">
+                  {mode === ViewModeType.LIST && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0, x: -5 }}
+                      animate={{ opacity: 1, width: 'auto', x: 0 }}
+                      exit={{ opacity: 0, width: 0, x: -5 }}
+                      transition={{ duration: 0.3 }}
+                      className="ml-2 overflow-hidden text-xs whitespace-nowrap"
+                    >
+                      List
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {mode === ViewModeType.LIST && (
+                <motion.div
+                  className="bg-secondary/20 absolute inset-0 rounded-r-md"
+                  layoutId="viewModeHighlight"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center">
             <p>List View</p>
           </TooltipContent>
         </Tooltip>
-      </div>
+      </motion.div>
     </TooltipProvider>
   );
 }
