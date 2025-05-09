@@ -19,6 +19,7 @@ import {
 import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SearchableMonthPickerProps {
   date: Date;
@@ -40,6 +41,8 @@ export function SearchMonthPicker({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
+  const [selectedMonthChange, setSelectedMonthChanged] =
+    useState<boolean>(false);
 
   const months = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => ({
@@ -66,6 +69,8 @@ export function SearchMonthPicker({
     onDateChange(newDate);
     setOpen(false);
     setSearchValue('');
+
+    setTimeout(() => setSelectedMonthChanged(false), 1000);
   };
 
   useEffect(() => {
@@ -78,25 +83,45 @@ export function SearchMonthPicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn(
-            'w-[130px] justify-between font-normal',
-            !selectedMonth && 'text-muted-foreground',
-            className,
-          )}
-          title="Select month"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.02 }}
         >
-          <div className="flex items-center">
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            <span className="truncate">
-              {selectedMonth?.label || placeholder}
-            </span>
-          </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn(
+              'w-[150px] justify-between font-normal',
+              !selectedMonth && 'text-muted-foreground',
+              className,
+            )}
+            title="Select month"
+          >
+            <div className="flex items-center">
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedMonth.label}
+                  initial={{
+                    y: selectedMonthChange ? 11 : 0,
+                    opacity: selectedMonthChange ? 0 : 1,
+                  }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -10, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span className="truncate">
+                    {selectedMonth?.label || placeholder}
+                  </span>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </motion.div>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command shouldFilter={false}>
