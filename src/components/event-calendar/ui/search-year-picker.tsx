@@ -19,6 +19,7 @@ import {
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface SearchYearPickerProps {
   date: Date;
@@ -40,6 +41,7 @@ export function SearchYearPicker({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
+  const [selectedYearChanged, setSelectedYearChanged] = useState(false);
 
   const currentYear = getYear(new Date());
   const selectedYear = getYear(date);
@@ -69,6 +71,10 @@ export function SearchYearPicker({
     onDateChange(newDate);
     setOpen(false);
     setSearchValue('');
+    setSelectedYearChanged(true);
+
+    // Reset animation after a delay
+    setTimeout(() => setSelectedYearChanged(false), 1000);
   };
 
   useEffect(() => {
@@ -81,20 +87,40 @@ export function SearchYearPicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn(
-            'w-[120px] justify-between font-normal',
-            !selectedYear && 'text-muted-foreground',
-            className,
-          )}
-          title="Select year"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.02 }}
         >
-          {selectedYear || 'Pilih tahun'}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn(
+              'w-[120px] justify-between font-normal',
+              !selectedYear && 'text-muted-foreground',
+              className,
+            )}
+            title="Select year"
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedYear}
+                initial={{
+                  y: selectedYearChanged ? 10 : 0,
+                  opacity: selectedYearChanged ? 0 : 1,
+                }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -10, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {selectedYear || 'Pilih tahun'}
+              </motion.div>
+            </AnimatePresence>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </motion.div>
       </PopoverTrigger>
       <PopoverContent className="w-[120px] p-0" align="start">
         <Command shouldFilter={false}>
