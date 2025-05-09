@@ -5,6 +5,7 @@ import { Button } from '../../ui/button';
 import { useEffect, useState } from 'react';
 import { isToday, isThisWeek, isThisMonth, isThisYear } from 'date-fns';
 import { CalendarViewType } from '@/types/event';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface TodayButtonProps {
   currentDate: Date;
@@ -40,7 +41,7 @@ export function TodayButton({
     goToday();
 
     // Reset animation after 300ms
-    setTimeout(() => setIsAnimating(false), 300);
+    setTimeout(() => setIsAnimating(false), 500);
   };
 
   const getButtonLabel = () => {
@@ -55,18 +56,43 @@ export function TodayButton({
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      disabled={isDisabled}
-      onClick={handleClick}
-      className={`transition-transform ${className} ${
-        isAnimating ? 'scale-95' : 'scale-100'
-      }`}
-      aria-label={getButtonLabel()}
-    >
-      <CalendarIcon className="mr-2 h-4 w-4" />
-      {getButtonLabel()}
-    </Button>
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={isDisabled}
+          onClick={handleClick}
+          className={`${className}`}
+          aria-label={getButtonLabel()}
+        >
+          <motion.div
+            className="flex items-center"
+            animate={
+              isAnimating ? { rotate: [0, 15, -15, 10, -10, 5, -5, 0] } : {}
+            }
+            transition={{ duration: 0.5 }}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            <motion.span
+              animate={
+                isAnimating
+                  ? {
+                      y: [0, -4, 0],
+                      transition: { duration: 0.3, times: [0, 0.5, 1] },
+                    }
+                  : {}
+              }
+            >
+              {getButtonLabel()}
+            </motion.span>
+          </motion.div>
+        </Button>
+      </motion.div>
+    </AnimatePresence>
   );
 }
