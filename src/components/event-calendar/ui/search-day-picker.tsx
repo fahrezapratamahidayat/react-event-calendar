@@ -28,6 +28,7 @@ import {
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SearchDayPickerProps {
   currentDate: Date;
@@ -49,6 +50,7 @@ export function SearchDayPicker({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
+  const [selectedDayChanged, setSelectedDayChanged] = useState(false);
 
   /**
    * Gets the day suffix (st, nd, rd, th) for a given day number
@@ -113,6 +115,10 @@ export function SearchDayPicker({
     onDateChange(newDate);
     setOpen(false);
     setSearchValue('');
+
+    setTimeout(() => {
+      setSelectedDayChanged(false);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -125,32 +131,52 @@ export function SearchDayPicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn(
-            'w-[130px] justify-between font-normal',
-            !selectedDay && 'text-muted-foreground',
-            className,
-          )}
-          title="Choose a day"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.02 }}
         >
-          {selectedDay ? (
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground italic">
-                {selectedDay.dayName}
-              </span>
-              <span>
-                {selectedDay.day}
-                <sup>{selectedDay.daySuffix}</sup>
-              </span>
-            </div>
-          ) : (
-            placeholder
-          )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn(
+              'w-[130px] justify-between font-normal',
+              !selectedDay && 'text-muted-foreground',
+              className,
+            )}
+            title="Choose a day"
+          >
+            {selectedDay ? (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedDay.label}
+                  initial={{
+                    y: selectedDayChanged ? 11 : 0,
+                    opacity: selectedDayChanged ? 0 : 1,
+                  }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -10, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground italic">
+                      {selectedDay.dayName}
+                    </span>
+                    <span>
+                      {selectedDay.day}
+                      <sup>{selectedDay.daySuffix}</sup>
+                    </span>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            ) : (
+              placeholder
+            )}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </motion.div>
       </PopoverTrigger>
       <PopoverContent className="w-[130px] p-0" align="start">
         <Command shouldFilter={false}>
