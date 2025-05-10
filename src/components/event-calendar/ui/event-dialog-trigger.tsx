@@ -9,6 +9,12 @@ type EventDialogTriggerProps = {
   position: EventPosition;
   leftOffset: number;
   rightOffset: number;
+  onClick: (
+    event: EventTypes,
+    position: EventPosition,
+    leftOffset: number,
+    rightOffset: number,
+  ) => void;
 };
 
 export const EventDialogTrigger = ({
@@ -16,8 +22,11 @@ export const EventDialogTrigger = ({
   position,
   leftOffset,
   rightOffset,
+  onClick,
 }: EventDialogTriggerProps) => {
-  const { openEventDialog } = useEventCalendarStore();
+  const handleOpenEventDialog = () => {
+    onClick(event, position, leftOffset, rightOffset);
+  };
   return (
     <Button
       className={cn(
@@ -25,7 +34,7 @@ export const EventDialogTrigger = ({
         'border-none shadow-none ring-0 focus:ring-0 focus:outline-none',
         'transition-colors',
       )}
-      onClick={() => openEventDialog(event, position, leftOffset, rightOffset)}
+      onClick={handleOpenEventDialog}
       style={{
         top: `${position?.top}px`,
         height: `${position?.height}px`,
