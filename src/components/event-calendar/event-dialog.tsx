@@ -17,7 +17,7 @@ import { z } from 'zod';
 import { EventTypes } from '@/types/event';
 import { ensureDate } from '@/lib/date';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
-import { eventFormSchema } from '@/schemas/event-schema';
+import { eventFormSchema } from '@/lib/validations';
 import { EventDetailsForm } from './event-detail-form';
 
 const DEFAULT_START_TIME = '09:00';
@@ -37,7 +37,6 @@ const DEFAULT_FORM_VALUES: EventFormValues = {
   endTime: DEFAULT_END_TIME,
   location: '',
   color: DEFAULT_COLOR,
-  eventType: 'day',
 };
 
 function useIsMounted() {
@@ -89,7 +88,6 @@ export default function EventDialog() {
           endTime: selectedEvent.endTime || DEFAULT_END_TIME,
           location: selectedEvent.location || '',
           color: selectedEvent.color || DEFAULT_COLOR,
-          eventType: 'day',
         });
       } catch (error) {
         console.error('Error resetting form with event data:', error);
