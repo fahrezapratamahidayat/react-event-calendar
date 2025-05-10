@@ -18,6 +18,7 @@ import {
   useWeekDays,
 } from '@/lib/event-utils';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useShallow } from 'zustand/shallow';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -35,7 +36,20 @@ export function CalendarWeek() {
     firstDayOfWeek,
     viewConfigs,
     openQuickAddDialog,
-  } = useEventCalendarStore();
+    openEventDialog,
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      events: state.events,
+      currentDate: state.currentDate,
+      timeFormat: state.timeFormat,
+      viewConfigs: state.viewConfigs,
+      locale: state.locale,
+      firstDayOfWeek: state.firstDayOfWeek,
+      openDayEventsDialog: state.openDayEventsDialog,
+      openQuickAddDialog: state.openQuickAddDialog,
+      openEventDialog: state.openEventDialog,
+    })),
+  );
   const [hoverPosition, setHoverPosition] = useState<
     HoverPositionType | undefined
   >(undefined);
@@ -201,6 +215,7 @@ export function CalendarWeek() {
                         position={position}
                         leftOffset={leftPercent}
                         rightOffset={rightPercent}
+                        onClick={openEventDialog}
                       />
                     );
                   })}
