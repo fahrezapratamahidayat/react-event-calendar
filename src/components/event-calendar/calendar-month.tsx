@@ -22,6 +22,7 @@ import { formatTime } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useShallow } from 'zustand/shallow';
 
 export function CalendarMonth() {
   const {
@@ -34,7 +35,19 @@ export function CalendarMonth() {
     openDayEventsDialog,
     openEventDialog,
     openQuickAddDialog,
-  } = useEventCalendarStore();
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      events: state.events,
+      currentDate: state.currentDate,
+      timeFormat: state.timeFormat,
+      viewConfigs: state.viewConfigs,
+      locale: state.locale,
+      firstDayOfWeek: state.firstDayOfWeek,
+      openDayEventsDialog: state.openDayEventsDialog,
+      openEventDialog: state.openEventDialog,
+      openQuickAddDialog: state.openQuickAddDialog,
+    })),
+  );
   const today = new Date();
   const daysContainerRef = useRef<HTMLDivElement>(null);
   const [focusedDate, setFocusedDate] = useState<Date | null>(null);
