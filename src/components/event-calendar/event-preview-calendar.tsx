@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/card';
 import { calculateEventDuration, formatTime } from '@/lib/date';
 import { cn } from '@/lib/utils';
-import { eventFormSchema } from '@/schemas/event-schema';
+import { eventFormSchema } from '@/lib/validations';
 import { TimeFormatType } from '@/types/event';
 import { format, Locale } from 'date-fns';
 import { CalendarIcon, Clock, MapPin, Tag } from 'lucide-react';
