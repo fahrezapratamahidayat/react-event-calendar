@@ -1,4 +1,4 @@
-import { eventFormSchema } from '@/schemas/event-schema';
+import { eventFormSchema } from '@/lib/validations';
 import { Locale } from 'date-fns';
 import { memo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
