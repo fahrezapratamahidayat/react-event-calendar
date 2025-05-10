@@ -122,6 +122,8 @@ interface EventCalendarState {
     initialEvents?: EventTypes[],
     initialDate?: Date,
   ) => void;
+  setEvents: (events: EventTypes[]) => void;
+  setLoading: (loading: boolean) => void;
   addEvent: (event: EventTypes) => Promise<void>;
   updateEvent: (event: EventTypes) => Promise<void>;
   deleteEvent: (eventId: string) => Promise<void>;
@@ -219,7 +221,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
           ...(config?.viewConfigs || {}),
         },
       };
-
       set({
         config: mergedConfig,
         viewConfigs: mergedConfig.viewConfigs as CalendarViewConfigs,
@@ -235,7 +236,8 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
           mergedConfig.firstDayOfWeek || defaultConfig.firstDayOfWeek!,
       });
     },
-
+    setEvents: (events) => set({ events }),
+    setLoading: (loading) => set({ loading }),
     // Event CRUD operations
     addEvent: async (newEvent) => {
       try {
