@@ -12,6 +12,7 @@ import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { useDayEventPositions } from '@/lib/event-utils';
 import { TimeColumn } from './ui/time-column';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useShallow } from 'zustand/shallow';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -19,8 +20,23 @@ const END_HOUR = 23; // 23:00
 const COLUMN_WIDTH_TOTAL = 99.5; // Total width percentage for columns
 
 export function CalendarDay() {
-  const { events, currentDate, timeFormat, viewConfigs, openQuickAddDialog } =
-    useEventCalendarStore();
+  const {
+    events,
+    currentDate,
+    timeFormat,
+    viewConfigs,
+    openQuickAddDialog,
+    openEventDialog,
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      events: state.events,
+      currentDate: state.currentDate,
+      timeFormat: state.timeFormat,
+      viewConfigs: state.viewConfigs,
+      openQuickAddDialog: state.openQuickAddDialog,
+      openEventDialog: state.openEventDialog,
+    })),
+  );
 
   const [hoverPosition, setHoverPosition] = useState<
     HoverPositionType | undefined
@@ -141,6 +157,7 @@ export function CalendarDay() {
                     position={position}
                     leftOffset={leftPercent}
                     rightOffset={rightPercent}
+                    onClick={openEventDialog}
                   />
                 );
               })}
