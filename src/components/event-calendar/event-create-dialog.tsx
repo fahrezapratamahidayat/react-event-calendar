@@ -3,15 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
-import { add30Minutes, combineDateAndTime } from '@/lib/date';
-import { eventFormSchema } from '@/schemas/event-schema';
-import { EventTypes } from '@/types/event';
+import { add30Minutes } from '@/lib/date';
+import { eventFormSchema, eventSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDays } from 'date-fns';
 import { Save } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { z } from 'zod';
 import {
   Dialog,
@@ -42,7 +40,7 @@ const DEFAULT_FORM_VALUES: EventFormValues = {
   endTime: DEFAULT_END_TIME,
   location: '',
   color: DEFAULT_COLOR,
-  eventType: 'day',
+  isRepeating: false,
 };
 
 export default function EventCreateDialog() {
@@ -65,30 +63,47 @@ export default function EventCreateDialog() {
 
   const watchedValues = form.watch();
 
-  const handleSubmit = async (values: EventFormValues) => {
-    const startDateTime = combineDateAndTime(
-      values.startDate,
-      values.startTime,
-    );
-    const endDateTime = combineDateAndTime(values.endDate, values.endTime);
-
-    const newEvent: EventTypes = {
-      id: `event-${Date.now()}`,
-      title: values.title,
-      description: values.description || '',
-      startDate: startDateTime,
-      endDate: endDateTime,
-      startTime: values.startTime,
-      endTime: values.endTime,
-      location: values.location,
-      category: values.category,
-      color: values.color,
+  const handleSubmit = async (formValues: z.infer<typeof eventFormSchema>) => {
+    const dbEvent = {
+      ...formValues,
+      id: crypto.randomUUID(),
+      startTime: formValues.startTime.includes(':')
+        ? formValues.startTime + ':00'
+        : formValues.startTime + ':00:00',
+      endTime: formValues.endTime.includes(':')
+        ? formValues.endTime + ':00'
+        : formValues.endTime + ':00:00',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      ...(formValues.isRepeating
+        ? {
+            isRepeating: true,
+            repeatingType: formValues.repeatingType,
+          }
+        : {
+            isRepeating: false,
+            repeatingType: null,
+          }),
     };
 
-    await addEvent(newEvent);
-    form.reset();
-    closeQuickAddDialog();
-    toast.success('Acara berhasil dibuat');
+    try {
+      const parsedEvent = eventSchema.parse(dbEvent);
+
+      if (parsedEvent.isRepeating) {
+        console.log('Repeating event with type:', parsedEvent.repeatingType);
+      } else {
+        console.log('One-time event');
+      }
+
+      // send to database
+      // return { success: true, event: parsedEvent };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error('Validation error:', error.errors);
+        return { success: false, errors: error.errors };
+      }
+      throw error;
+    }
   };
 
   useEffect(() => {
