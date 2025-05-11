@@ -26,6 +26,52 @@ export const eventSearchSchema = z.object({
   category: z.string().optional(),
 });
 
+export const advancedEventSearchSchema = eventSearchSchema.extend({
+  page: z.number().min(1).default(1),
+  perPage: z.number().min(1).max(100).default(10),
+  title: z.string().optional(),
+  filterFlag: z
+    .enum(['basicFilters', 'advancedFilters'])
+    .default('basicFilters'),
+  joinOperator: z.enum(['and', 'or']).default('and'),
+  filters: z
+    .array(
+      z.object({
+        id: z.string(),
+        value: z.union([
+          z.string(),
+          z.boolean(),
+          z.date(),
+          z.array(z.string()),
+          z.array(z.date()),
+        ]),
+        operator: z.enum([
+          'equals',
+          'contains',
+          'startsWith',
+          'endsWith',
+          'gt',
+          'gte',
+          'lt',
+          'lte',
+          'between',
+          'in',
+        ]),
+      }),
+    )
+    .optional()
+    .default([]),
+  sort: z
+    .array(
+      z.object({
+        id: z.string(),
+        desc: z.boolean(),
+      }),
+    )
+    .optional()
+    .default([]),
+});
+
 export const eventSchema = z.discriminatedUnion('isRepeating', [
   baseEventSchema.extend({
     isRepeating: z.literal(false).optional(),
@@ -43,7 +89,7 @@ export const eventFormSchema = baseEventSchema
     startTime: z
       .string()
       .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
-      .transform((time) => `${time}:00`), // HH:MM
+      .transform((time) => `${time}:00`),
     endTime: z
       .string()
       .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
@@ -60,5 +106,24 @@ export const eventFormSchema = baseEventSchema
     path: ['endTime'],
   });
 
+export interface FilterColumn {
+  id: string;
+  value: string | boolean | Date | string[] | Date[];
+  operator:
+    | 'equals'
+    | 'contains'
+    | 'startsWith'
+    | 'endsWith'
+    | 'gt'
+    | 'gte'
+    | 'lt'
+    | 'lte'
+    | 'between'
+    | 'in';
+}
+
 export type EventTypes = z.infer<typeof eventSchema>;
 export type EventSearchParams = z.infer<typeof eventSearchSchema>;
+export type AdvancedEventSearchParams = z.infer<
+  typeof advancedEventSearchSchema
+>;
