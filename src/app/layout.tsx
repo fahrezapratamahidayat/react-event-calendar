@@ -1,6 +1,7 @@
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/theme-provider';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 export default function RootLayout({
   children,
@@ -17,9 +18,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster expand={true} richColors position="top-center" />
-          <div vaul-drawer-wrapper="" className="bg-background">
-            {children}
-          </div>
+          <NuqsAdapter>{children}</NuqsAdapter>
         </ThemeProvider>
       </body>
     </html>
