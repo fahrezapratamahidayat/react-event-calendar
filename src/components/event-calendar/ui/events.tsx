@@ -1,9 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { EventTypes } from '@/db/schema';
 import { formatTime } from '@/lib/date';
 import { cn } from '@/lib/utils';
-import { CalendarViewType, EventTypes, TimeFormatType } from '@/types/event';
+import { CalendarViewType, TimeFormatType } from '@/types/event';
 import { endOfWeek, format, Locale, startOfWeek } from 'date-fns';
 import { Calendar, Clock, MapPin } from 'lucide-react';
 import { memo } from 'react';
