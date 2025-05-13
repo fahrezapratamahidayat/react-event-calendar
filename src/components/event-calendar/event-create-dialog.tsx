@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { add30Minutes } from '@/lib/date';
-import { eventFormSchema, eventSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDays } from 'date-fns';
 import { Save } from 'lucide-react';
@@ -22,13 +21,14 @@ import {
 import { ScrollArea } from '../ui/scroll-area';
 import { EventDetailsForm } from './event-detail-form';
 import { EventPreviewCalendar } from './event-preview-calendar';
+import { createEventSchema } from '@/lib/validations';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
 const DEFAULT_COLOR = 'bg-red-600';
 const DEFAULT_CATEGORY = 'workshop';
 
-type EventFormValues = z.infer<typeof eventFormSchema>;
+type EventFormValues = z.infer<typeof createEventSchema>;
 
 const DEFAULT_FORM_VALUES: EventFormValues = {
   title: '',
@@ -56,47 +56,18 @@ export default function EventCreateDialog() {
   } = useEventCalendarStore();
 
   const form = useForm<EventFormValues>({
-    resolver: zodResolver(eventFormSchema),
+    resolver: zodResolver(createEventSchema),
     defaultValues: DEFAULT_FORM_VALUES,
     mode: 'onChange',
   });
 
   const watchedValues = form.watch();
 
-  const handleSubmit = async (formValues: z.infer<typeof eventFormSchema>) => {
-    const dbEvent = {
-      ...formValues,
-      id: crypto.randomUUID(),
-      startTime: formValues.startTime.includes(':')
-        ? formValues.startTime + ':00'
-        : formValues.startTime + ':00:00',
-      endTime: formValues.endTime.includes(':')
-        ? formValues.endTime + ':00'
-        : formValues.endTime + ':00:00',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      ...(formValues.isRepeating
-        ? {
-            isRepeating: true,
-            repeatingType: formValues.repeatingType,
-          }
-        : {
-            isRepeating: false,
-            repeatingType: null,
-          }),
-    };
-
+  const handleSubmit = async (
+    formValues: z.infer<typeof createEventSchema>,
+  ) => {
+    console.log(formValues);
     try {
-      const parsedEvent = eventSchema.parse(dbEvent);
-
-      if (parsedEvent.isRepeating) {
-        console.log('Repeating event with type:', parsedEvent.repeatingType);
-      } else {
-        console.log('One-time event');
-      }
-
-      // send to database
-      // return { success: true, event: parsedEvent };
     } catch (error) {
       if (error instanceof z.ZodError) {
         console.error('Validation error:', error.errors);
