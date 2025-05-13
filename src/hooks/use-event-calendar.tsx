@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import {
   CalendarViewType,
   EventPosition,
-  EventTypes,
   QuickAddDialogData,
   TimeFormatType,
   ViewModeType,
@@ -19,6 +18,7 @@ import {
 } from 'date-fns';
 import { Locale, enUS } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { EventTypes } from '@/db/schema';
 
 export interface DayViewConfig {
   showCurrentTimeIndicator: boolean;
