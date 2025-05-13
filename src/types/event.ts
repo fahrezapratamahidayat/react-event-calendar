@@ -1,29 +1,3 @@
-interface EventBase {
-  id: string;
-  title: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
-  startTime: string; // "HH:MM:SS"
-  endTime: string; // "HH:MM:SS"
-  location: string;
-  category: string;
-  color: string; // Tailwind class like "bg-blue-500"
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
-}
-
-export interface SingleEvent extends EventBase {
-  isRepeating?: false;
-}
-
-export interface RepeatingEvent extends EventBase {
-  isRepeating: true;
-  repeatingType: 'daily' | 'weekly' | 'monthly';
-}
-
-export type EventTypes = SingleEvent | RepeatingEvent;
-
 export interface HoverPositionType {
   hour: number;
   minute: number;
@@ -31,7 +5,6 @@ export interface HoverPositionType {
 }
 
 export interface MultiDayEventRowType {
-  event: EventTypes;
   startIndex: number;
   endIndex: number;
   row: number;
