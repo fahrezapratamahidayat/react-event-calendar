@@ -19,14 +19,10 @@ import { MonthDayEventsDialog } from './month-day-events-dialog';
 import EventCreateDialog from './event-create-dialog';
 import { CalendarTabs } from './ui/calendar-tabs';
 import { useShallow } from 'zustand/shallow';
-import { useCallback, useEffect } from 'react';
-import { fetchEvents } from '@/app/actions/event-actions';
-import { addMonths, endOfMonth, startOfMonth } from 'date-fns';
+import { FilterContainer } from './ui/filter-container';
 
 export function EventCalendar() {
   const {
-    setEvents,
-    setLoading,
     viewMode,
     locale,
     currentDate,
@@ -59,36 +55,6 @@ export function EventCalendar() {
       openQuickAddDialog: state.openQuickAddDialog,
     })),
   );
-
-  const loadEvents = useCallback(
-    async (date: Date) => {
-      try {
-        setLoading(true);
-
-        const params = {
-          start: startOfMonth(addMonths(date, -1)),
-          end: endOfMonth(addMonths(date, 1)),
-        };
-
-        const eventsData = await fetchEvents(params);
-        console.log(eventsData);
-        setEvents(eventsData);
-      } catch (error) {
-        console.error('Error loading events:', error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [setEvents, setLoading],
-  );
-
-  useEffect(() => {
-    loadEvents(currentDate);
-  }, [currentDate, loadEvents]);
-
-  const _handleDateChange = (newDate: Date) => {
-    setCurrentDate(newDate);
-  };
 
   const handleDayChange = (newDate: Date) => {
     setCurrentDate(newDate);
@@ -182,6 +148,7 @@ export function EventCalendar() {
               </Button>
             </div>
             <div className="hidden shrink-0 items-center gap-2 sm:flex">
+              <FilterContainer />
               <TodayButton
                 currentDate={currentDate}
                 goToday={goToday}
