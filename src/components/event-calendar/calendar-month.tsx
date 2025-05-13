@@ -14,7 +14,6 @@ import {
   setDay,
   getDay,
 } from 'date-fns';
-import { EventTypes } from '@/types/event';
 import { Button } from '@/components/ui/button';
 import { Clock, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,6 +22,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
+import { EventTypes } from '@/db/schema';
 
 export function CalendarMonth() {
   const {
