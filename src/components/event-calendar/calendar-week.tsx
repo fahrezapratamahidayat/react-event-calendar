@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { formatDate, generateTimeSlots, isSameFullDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
-import { EventTypes, HoverPositionType } from '@/types/event';
+import { HoverPositionType } from '@/types/event';
 import { WeekHeader } from './ui/week-header';
 import { TimeColumn } from './ui/time-column';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
@@ -19,6 +19,7 @@ import {
 } from '@/lib/event-utils';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
+import { EventTypes } from '@/db/schema';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
