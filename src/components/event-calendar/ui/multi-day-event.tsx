@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { EventTypes } from '@/types/event';
 import { memo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { EventTypes } from '@/db/schema';
 
 interface MultiDayEventProps {
   event: EventTypes;
