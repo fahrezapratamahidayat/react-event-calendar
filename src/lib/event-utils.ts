@@ -7,8 +7,9 @@ import {
 } from 'date-fns';
 import { useMemo } from 'react';
 import { convertTimeToMinutes, isSameFullDay } from './date';
-import { EventPosition, EventTypes, MultiDayEventRowType } from '@/types/event';
+import { EventPosition, MultiDayEventRowType } from '@/types/event';
 import { CATEGORY_OPTIONS } from '@/constants/event-options';
+import { EventTypes } from '@/db/schema';
 
 /**
  * Custom hook for generating the list of days in the current week,
@@ -225,7 +226,7 @@ export function useMultiDayEventRows(
   daysInWeek: Date[],
 ) {
   return useMemo(() => {
-    const rows: MultiDayEventRowType[] = [];
+    const rows: Array<MultiDayEventRowType & { event: EventTypes }> = [];
 
     // Set reference for weekly date range
     const weekStart = daysInWeek[0];
