@@ -10,9 +10,10 @@ import {
   Locale,
 } from 'date-fns';
 import { formatTime } from '@/lib/date';
-import { CalendarViewType, EventTypes } from '@/types/event';
+import { CalendarViewType } from '@/types/event';
 import { EventGroup, NoEvents } from './ui/events';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { EventTypes } from '@/db/schema';
 
 const CONTAINER_HEIGHT = 'calc(100vh-12rem)';
 /**
