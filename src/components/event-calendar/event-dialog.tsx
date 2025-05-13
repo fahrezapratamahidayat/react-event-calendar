@@ -14,11 +14,11 @@ import { DeleteAlert } from '@/components/event-calendar/ui/delete-alert';
 import { FormFooter } from '@/components/event-calendar/ui/form-footer';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { EventTypes } from '@/types/event';
 import { ensureDate } from '@/lib/date';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { eventFormSchema } from '@/lib/validations';
 import { EventDetailsForm } from './event-detail-form';
+import { EventTypes } from '@/db/schema';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
