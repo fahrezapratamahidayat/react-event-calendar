@@ -26,12 +26,11 @@ export async function seedEvents() {
 
     await db.delete(events);
 
-    const MONTH_RANGE = 6; // ±6 bulan = 12 bulan total
+    const MONTH_RANGE = 6;
     const TODAY = new Date();
-    const EVENT_COUNT = 500; // Jumlah event diperbanyak
+    const EVENT_COUNT = 500;
 
     const fakeEvents = Array.from({ length: EVENT_COUNT }, (_, i) => {
-      // Generate tanggal dengan distribusi lebih terkontrol
       const randomMonth = faker.number.int({
         min: -MONTH_RANGE,
         max: MONTH_RANGE,
@@ -40,7 +39,7 @@ export async function seedEvents() {
       const startDate = new Date(
         TODAY.getFullYear(),
         TODAY.getMonth() + randomMonth,
-        faker.number.int({ min: 1, max: 28 }), // Pastikan tanggal valid
+        faker.number.int({ min: 1, max: 28 }),
         faker.number.int({ min: 0, max: 23 }),
         faker.number.int({ min: 0, max: 59 }),
       );
@@ -52,7 +51,7 @@ export async function seedEvents() {
 
       const category = getBalancedCategory();
       const color = faker.helpers.arrayElement(EVENT_COLORS);
-      const isRepeating = i < 100; // 20% event berulang
+      const isRepeating = i < 20; // 5% event berulang
 
       return {
         title: `${category.label}: ${faker.lorem.words(3)}`,
