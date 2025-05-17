@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '../../ui/button';
 import { calculateEventDuration, formatTime } from '@/lib/date';
 import { EventTypes } from '@/db/schema';
+import { getColorClasses } from '@/lib/event-utils';
 
 type EventDialogTriggerProps = {
   event: EventTypes;
@@ -24,17 +25,22 @@ export const EventDialogTrigger = ({
   rightOffset,
   onClick,
 }: EventDialogTriggerProps) => {
-  const handleOpenEventDialog = () => {
+  const { bg } = getColorClasses(event.color);
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     onClick(event, position, leftOffset, rightOffset);
   };
+
   return (
     <Button
       className={cn(
         'group absolute flex cursor-pointer flex-col items-start justify-start gap-0 overflow-hidden rounded bg-transparent p-2 text-white hover:bg-transparent',
         'border-none shadow-none ring-0 focus:ring-0 focus:outline-none',
         'transition-colors',
+        bg,
       )}
-      onClick={handleOpenEventDialog}
+      onClick={handleClick}
       style={{
         top: `${position?.top}px`,
         height: `${position?.height}px`,
@@ -43,13 +49,6 @@ export const EventDialogTrigger = ({
         zIndex: 5,
       }}
     >
-      <div
-        className={cn(
-          'absolute inset-0 -z-10 rounded transition-opacity',
-          event.color,
-          'group-hover:opacity-20',
-        )}
-      />
       <div className="text-xs font-medium sm:truncate">{event.title}</div>
       <div className="text-xs sm:truncate">
         {formatTime(event.startTime, '12')} - {formatTime(event.endTime, '12')}
