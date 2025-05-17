@@ -6,30 +6,19 @@ import {
   TimeFormatType,
   ViewModeType,
 } from '@/types/event';
-import {
-  addDays,
-  addMonths,
-  addWeeks,
-  addYears,
-  subDays,
-  subMonths,
-  subWeeks,
-  subYears,
-} from 'date-fns';
 import { Locale, enUS } from 'date-fns/locale';
-import { toast } from 'sonner';
 import { EventTypes } from '@/db/schema';
 
 export interface DayViewConfig {
   showCurrentTimeIndicator: boolean;
   showHoverTimeIndicator: boolean;
-  onTimeIndicatorClick: boolean;
+  enableTimeSlotClick: boolean;
 }
 
 export interface WeekViewConfig {
   showCurrentTimeIndicator: boolean;
   showHoverTimeIndicator: boolean;
-  onTimeIndicatorClick: boolean;
+  enableTimeSlotClick: boolean;
 }
 
 export interface MonthViewConfig {
@@ -57,12 +46,12 @@ const DEFAULT_VIEW_CONFIGS: CalendarViewConfigs = {
   day: {
     showCurrentTimeIndicator: true,
     showHoverTimeIndicator: true,
-    onTimeIndicatorClick: true,
+    enableTimeSlotClick: true,
   },
   week: {
     showCurrentTimeIndicator: true,
     showHoverTimeIndicator: true,
-    onTimeIndicatorClick: true,
+    enableTimeSlotClick: true,
   },
   month: {
     eventLimit: 3,
@@ -88,8 +77,6 @@ export interface EventCalendarConfig {
 }
 
 interface EventCalendarState {
-  events: EventTypes[];
-  currentDate: Date;
   selectedEvent: EventTypes | null;
   currentView: CalendarViewType;
   viewMode: ViewModeType;
@@ -122,24 +109,7 @@ interface EventCalendarState {
     initialEvents?: EventTypes[],
     initialDate?: Date,
   ) => void;
-  setEvents: (events: EventTypes[]) => void;
   setLoading: (loading: boolean) => void;
-  addEvent: (event: EventTypes) => Promise<void>;
-  updateEvent: (event: EventTypes) => Promise<void>;
-  deleteEvent: (eventId: string) => Promise<void>;
-  handleDateRangeChange: (
-    startDate: Date,
-    endDate: Date,
-    signal?: AbortSignal,
-  ) => Promise<void>;
-
-  // Navigation
-  goToday: () => void;
-  navigateNext: () => void;
-  navigatePrevious: () => void;
-
-  // Setters
-  setCurrentDate: (date: Date) => void;
   setCurrentView: (view: CalendarViewType) => void;
   setViewMode: (mode: ViewModeType) => void;
   setTimeFormat: (format: TimeFormatType) => void;
@@ -181,8 +151,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
   };
 
   return {
-    events: [],
-    currentDate: new Date(),
     selectedEvent: null,
     currentView: defaultConfig.defaultView!,
     viewMode: defaultConfig.defaultViewMode!,
@@ -212,7 +180,7 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
     },
     isDialogAddOpen: false,
 
-    initialize: (config, initialEvents = [], initialDate = new Date()) => {
+    initialize: (config) => {
       const mergedConfig = {
         ...defaultConfig,
         ...config,
@@ -224,8 +192,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
       set({
         config: mergedConfig,
         viewConfigs: mergedConfig.viewConfigs as CalendarViewConfigs,
-        events: initialEvents,
-        currentDate: initialDate,
         currentView: mergedConfig.defaultView || defaultConfig.defaultView!,
         viewMode:
           mergedConfig.defaultViewMode || defaultConfig.defaultViewMode!,
@@ -236,117 +202,7 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
           mergedConfig.firstDayOfWeek || defaultConfig.firstDayOfWeek!,
       });
     },
-    setEvents: (events) => set({ events }),
     setLoading: (loading) => set({ loading }),
-    // Event CRUD operations
-    addEvent: async (newEvent) => {
-      try {
-        set({ loading: true, error: null });
-        set((state) => ({ events: [...state.events, newEvent] }));
-      } catch (err) {
-        set({
-          error: err instanceof Error ? err : new Error('Failed to add event'),
-        });
-        throw err;
-      } finally {
-        set({ loading: false });
-      }
-    },
-
-    updateEvent: async (updatedEvent) => {
-      try {
-        set({ loading: true, error: null, isSubmitting: true });
-        set((state) => ({
-          events: state.events.map((event) =>
-            event.id === updatedEvent.id ? updatedEvent : event,
-          ),
-        }));
-        toast.success('Event updated successfully');
-      } catch (err) {
-        set({
-          error:
-            err instanceof Error ? err : new Error('Failed to update event'),
-        });
-        throw err;
-      } finally {
-        set({ loading: false, isSubmitting: false, isDialogOpen: false });
-      }
-    },
-
-    deleteEvent: async (eventId) => {
-      try {
-        set({ loading: true, error: null, isSubmitting: true });
-        set((state) => ({
-          events: state.events.filter((event) => event.id !== eventId),
-        }));
-        toast.success('Event deleted successfully');
-      } catch (err) {
-        set({
-          error:
-            err instanceof Error ? err : new Error('Failed to delete event'),
-        });
-        throw err;
-      } finally {
-        set({ loading: false, isSubmitting: false, isDialogOpen: false });
-      }
-    },
-
-    handleDateRangeChange: async (startDate) => {
-      try {
-        set({ loading: true, error: null });
-        set({ currentDate: startDate });
-      } catch (err) {
-        set({
-          error:
-            err instanceof Error ? err : new Error('Failed to load events'),
-        });
-      } finally {
-        set({ loading: false });
-      }
-    },
-
-    // Navigation
-    goToday: () => set({ currentDate: new Date() }),
-
-    navigateNext: () => {
-      const { currentDate, currentView } = get();
-      let newDate = new Date(currentDate);
-      switch (currentView) {
-        case CalendarViewType.DAY:
-          newDate = addDays(newDate, 1);
-          break;
-        case CalendarViewType.WEEK:
-          newDate = addWeeks(newDate, 1);
-          break;
-        case CalendarViewType.MONTH:
-          newDate = addMonths(newDate, 1);
-          break;
-        case CalendarViewType.YEAR:
-          newDate = addYears(newDate, 1);
-          break;
-      }
-      set({ currentDate: newDate });
-    },
-
-    navigatePrevious: () => {
-      const { currentDate, currentView } = get();
-      let newDate = new Date(currentDate);
-      switch (currentView) {
-        case CalendarViewType.DAY:
-          newDate = subDays(newDate, 1);
-          break;
-        case CalendarViewType.WEEK:
-          newDate = subWeeks(newDate, 1);
-          break;
-        case CalendarViewType.MONTH:
-          newDate = subMonths(newDate, 1);
-          break;
-        case CalendarViewType.YEAR:
-          newDate = subYears(newDate, 1);
-          break;
-      }
-      set({ currentDate: newDate });
-    },
 
     // View configuration management
     updateDayViewConfig: (config) =>
@@ -455,7 +311,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
     },
 
     // Basic setters
-    setCurrentDate: (date) => set({ currentDate: date }),
     setCurrentView: (view) => set({ currentView: view }),
     setViewMode: (mode) => set({ viewMode: mode }),
     setTimeFormat: (format) => set({ timeFormat: format }),
