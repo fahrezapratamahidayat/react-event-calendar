@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useTransition } from 'react';
 import {
   format,
   getDate,
-  setDate,
   getDaysInMonth,
   getMonth,
   getYear,
@@ -29,10 +28,11 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQueryState } from 'nuqs';
+import { parseAsIsoDate } from 'nuqs/server';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface SearchDayPickerProps {
-  currentDate: Date;
-  onDateChange: (date: Date) => void;
   locale?: Locale;
   className?: string;
   placeholder?: string;
@@ -40,8 +40,6 @@ interface SearchDayPickerProps {
 }
 
 export function SearchDayPicker({
-  currentDate,
-  onDateChange,
   locale = id,
   className = '',
   placeholder = 'Choose Day',
@@ -51,6 +49,16 @@ export function SearchDayPicker({
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [selectedDayChanged, setSelectedDayChanged] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [date, setDate] = useQueryState(
+    'date',
+    parseAsIsoDate.withDefault(new Date()).withOptions({
+      shallow: false,
+      startTransition,
+    }),
+  );
+
+  const day = getDate(date);
 
   /**
    * Gets the day suffix (st, nd, rd, th) for a given day number
@@ -72,30 +80,30 @@ export function SearchDayPicker({
   }, []);
 
   const daysInMonth = useMemo(() => {
-    const year = getYear(currentDate);
-    const month = getMonth(currentDate);
+    const year = getYear(date);
+    const month = getMonth(date);
     const daysCount = getDaysInMonth(new Date(year, month));
 
     return Array.from({ length: daysCount }, (_, i) => {
-      const day = i + 1;
-      const dayDate = new Date(year, month, day);
+      const dayNum = i + 1;
+      const dayDate = new Date(year, month, dayNum);
       const dayName = format(dayDate, 'EEE', { locale, weekStartsOn });
       const fullDayName = format(dayDate, 'EEEE', { locale, weekStartsOn });
-      const daySuffix = getDaySuffix(day);
+      const daySuffix = getDaySuffix(dayNum);
 
       return {
-        value: day.toString(),
-        day,
+        value: dayNum.toString(),
+        day: dayNum,
         dayName,
         fullDayName,
         daySuffix,
         formattedDate: format(dayDate, 'd MMMM', { locale }),
-        label: `${dayName} ${day}${daySuffix}`,
+        label: `${dayName} ${dayNum}${daySuffix}`,
         searchableText:
-          `${fullDayName} ${day} ${format(dayDate, 'd MMMM', { locale })}`.toLowerCase(),
+          `${fullDayName} ${dayNum} ${format(dayDate, 'd MMMM', { locale })}`.toLowerCase(),
       };
     });
-  }, [currentDate, locale, weekStartsOn, getDaySuffix]);
+  }, [date, locale, weekStartsOn, getDaySuffix]);
 
   const filteredDays = useMemo(() => {
     if (!searchValue) return daysInMonth;
@@ -107,14 +115,17 @@ export function SearchDayPicker({
     );
   }, [daysInMonth, searchValue]);
 
-  const currentDay = getDate(currentDate);
-  const selectedDay = daysInMonth[currentDay - 1];
+  const selectedDay = daysInMonth.find((d) => d.day === day) || daysInMonth[0];
 
   const handleDayChange = (dayValue: string) => {
-    const newDate = setDate(currentDate, parseInt(dayValue));
-    onDateChange(newDate);
+    const newDay = parseInt(dayValue);
+    const newDate = new Date(date);
+    newDate.setDate(newDay);
+
+    setDate(newDate);
     setOpen(false);
     setSearchValue('');
+    setSelectedDayChanged(true);
 
     setTimeout(() => {
       setSelectedDayChanged(false);
@@ -127,6 +138,10 @@ export function SearchDayPicker({
       setInputValue('');
     }
   }, [open]);
+
+  if (isPending) {
+    <Skeleton />;
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -211,7 +226,9 @@ export function SearchDayPicker({
                     <Check
                       className={cn(
                         'h-4 w-4',
-                        currentDay === day.day ? 'opacity-100' : 'opacity-0',
+                        selectedDay.day === day.day
+                          ? 'opacity-100'
+                          : 'opacity-0',
                       )}
                     />
                   </CommandItem>
