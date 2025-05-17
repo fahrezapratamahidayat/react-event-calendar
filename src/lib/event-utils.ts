@@ -4,22 +4,20 @@ import {
   getWeek,
   Locale,
   startOfWeek,
+  format,
 } from 'date-fns';
 import { useMemo } from 'react';
-import { convertTimeToMinutes, isSameFullDay } from './date';
-import { EventPosition, MultiDayEventRowType } from '@/types/event';
+import { convertTimeToMinutes, formatTime, isSameFullDay } from './date';
+import {
+  CalendarViewType,
+  EventPosition,
+  MultiDayEventRowType,
+  TimeFormatType,
+} from '@/types/event';
 import { CATEGORY_OPTIONS } from '@/constants/event-options';
 import { EventTypes } from '@/db/schema';
+import { VIEW_CONFIG } from '@/components/event-calendar/event-list';
 
-/**
- * Custom hook for generating the list of days in the current week,
- * getting the start of the week, the week number, and tracking today's index.
- *
- * @param currentDate - The date to determine the current week.
- * @param daysInWeek - Total number of days in a week (usually 7).
- * @param locale - Optional locale for date formatting.
- * @returns Object containing week start date, week number, days in week, and today's index.
- */
 export function useWeekDays(
   currentDate: Date,
   daysInWeek: number,
@@ -54,16 +52,6 @@ export function useWeekDays(
   };
 }
 
-/**
- * Hook to categorize events into single-day and multi-day events for a given week.
- *
- * @param events - Array of event objects with start and end dates.
- * @param daysInWeek - Array of 7 dates representing the current week.
- * @returns An object containing filtered single-day and multi-day events.
- *
- * Single-day: Events with duration <= 1 day.
- * Multi-day: Events spanning more than 1 day, and visible in the current week.
- */
 export function useFilteredEvents(events: EventTypes[], daysInWeek: Date[]) {
   return useMemo(() => {
     const singleDayEvents: EventTypes[] = [];
@@ -98,17 +86,6 @@ export function useFilteredEvents(events: EventTypes[], daysInWeek: Date[]) {
   }, [events, daysInWeek]);
 }
 
-/**
- * Hook to calculate positions for single-day events on a weekly calendar.
- *
- * It determines the top offset, height, column index, and total columns
- * for each event based on time overlap and day index.
- *
- * @param singleDayEvents - Array of events that start and end on the same day
- * @param daysInWeek - Array of dates representing the days displayed in the calendar
- * @param hourHeight - Height in pixels per hour, used for calculating vertical sizing
- * @returns An object mapping event positions by key format `${dayIndex}-${eventId}`
- */
 export function useEventPositions(
   singleDayEvents: EventTypes[],
   daysInWeek: Date[],
@@ -210,17 +187,6 @@ export function useEventPositions(
   }, [daysInWeek, singleDayEvents, hourHeight]);
 }
 
-/**
- * Hook to calculate row positions for multi-day events in a weekly calendar.
- *
- * Fungsi ini alokasikan multi-day events ke baris yang tersedia berdasarkan
- * overlap-nya dengan event lain yang ada di minggu itu. Hasilnya berguna
- * buat tampilan seperti bar di atas grid kalender mingguan (mirip Google Calendar).
- *
- * @param multiDayEvents - Array event yang durasinya lebih dari 1 hari
- * @param daysInWeek - Array berisi 7 tanggal (1 minggu) sebagai referensi tampilan kalender
- * @returns Array of event rows with event data, start index, end index, and assigned row
- */
 export function useMultiDayEventRows(
   multiDayEvents: EventTypes[],
   daysInWeek: Date[],
@@ -315,20 +281,6 @@ export function useMultiDayEventRows(
   }, [multiDayEvents, daysInWeek]);
 }
 
-/**
- * Hook for calculating the layout positions of events in a single day view.
- *
- * This hook determines the vertical position, height, and column layout
- * of events that occur within the same day, preventing visual overlaps
- * by assigning them to different columns when needed.
- *
- * @param events - Array of events scheduled on the selected day
- * @returns A record of event positions keyed by event ID, each containing:
- *  - top: Vertical offset in pixels
- *  - height: Height in pixels
- *  - column: Column index to avoid overlap
- *  - totalColumns: Total number of columns for that day (for width calculation)
- */
 export function useDayEventPositions(events: EventTypes[], hourHeight: number) {
   return useMemo(() => {
     const positions: Record<string, EventPosition> = {};
@@ -390,17 +342,71 @@ export function useDayEventPositions(events: EventTypes[], hourHeight: number) {
   }, [events, hourHeight]);
 }
 
-/**
- * Determines a contrasting text color (black or white) based on the background color.
- *
- * @param {string} hexColor - The background color in hexadecimal format (e.g., "#ffffff").
- * @returns {string} - Returns "#000000" (black) if the background is light,
- *                     or "#ffffff" (white) if the background is dark.
- *
- * @example
- * getContrastColor("#ffffff"); // "#000000"
- * getContrastColor("#222222"); // "#ffffff"
- */
+export function useEventFilter(
+  events: EventTypes[],
+  currentDate: Date,
+  viewType: CalendarViewType,
+  locale?: Locale,
+) {
+  return useMemo(() => {
+    try {
+      const { filterFn } = VIEW_CONFIG[viewType];
+      return events.filter((event) => {
+        const eventDate = safeParseDate(event.startDate);
+        return filterFn(eventDate, currentDate, locale);
+      });
+    } catch (error) {
+      console.error('Event filtering error:', error);
+      return [];
+    }
+  }, [events, currentDate, viewType, locale]);
+}
+
+export function useEventGrouper(
+  events: EventTypes[],
+  viewType: CalendarViewType,
+  timeFormat: TimeFormatType,
+  locale?: Locale,
+) {
+  return useMemo(() => {
+    const { groupFormat, titleFormat } = VIEW_CONFIG[viewType];
+    const isDayView = viewType === CalendarViewType.DAY;
+
+    const groupMap = events.reduce(
+      (acc, event) => {
+        const eventDate = safeParseDate(event.startDate);
+        const groupKey = isDayView
+          ? event.startTime
+          : format(eventDate, groupFormat, { locale });
+
+        const groupTitle = isDayView
+          ? formatTime(groupKey, timeFormat)
+          : format(eventDate, titleFormat, { locale });
+
+        if (!acc[groupKey]) {
+          acc[groupKey] = {
+            key: groupKey,
+            title: groupTitle,
+            events: [],
+          };
+        }
+        acc[groupKey].events.push(event);
+        return acc;
+      },
+      {} as Record<
+        string,
+        { key: string; title: string; events: EventTypes[] }
+      >,
+    );
+
+    return Object.values(groupMap).sort((a, b) => a.key.localeCompare(b.key));
+  }, [events, viewType, timeFormat, locale]);
+}
+
+function safeParseDate(date: Date | string): Date {
+  return date instanceof Date ? date : new Date(date);
+}
+
 export function getContrastColor(hexColor: string): string {
   const r = parseInt(hexColor.slice(1, 3), 16);
   const g = parseInt(hexColor.slice(3, 5), 16);
@@ -413,3 +419,59 @@ export function getCategoryLabel(categoryValue: string) {
   const category = CATEGORY_OPTIONS.find((c) => c.value === categoryValue);
   return category ? category.label : categoryValue;
 }
+
+export const COLOR_CLASSES = {
+  blue: {
+    bg: 'bg-blue-500 hover:bg-blue-600',
+    border: 'border-blue-600 hover:border-blue-700',
+    text: 'text-blue-600 hover:text-blue-700',
+  },
+  red: {
+    bg: 'bg-red-500 hover:bg-red-600',
+    border: 'border-red-600 ',
+    text: 'text-red-600 hover:text-red-700',
+  },
+  lime: {
+    bg: 'bg-lime-500 hover:bg-lime-600',
+    border: 'border-lime-600 ',
+    text: 'text-lime-600 hover:text-lime-700',
+  },
+  green: {
+    bg: 'bg-green-500 hover:bg-green-600',
+    border: 'border-green-600 ',
+    text: 'text-green-600 hover:text-green-700',
+  },
+  amber: {
+    bg: 'bg-amber-500 hover:bg-amber-600',
+    border: 'border-amber-600 ',
+    text: 'text-amber-600 hover:text-amber-700',
+  },
+  yellow: {
+    bg: 'bg-yellow-500 hover:bg-yellow-600',
+    border: 'border-yellow-600 ',
+    text: 'text-yellow-600 hover:text-yellow-700',
+  },
+  purple: {
+    bg: 'bg-purple-500 hover:bg-purple-600',
+    border: 'border-purple-600 ',
+    text: 'text-purple-600 hover:text-purple-700',
+  },
+  pink: {
+    bg: 'bg-pink-500 hover:bg-pink-600',
+    border: 'border-pink-600 ',
+    text: 'text-pink-600 hover:text-pink-700',
+  },
+  indigo: {
+    bg: 'bg-indigo-500 hover:bg-indigo-600',
+    border: 'border-indigo-600 ',
+    text: 'text-indigo-600 hover:text-indigo-700',
+  },
+  teal: {
+    bg: 'bg-teal-500 hover:bg-teal-600',
+    border: 'border-teal-600 ',
+    text: 'text-teal-600 hover:text-teal-700',
+  },
+} satisfies Record<string, { bg: string; border: string; text: string }>;
+export type ColorName = keyof typeof COLOR_CLASSES;
+export const getColorClasses = (color: string) =>
+  COLOR_CLASSES[color as ColorName] || COLOR_CLASSES.blue;
