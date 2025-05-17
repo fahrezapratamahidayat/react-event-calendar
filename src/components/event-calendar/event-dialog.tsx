@@ -55,8 +55,6 @@ export default function EventDialog() {
     selectedEvent,
     isDialogOpen,
     closeEventDialog,
-    updateEvent,
-    deleteEvent,
     locale,
     isSubmitting,
   } = useEventCalendarStore();
@@ -110,13 +108,10 @@ export default function EventDialog() {
       category: values.category,
       color: values.color,
     };
-
-    await updateEvent(updatedEvent);
   };
 
   const handleDeleteEvent = async () => {
     if (!selectedEvent) return;
-    await deleteEvent(selectedEvent.id);
     setIsDeleteAlertOpen(false);
   };
 
