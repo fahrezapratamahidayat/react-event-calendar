@@ -20,35 +20,55 @@ import EventCreateDialog from './event-create-dialog';
 import { CalendarTabs } from './ui/calendar-tabs';
 import { useShallow } from 'zustand/shallow';
 import { FilterContainer } from './ui/filter-container';
+import { getCategories, getEvents } from '@/app/actions';
+import { useCallback, useMemo } from 'react';
+import {
+  addDays,
+  addMonths,
+  addWeeks,
+  addYears,
+  subDays,
+  subMonths,
+  subWeeks,
+  subYears,
+} from 'date-fns';
+import { useQueryState } from 'nuqs';
+import { parseAsIsoDate } from 'nuqs/server';
 
-export function EventCalendar() {
+interface EventCalendarProps {
+  initialDate: Date;
+  promises: [
+    Awaited<ReturnType<typeof getEvents>>,
+    Awaited<ReturnType<typeof getCategories>>,
+  ];
+}
+export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
+  const [eventsData] = promises;
+  const [date, setDate] = useQueryState(
+    'date',
+    parseAsIsoDate.withDefault(new Date()).withOptions({
+      shallow: false,
+      throttleMs: 300,
+    }),
+  );
+
   const {
     viewMode,
     locale,
-    currentDate,
     timeFormat,
     currentView,
-    goToday,
-    navigateNext,
-    navigatePrevious,
-    setCurrentDate,
     setCurrentView,
     setTimeFormat,
     setViewMode,
     openQuickAddDialog,
   } = useEventCalendarStore(
     useShallow((state) => ({
+      initialize: state.initialize,
       setLoading: state.setLoading,
-      setEvents: state.setEvents,
       viewMode: state.viewMode,
       locale: state.locale,
-      currentDate: state.currentDate,
       timeFormat: state.timeFormat,
       currentView: state.currentView,
-      goToday: state.goToday,
-      navigateNext: state.navigateNext,
-      navigatePrevious: state.navigatePrevious,
-      setCurrentDate: state.setCurrentDate,
       setCurrentView: state.setCurrentView,
       setTimeFormat: state.setTimeFormat,
       setViewMode: state.setViewMode,
@@ -56,46 +76,94 @@ export function EventCalendar() {
     })),
   );
 
-  const handleDayChange = (newDate: Date) => {
-    setCurrentDate(newDate);
-  };
-
-  const handleMonthChange = (newDate: Date) => {
-    setCurrentDate(newDate);
-  };
-
-  const handleYearChange = (newDate: Date) => {
-    setCurrentDate(newDate);
-  };
-
-  const handleTimeFormatChange = (format: TimeFormatType) => {
-    setTimeFormat(format);
-  };
-
-  const handleViewModeChange = (mode: ViewModeType) => {
-    setViewMode(mode);
-  };
-
-  const handleViewTypeChange = (viewType: CalendarViewType) => {
-    setCurrentView(viewType);
-  };
-
-  const renderCalendarView = () => {
-    if (viewMode === 'list') {
-      return <EventsList />;
-    }
+  const handleNavigateNext = useCallback(() => {
+    let newDate = new Date(date);
 
     switch (currentView) {
       case 'day':
-        return <CalendarDay />;
+        newDate = addDays(newDate, 1);
+        break;
       case 'week':
-        return <CalendarWeek />;
+        newDate = addWeeks(newDate, 1);
+        break;
       case 'month':
-        return <CalendarMonth />;
-      default:
-        return <CalendarDay />;
+        newDate = addMonths(newDate, 1);
+        break;
+      case 'year':
+        newDate = addYears(newDate, 1);
+        break;
     }
-  };
+
+    setDate(newDate);
+  }, [date, currentView, setDate]);
+
+  const handleNavigatePrevious = useCallback(() => {
+    let newDate = new Date(date);
+
+    switch (currentView) {
+      case 'day':
+        newDate = subDays(newDate, 1);
+        break;
+      case 'week':
+        newDate = subWeeks(newDate, 1);
+        break;
+      case 'month':
+        newDate = subMonths(newDate, 1);
+        break;
+      case 'year':
+        newDate = subYears(newDate, 1);
+        break;
+    }
+
+    setDate(newDate);
+  }, [date, currentView, setDate]);
+
+  const handleTimeFormatChange = useCallback(
+    (format: TimeFormatType) => {
+      setTimeFormat(format);
+    },
+    [setTimeFormat],
+  );
+
+  const handleViewModeChange = useCallback(
+    (mode: ViewModeType) => {
+      setViewMode(mode);
+    },
+    [setViewMode],
+  );
+
+  const handleViewTypeChange = useCallback(
+    (viewType: CalendarViewType) => {
+      setCurrentView(viewType);
+    },
+    [setCurrentView],
+  );
+
+  const renderCalendarView = useMemo(() => {
+    if (viewMode === 'list') {
+      return (
+        <EventsList events={eventsData.events} currentDate={initialDate} />
+      );
+    }
+    switch (currentView) {
+      case 'day':
+        return (
+          <CalendarDay events={eventsData.events} currentDate={initialDate} />
+        );
+      case 'week':
+        return (
+          <CalendarWeek events={eventsData.events} currentDate={initialDate} />
+        );
+      case 'month':
+        return (
+          <CalendarMonth events={eventsData.events} baseDate={initialDate} />
+        );
+      default:
+        return (
+          <CalendarDay events={eventsData.events} currentDate={initialDate} />
+        );
+    }
+  }, [currentView, eventsData.events, initialDate, viewMode]);
 
   return (
     <>
@@ -110,50 +178,33 @@ export function EventCalendar() {
                 variant="ghost"
                 size="icon"
                 className="hover:bg-muted h-8 w-8 rounded-full"
-                onClick={navigatePrevious}
+                onClick={handleNavigatePrevious}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               {currentView === 'day' && (
                 <SearchDayPicker
-                  currentDate={currentDate}
-                  onDateChange={handleDayChange}
                   locale={locale}
                   weekStartsOn={0}
                   placeholder="Select day"
                 />
               )}
               {currentView !== 'year' && (
-                <SearchMonthPicker
-                  date={currentDate}
-                  onDateChange={handleMonthChange}
-                  locale={locale}
-                  monthFormat="LLLL"
-                />
+                <SearchMonthPicker locale={locale} monthFormat="LLLL" />
               )}
-              <SearchYearPicker
-                date={currentDate}
-                onDateChange={handleYearChange}
-                yearRange={20}
-                minYear={2000}
-                maxYear={2030}
-              />
+              <SearchYearPicker yearRange={20} minYear={2000} maxYear={2030} />
               <Button
                 variant="ghost"
                 size="icon"
                 className="hover:bg-muted h-8 w-8 rounded-full"
-                onClick={navigateNext}
+                onClick={handleNavigateNext}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
             <div className="hidden shrink-0 items-center gap-2 sm:flex">
               <FilterContainer />
-              <TodayButton
-                currentDate={currentDate}
-                goToday={goToday}
-                viewType={currentView}
-              />
+              <TodayButton viewType={currentView} />
               <Button
                 variant="outline"
                 size="sm"
@@ -184,11 +235,7 @@ export function EventCalendar() {
               <ViewModeToggle mode={viewMode} onChange={handleViewModeChange} />
             </div>
             <div className="border-border/50 order-3 mt-2 flex w-full items-center justify-between gap-2 border-t py-2 sm:hidden">
-              <TodayButton
-                currentDate={currentDate}
-                goToday={goToday}
-                viewType={currentView}
-              />
+              <TodayButton viewType={currentView} />
               <Button
                 variant="outline"
                 size="sm"
@@ -204,7 +251,7 @@ export function EventCalendar() {
               </Button>
             </div>
           </div>
-          <div className="overflow-hidden p-0">{renderCalendarView()}</div>
+          <div className="overflow-hidden p-0">{renderCalendarView}</div>
         </div>
       </div>
     </>
