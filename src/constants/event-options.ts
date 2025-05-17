@@ -1,29 +1,15 @@
 export const EVENT_COLORS = [
-  {
-    value: 'bg-red-600',
-    label: 'Red',
-  },
-  {
-    value: 'bg-blue-600',
-    label: 'Blue',
-  },
-  {
-    value: 'bg-amber-600',
-    label: 'Amber',
-  },
-  {
-    value: 'bg-yellow-600',
-    label: 'Yellow',
-  },
-  {
-    value: 'bg-lime-600',
-    label: 'Lime',
-  },
-  {
-    value: 'bg-green-600',
-    label: 'Green',
-  },
-];
+  { value: 'red', label: 'Red' },
+  { value: 'blue', label: 'Blue' },
+  { value: 'amber', label: 'Amber' },
+  { value: 'yellow', label: 'Yellow' },
+  { value: 'lime', label: 'Lime' },
+  { value: 'green', label: 'Green' },
+  { value: 'purple', label: 'Purple' },
+  { value: 'pink', label: 'Pink' },
+  { value: 'indigo', label: 'Indigo' },
+  { value: 'teal', label: 'Teal' },
+] as const;
 
 export const CATEGORY_OPTIONS = [
   { value: 'workshop', label: 'Workshop' },
