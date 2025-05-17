@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { format, getMonth, Locale, setMonth } from 'date-fns';
+import { format, getMonth, setMonth, Locale } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -20,10 +20,10 @@ import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQueryState } from 'nuqs';
+import { parseAsIsoDate } from 'nuqs/server';
 
 interface SearchableMonthPickerProps {
-  date: Date;
-  onDateChange: (date: Date) => void;
   locale?: Locale;
   className?: string;
   monthFormat?: string;
@@ -31,8 +31,6 @@ interface SearchableMonthPickerProps {
 }
 
 export function SearchMonthPicker({
-  date,
-  onDateChange,
   locale,
   className = '',
   monthFormat = 'MMMM',
@@ -43,6 +41,14 @@ export function SearchMonthPicker({
   const [inputValue, setInputValue] = useState('');
   const [selectedMonthChange, setSelectedMonthChanged] =
     useState<boolean>(false);
+  const [date, setDate] = useQueryState(
+    'date',
+    parseAsIsoDate.withDefault(new Date()).withOptions({
+      shallow: false,
+    }),
+  );
+
+  const month = getMonth(date);
 
   const months = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => ({
@@ -55,20 +61,22 @@ export function SearchMonthPicker({
   const filteredMonths = useMemo(() => {
     if (!searchValue) return months;
     return months.filter(
-      (month) =>
-        month.label.toLowerCase().includes(searchValue.toLowerCase()) ||
-        month.shortLabel.toLowerCase().includes(searchValue.toLowerCase()),
+      (m) =>
+        m.label.toLowerCase().includes(searchValue.toLowerCase()) ||
+        m.shortLabel.toLowerCase().includes(searchValue.toLowerCase()),
     );
   }, [months, searchValue]);
 
-  const currentMonth = getMonth(date);
-  const selectedMonth = months[currentMonth];
+  const selectedMonth = months[month];
 
   const handleMonthChange = (monthValue: string) => {
-    const newDate = setMonth(date, parseInt(monthValue));
-    onDateChange(newDate);
+    const newMonth = parseInt(monthValue);
+    const newDate = setMonth(date, newMonth);
+
+    setDate(newDate);
     setOpen(false);
     setSearchValue('');
+    setSelectedMonthChanged(true);
 
     setTimeout(() => setSelectedMonthChanged(false), 1000);
   };
@@ -104,7 +112,7 @@ export function SearchMonthPicker({
               <CalendarIcon className="mr-2 h-4 w-4" />
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={selectedMonth.label}
+                  key={selectedMonth?.label}
                   initial={{
                     y: selectedMonthChange ? 11 : 0,
                     opacity: selectedMonthChange ? 0 : 1,
@@ -137,23 +145,23 @@ export function SearchMonthPicker({
             <CommandEmpty>Month not found</CommandEmpty>
             <CommandGroup>
               <ScrollArea className="h-[200px]">
-                {filteredMonths.map((month) => (
+                {filteredMonths.map((m) => (
                   <CommandItem
-                    key={month.value}
-                    value={month.value}
+                    key={m.value}
+                    value={m.value}
                     onSelect={handleMonthChange}
                   >
                     <Check
                       className={cn(
                         'mr-2 h-4 w-4',
-                        currentMonth === parseInt(month.value)
+                        month === parseInt(m.value)
                           ? 'opacity-100'
                           : 'opacity-0',
                       )}
                     />
-                    <span className="flex-1">{month.label}</span>
+                    <span className="flex-1">{m.label}</span>
                     <span className="text-muted-foreground mr-2 text-xs">
-                      {month.shortLabel}
+                      {m.shortLabel}
                     </span>
                   </CommandItem>
                 ))}
