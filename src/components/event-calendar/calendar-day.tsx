@@ -13,30 +13,27 @@ import { useDayEventPositions } from '@/lib/event-utils';
 import { TimeColumn } from './ui/time-column';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
+import { EventTypes } from '@/db/schema';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
 const END_HOUR = 23; // 23:00
 const COLUMN_WIDTH_TOTAL = 99.5; // Total width percentage for columns
 
-export function CalendarDay() {
-  const {
-    events,
-    currentDate,
-    timeFormat,
-    viewConfigs,
-    openQuickAddDialog,
-    openEventDialog,
-  } = useEventCalendarStore(
-    useShallow((state) => ({
-      events: state.events,
-      currentDate: state.currentDate,
-      timeFormat: state.timeFormat,
-      viewConfigs: state.viewConfigs,
-      openQuickAddDialog: state.openQuickAddDialog,
-      openEventDialog: state.openEventDialog,
-    })),
-  );
+interface CalendarDayProps {
+  events: EventTypes[];
+  currentDate: Date;
+}
+export function CalendarDay({ events, currentDate }: CalendarDayProps) {
+  const { timeFormat, viewConfigs, openQuickAddDialog, openEventDialog } =
+    useEventCalendarStore(
+      useShallow((state) => ({
+        timeFormat: state.timeFormat,
+        viewConfigs: state.viewConfigs,
+        openQuickAddDialog: state.openQuickAddDialog,
+        openEventDialog: state.openEventDialog,
+      })),
+    );
 
   const [hoverPosition, setHoverPosition] = useState<
     HoverPositionType | undefined
@@ -49,7 +46,6 @@ export function CalendarDay() {
       const eventStartDate = new Date(event.startDate);
       const eventEndDate = new Date(event.endDate);
 
-      // Check if currentDate is between start and end dates
       return (
         isSameDay(eventStartDate, currentDate) ||
         isSameDay(eventEndDate, currentDate) ||
@@ -65,20 +61,20 @@ export function CalendarDay() {
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
 
-  const handleTimeHover = useCallback((hour: number) => {
+  const handleTimeSlotHover = useCallback((hour: number) => {
     setHoverPosition({ hour, minute: 0, dayIndex: -1 });
   }, []);
 
-  const handleMinuteHover = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>, hour: number) => {
+  const handlePreciseHover = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>, hour: number) => {
       if (!sidebarRef.current) return;
 
-      const rect = e.currentTarget.getBoundingClientRect();
-      const relativeY = e.clientY - rect.top;
-      const minute = Math.floor((relativeY / rect.height) * 60);
-      const validMinute = Math.max(0, Math.min(59, minute));
+      const slotRect = event.currentTarget.getBoundingClientRect();
+      const cursorY = event.clientY - slotRect.top;
+      const minutes = Math.floor((cursorY / slotRect.height) * 60);
+      const clampedMinutes = Math.max(0, Math.min(59, minutes));
 
-      setHoverPosition({ hour, minute: validMinute, dayIndex: -1 });
+      setHoverPosition({ hour, minute: clampedMinutes, dayIndex: -1 });
     },
     [],
   );
@@ -87,8 +83,9 @@ export function CalendarDay() {
     setHoverPosition(undefined);
   }, []);
 
-  const handleTimeClick = useCallback(() => {
-    if (!viewConfigs.day.onTimeIndicatorClick) return;
+  const handleTimeSlotInteraction = useCallback(() => {
+    if (!viewConfigs.day.enableTimeSlotClick) return;
+
     openQuickAddDialog({
       date: currentDate,
       position: hoverPosition,
@@ -97,11 +94,11 @@ export function CalendarDay() {
     currentDate,
     hoverPosition,
     openQuickAddDialog,
-    viewConfigs.day.onTimeIndicatorClick,
+    viewConfigs.day.enableTimeSlotClick,
   ]);
 
   return (
-    <div className="py- flex h-[650px] flex-col">
+    <div className="flex h-[760px] flex-col py-3">
       <ScrollArea className="h-full w-full rounded-md px-4">
         <div className="mb-2 min-w-full">
           <div className="relative mt-2 mb-2">
@@ -110,11 +107,11 @@ export function CalendarDay() {
                 ref={sidebarRef}
                 timeSlots={timeSlots}
                 timeFormat={timeFormat}
-                onHover={handleTimeHover}
-                onHoverMinute={handleMinuteHover}
+                onHover={handleTimeSlotHover}
+                onHoverMinute={handlePreciseHover}
                 onLeave={handleTimeLeave}
-                variant="day"
-                onClick={handleTimeClick}
+                viewMode="day"
+                onSlotClick={handleTimeSlotInteraction}
               />
             </div>
             <div className="relative ml-16">
