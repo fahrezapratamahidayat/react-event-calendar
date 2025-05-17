@@ -6,22 +6,26 @@ import { useEffect, useState } from 'react';
 import { isToday, isThisWeek, isThisMonth, isThisYear } from 'date-fns';
 import { CalendarViewType } from '@/types/event';
 import { motion, AnimatePresence } from 'motion/react';
+import { useQueryState } from 'nuqs';
+import { parseAsIsoDate } from 'nuqs/server';
 
 interface TodayButtonProps {
-  currentDate: Date;
   viewType?: CalendarViewType;
-  goToday: () => void;
   className?: string;
 }
 
 export function TodayButton({
-  currentDate,
   viewType = CalendarViewType.DAY,
-  goToday,
   className = '',
 }: TodayButtonProps) {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [date, setDate] = useQueryState(
+    'date',
+    parseAsIsoDate.withDefault(new Date()).withOptions({
+      shallow: false,
+    }),
+  );
 
   useEffect(() => {
     const checks = {
@@ -31,14 +35,14 @@ export function TodayButton({
       [CalendarViewType.YEAR]: isThisYear,
     };
 
-    setIsDisabled(checks[viewType](currentDate));
-  }, [currentDate, viewType]);
+    setIsDisabled(checks[viewType](date));
+  }, [date, viewType]);
 
   const handleClick = () => {
     if (isDisabled) return;
 
+    setDate(new Date());
     setIsAnimating(true);
-    goToday();
 
     // Reset animation after 300ms
     setTimeout(() => setIsAnimating(false), 500);
