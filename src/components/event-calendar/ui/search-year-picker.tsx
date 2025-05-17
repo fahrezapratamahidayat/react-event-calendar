@@ -20,10 +20,10 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
 import { motion, AnimatePresence } from 'motion/react';
+import { useQueryState } from 'nuqs';
+import { parseAsIsoDate } from 'nuqs/server';
 
 interface SearchYearPickerProps {
-  date: Date;
-  onDateChange: (date: Date) => void;
   yearRange?: number;
   className?: string;
   minYear?: number;
@@ -31,8 +31,6 @@ interface SearchYearPickerProps {
 }
 
 export function SearchYearPicker({
-  date,
-  onDateChange,
   yearRange = 10,
   className = '',
   minYear,
@@ -42,33 +40,40 @@ export function SearchYearPicker({
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [selectedYearChanged, setSelectedYearChanged] = useState(false);
+  const [date, setDate] = useQueryState(
+    'date',
+    parseAsIsoDate.withDefault(new Date()).withOptions({
+      shallow: false,
+    }),
+  );
 
-  const currentYear = getYear(new Date());
-  const selectedYear = getYear(date);
+  const year = getYear(date);
 
   const years = useMemo(() => {
-    const startYear = minYear ?? currentYear - yearRange;
-    const endYear = maxYear ?? currentYear + yearRange;
+    const startYear = minYear ?? year - yearRange;
+    const endYear = maxYear ?? year + yearRange;
     const yearsArray = [];
 
-    for (let year = startYear; year <= endYear; year++) {
+    for (let y = startYear; y <= endYear; y++) {
       yearsArray.push({
-        value: year.toString(),
-        label: year.toString(),
+        value: y.toString(),
+        label: y.toString(),
       });
     }
 
     return yearsArray;
-  }, [currentYear, yearRange, minYear, maxYear]);
+  }, [year, yearRange, minYear, maxYear]);
 
   const filteredYears = useMemo(() => {
     if (!searchValue) return years;
-    return years.filter((year) => year.label.includes(searchValue));
+    return years.filter((y) => y.label.includes(searchValue));
   }, [years, searchValue]);
 
   const handleYearChange = (yearValue: string) => {
-    const newDate = setYear(date, parseInt(yearValue));
-    onDateChange(newDate);
+    const newYear = parseInt(yearValue);
+    const newDate = setYear(date, newYear);
+
+    setDate(newDate);
     setOpen(false);
     setSearchValue('');
     setSelectedYearChanged(true);
@@ -99,14 +104,14 @@ export function SearchYearPicker({
             aria-expanded={open}
             className={cn(
               'w-[120px] justify-between font-normal',
-              !selectedYear && 'text-muted-foreground',
+              !year && 'text-muted-foreground',
               className,
             )}
             title="Select year"
           >
             <AnimatePresence mode="wait">
               <motion.div
-                key={selectedYear}
+                key={year}
                 initial={{
                   y: selectedYearChanged ? 10 : 0,
                   opacity: selectedYearChanged ? 0 : 1,
@@ -115,7 +120,7 @@ export function SearchYearPicker({
                 exit={{ y: -10, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                {selectedYear || 'Pilih tahun'}
+                {year || 'Pilih tahun'}
               </motion.div>
             </AnimatePresence>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -136,18 +141,18 @@ export function SearchYearPicker({
             <CommandEmpty>Year not found</CommandEmpty>
             <CommandGroup>
               <ScrollArea className="h-[200px]">
-                {filteredYears.map((year) => (
+                {filteredYears.map((y) => (
                   <CommandItem
-                    key={year.value}
-                    value={year.value}
+                    key={y.value}
+                    value={y.value}
                     onSelect={handleYearChange}
                     className="flex items-center justify-between"
                   >
-                    {year.label}
+                    {y.label}
                     <Check
                       className={cn(
                         'h-4 w-4',
-                        selectedYear === parseInt(year.value)
+                        year === parseInt(y.value)
                           ? 'opacity-100'
                           : 'opacity-0',
                       )}
