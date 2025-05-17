@@ -1,0 +1,84 @@
+# React Event Calendar
+
+Selamat datang di dokumentasi React Event Calendar, sebuah komponen kalender event yang lengkap dengan berbagai fitur.
+
+<Callout type="info" title="Tentang Dokumentasi">
+  Dokumentasi ini menjelaskan struktur dan cara penggunaan komponen React Event Calendar.
+</Callout>
+
+## Instalasi
+
+<Steps>
+  <Steps.Item title="Instal Package">
+    Instal package menggunakan npm atau yarn:
+
+    ```bash
+    npm install react-event-calendar
+    ```
+  </Steps.Item>
+
+  <Steps.Item title="Setup Database">
+    Konfigurasikan database menggunakan Drizzle ORM:
+
+    ```typescript
+    import { drizzle } from 'drizzle-orm/...';
+    import { events } from './schema';
+
+    const db = drizzle(...);
+    ```
+  </Steps.Item>
+
+  <Steps.Item title="Gunakan Komponen">
+    Import dan gunakan komponen dalam aplikasi Anda:
+
+    ```tsx
+    import { EventCalendar } from 'react-event-calendar';
+
+    export default function App() {
+      return <EventCalendar />;
+    }
+    ```
+  </Steps.Item>
+</Steps>
+
+## Contoh Penggunaan
+
+<ComponentPreview
+  name="Calendar Example"
+  preview={<div className="p-4 border rounded">Calendar Preview</div>}
+  code={`import { EventCalendar } from '@/components/event-calendar';
+
+export default function Example() {
+  return <EventCalendar />;
+}`}
+/>
+
+## Fitur Utama
+
+- Multiple calendar views (Hari, Minggu, Bulan, Tahun)
+- Pembuatan dan manajemen event
+- Desain responsif
+- Tema yang dapat disesuaikan
+- Dukungan lokalisasi
+- Komponen yang dapat digunakan kembali
+
+## Arsitektur Dasar
+
+Project ini menggunakan pola arsitektur modern dengan pemisahan yang jelas antara:
+
+- **Components**: UI komponen reusable
+- **Hooks**: Logic yang digunakan di berbagai komponen
+- **Lib**: Utilitas dan helper functions
+- **DB**: Schema dan model database
+- **Types**: Type definitions
+
+## Navigasi Dokumentasi
+
+Gunakan sidebar di sebelah kiri untuk menjelajahi dokumentasi lengkap:
+
+1. **Pengenalan** - Pengenalan dan cara memulai
+2. **Komponen** - Detail komponen yang tersedia
+3. **Hooks** - Custom hooks untuk manajemen state
+4. **Database** - Skema dan manajemen data
+5. **API** - Referensi API untuk manipulasi data
+6. **Kustomisasi** - Cara menyesuaikan tampilan dan perilaku
