@@ -28,10 +28,13 @@ const DAYS_IN_WEEK = 7;
 const DAY_WIDTH_PERCENT = 100 / DAYS_IN_WEEK;
 const MULTI_DAY_ROW_HEIGHT = 50;
 
-export function CalendarWeek() {
+interface CalendarWeekProps {
+  events: EventTypes[];
+  currentDate: Date;
+}
+
+export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
   const {
-    events,
-    currentDate,
     timeFormat,
     locale,
     firstDayOfWeek,
@@ -40,8 +43,6 @@ export function CalendarWeek() {
     openEventDialog,
   } = useEventCalendarStore(
     useShallow((state) => ({
-      events: state.events,
-      currentDate: state.currentDate,
       timeFormat: state.timeFormat,
       viewConfigs: state.viewConfigs,
       locale: state.locale,
@@ -79,11 +80,11 @@ export function CalendarWeek() {
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
 
-  const handleTimeHover = useCallback((hour: number) => {
+  const handleTimeSlotHover = useCallback((hour: number) => {
     setHoverPosition({ hour, minute: 0, dayIndex: -1 });
   }, []);
 
-  const handleMinuteHover = useCallback(
+  const handlePreciseHover = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, hour: number) => {
       if (!sidebarRef.current) return;
 
@@ -101,14 +102,14 @@ export function CalendarWeek() {
     setHoverPosition(undefined);
   }, []);
 
-  const handleTimeClick = useCallback(() => {
-    if (!viewConfigs.day.onTimeIndicatorClick) return;
+  const handleTimeSlotInteraction = useCallback(() => {
+    if (!viewConfigs.day.enableTimeSlotClick) return;
     openQuickAddDialog({
       date: currentDate,
       position: hoverPosition,
     });
   }, [
-    viewConfigs.day.onTimeIndicatorClick,
+    viewConfigs.day.enableTimeSlotClick,
     openQuickAddDialog,
     currentDate,
     hoverPosition,
@@ -155,10 +156,11 @@ export function CalendarWeek() {
                 ref={sidebarRef}
                 timeSlots={timeSlots}
                 timeFormat={timeFormat}
-                onClick={handleTimeClick}
-                onHover={handleTimeHover}
-                onHoverMinute={handleMinuteHover}
+                onHover={handleTimeSlotHover}
+                onHoverMinute={handlePreciseHover}
                 onLeave={handleTimeLeave}
+                viewMode="day"
+                onSlotClick={handleTimeSlotInteraction}
               />
               <div
                 ref={containerRef}
