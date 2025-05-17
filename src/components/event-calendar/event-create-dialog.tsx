@@ -50,7 +50,6 @@ export default function EventCreateDialog() {
     currentView,
     locale,
     timeFormat,
-    addEvent,
     isSubmitting,
     quickAddDialogData,
   } = useEventCalendarStore();
