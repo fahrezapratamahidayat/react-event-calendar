@@ -7,13 +7,13 @@ const timeColumnVariants = cva(
   'flex h-16 w-full cursor-pointer items-center text-xs sm:text-sm',
   {
     variants: {
-      variant: {
+      viewMode: {
         day: 'text-muted-foreground pr-2 text-right justify-end',
         week: 'text-muted-foreground justify-center border-r border-border px-2',
       },
     },
     defaultVariants: {
-      variant: 'week',
+      viewMode: 'week',
     },
   },
 );
@@ -24,7 +24,7 @@ interface TimeColumnProps extends VariantProps<typeof timeColumnVariants> {
   onHover: (hour: number) => void;
   onHoverMinute: (e: React.MouseEvent<HTMLButtonElement>, hour: number) => void;
   onLeave: () => void;
-  onClick?: () => void;
+  onSlotClick: () => void;
 }
 
 export const TimeColumn = forwardRef<HTMLDivElement, TimeColumnProps>(
@@ -35,8 +35,8 @@ export const TimeColumn = forwardRef<HTMLDivElement, TimeColumnProps>(
       onHover,
       onHoverMinute,
       onLeave,
-      onClick,
-      variant = 'week',
+      onSlotClick,
+      viewMode = 'week',
     },
     ref,
   ) => {
@@ -45,7 +45,7 @@ export const TimeColumn = forwardRef<HTMLDivElement, TimeColumnProps>(
         ref={ref}
         className={cn(
           'z-20 flex-shrink-0 shadow-sm',
-          variant === 'week' ? 'w-14 sm:w-32' : 'w-16',
+          viewMode === 'week' ? 'w-14 sm:w-32' : 'w-16',
         )}
       >
         {timeSlots.map((time, index) => {
@@ -63,8 +63,8 @@ export const TimeColumn = forwardRef<HTMLDivElement, TimeColumnProps>(
           return (
             <button
               key={index}
-              className={timeColumnVariants({ variant })}
-              onClick={onClick}
+              className={timeColumnVariants({ viewMode })}
+              onClick={onSlotClick}
               onMouseEnter={() => onHover(hours)}
               onMouseMove={(e) => onHoverMinute(e, hours)}
               onMouseLeave={onLeave}
