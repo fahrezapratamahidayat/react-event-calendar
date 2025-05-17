@@ -33,9 +33,6 @@ type EventDetailsFormProps = {
   locale: Locale;
 };
 
-/**
- * EventDetailsForm - Separated form component
- */
 export const EventDetailsForm = memo(
   ({ form, onSubmit, locale }: EventDetailsFormProps) => {
     return (
@@ -78,7 +75,6 @@ export const EventDetailsForm = memo(
               </FormItem>
             )}
           />
-
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -106,7 +102,6 @@ export const EventDetailsForm = memo(
               )}
             />
           </div>
-
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -134,7 +129,6 @@ export const EventDetailsForm = memo(
               )}
             />
           </div>
-
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
