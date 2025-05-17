@@ -1,0 +1,171 @@
+---
+title: Instalasi
+description: Panduan lengkap instalasi React Event Calendar dengan Next.js 15 App Router
+toc: true
+---
+
+# Instalasi React Event Calendar
+
+<Callout type="info">
+  Dokumentasi ini khusus untuk Next.js 15 dengan App Router. Untuk versi Pages Router, lihat <a href="/docs/v1/installation">dokumentasi v1</a>.
+</Callout>
+
+## Prasyarat Sistem
+
+<Steps>
+  <Steps.Item title="Node.js">
+    Versi 18.17 atau lebih baru. Disarankan menggunakan LTS version.
+  </Steps.Item>
+  <Steps.Item title="Database">
+    PostgreSQL 12+ dengan akses untuk membuat database dan schema
+  </Steps.Item>
+  <Steps.Item title="Package Manager">
+    npm, yarn, atau pnpm (disarankan pnpm)
+  </Steps.Item>
+  <Steps.Item title="Tools Pendukung">
+    Git, PostgreSQL client (opsional), dan code editor
+  </Steps.Item>
+</Steps>
+
+## Proses Instalasi
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/yourorg/react-event-calendar.git
+cd react-event-calendar
+```
+
+### 2. Install Dependencies
+
+<Pre title="Terminal" icon="terminal">
+```bash
+# Menggunakan pnpm (disarankan)
+pnpm install
+
+# Atau menggunakan npm
+npm install
+
+# Atau menggunakan yarn
+yarn install
+```
+</Pre>
+
+### 3. Konfigurasi Environment
+
+Buat file `.env` di root project dengan konten berikut:
+
+```env
+# Database Configuration
+DATABASE_URL="postgresql://user:password@localhost:5432/event_calendar?schema=public"
+
+# Next.js Configuration
+NEXT_PUBLIC_APP_ENV=development
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=/api/v1
+
+# Authentication (opsional)
+NEXTAUTH_SECRET=your-secret-key
+NEXTAUTH_URL=http://localhost:3000
+```
+
+<Callout type="warning">
+  Jangan commit file `.env` ke version control! Pastikan sudah ada di `.gitignore`
+</Callout>
+
+### 4. Setup Database
+
+Jalankan migrasi database:
+
+```bash
+pnpm db:migrate
+```
+
+Verifikasi koneksi database:
+
+```bash
+pnpm db:check
+```
+
+### 5. (Opsional) Data Awal
+
+Untuk development, Anda bisa mengisi data dummy:
+
+```bash
+pnpm db:seed
+```
+
+### 6. Jalankan Development Server
+
+```bash
+pnpm dev
+```
+
+Aplikasi akan berjalan di http://localhost:3000.
+
+## Struktur Project
+
+Berikut struktur utama project:
+
+react-event-calendar/
+├── src/
+│   ├── app/                  # App Router
+│   │   ├── (auth)/           # Auth routes
+│   │   ├── (admin)/          # Admin routes
+│   │   ├── api/              # API routes
+│   │   │   └── v1/           # API versioning
+│   │   ├── calendar/         # Calendar features
+│   │   ├── layouts/          # Custom layouts
+│   │   ├── providers.tsx     # Context providers
+│   │   └── page.tsx          # Home page
+│   ├── components/           # Shared components
+│   ├── lib/                  # Utilities
+│   ├── db/                   # Database models
+│   ├── types/                # TypeScript types
+│   └── styles/               # Global styles
+├── public/                   # Static files
+├── drizzle/                  # Migrations
+├── next.config.js            # Next.js config
+└── package.json
+Troubleshooting
+Database Connection Error
+bash
+Error: Cannot connect to database
+Solusi:
+
+Pastikan PostgreSQL service berjalan
+
+Verifikasi kredensial di .env
+
+Coba koneksi manual dengan:
+
+bash
+psql -U username -d event_calendar -h 127.0.0.1 -W
+Dependency Conflicts
+bash
+npm ERR! Could not resolve dependency
+Solusi:
+
+Hapus node_modules dan lock file:
+
+bash
+rm -rf node_modules package-lock.json pnpm-lock.yaml yarn.lock
+Install ulang:
+
+bash
+pnpm install
+FAQ
+Q: Bagaimana cara deploy ke production?
+Lihat Panduan Deployment
+
+Q: Apakah bisa menggunakan database selain PostgreSQL?
+Saat ini hanya mendukung PostgreSQL. Issue untuk MySQL sedang dalam development.
+
+Langkah Selanjutnya
+Panduan Penggunaan
+
+Customisasi Komponen
+
+Integrasi API
+
+<Callout type="success"> Selamat! Anda berhasil menyiapkan development environment. Mulai eksplorasi fitur-fitur aplikasi. </Callout>
