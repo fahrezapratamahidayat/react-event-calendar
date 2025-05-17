@@ -31,8 +31,8 @@ export function WeekHeader({
   }, [daysInWeek, firstDayOfWeek]);
 
   return (
-    <div className="flex w-full items-center justify-between">
-      <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32">
+    <div className="flex w-full items-center justify-around">
+      <div className="ml-2.5 flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-14">
         <div className="text-muted-foreground text-xs sm:text-sm">Week</div>
         <div className="text-muted-foreground text-xs sm:text-sm">
           {weekNumber}
