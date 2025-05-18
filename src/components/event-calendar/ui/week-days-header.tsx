@@ -2,10 +2,10 @@ import { cn } from '@/lib/utils';
 import { FormatOptions, Locale } from 'date-fns';
 import { useMemo } from 'react';
 
-interface WeekHeaderProps {
-  weekNumber: number;
+interface WeekDayHeadersProps {
+  weekNumber?: number;
   daysInWeek: Date[];
-  todayIndex: number;
+  currentDayIndex: number;
   formatDate: (
     date: Date,
     formatStr: string,
@@ -13,16 +13,20 @@ interface WeekHeaderProps {
   ) => string;
   locale: Locale;
   firstDayOfWeek: number;
+  showWeekNumber?: boolean;
+  className?: string;
 }
 
-export function WeekHeader({
+export function WeekDayHeaders({
   weekNumber,
   daysInWeek,
-  todayIndex,
+  currentDayIndex,
   formatDate,
   locale,
   firstDayOfWeek,
-}: WeekHeaderProps) {
+  showWeekNumber = false,
+  className,
+}: WeekDayHeadersProps) {
   const reorderedDays = useMemo(() => {
     const ordered = [...daysInWeek];
     return ordered
@@ -31,23 +35,25 @@ export function WeekHeader({
   }, [daysInWeek, firstDayOfWeek]);
 
   return (
-    <div className="flex w-full items-center justify-around">
-      <div className="ml-2.5 flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-14">
-        <div className="text-muted-foreground text-xs sm:text-sm">Week</div>
-        <div className="text-muted-foreground text-xs sm:text-sm">
-          {weekNumber}
+    <div className={cn('flex w-full items-center justify-around', className)}>
+      {showWeekNumber && (
+        <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32">
+          <div className="text-muted-foreground text-xs sm:text-sm">Week</div>
+          <div className="text-muted-foreground text-xs sm:text-sm">
+            {weekNumber}
+          </div>
         </div>
-      </div>
+      )}
       {reorderedDays.map((day, dayIndex) => {
-        // Calculate the original index for today highlighting
         const originalIndex = (dayIndex + firstDayOfWeek) % 7;
-        const isToday = todayIndex === originalIndex;
+        const isToday = currentDayIndex === originalIndex;
 
         return (
           <div
             key={dayIndex}
             className={cn(
               'flex flex-1 flex-col items-center justify-center p-0 font-medium sm:p-2',
+              !showWeekNumber && 'ml-7 sm:p-0', // styling for calendar month
             )}
           >
             <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
