@@ -1,4 +1,4 @@
-import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/event-options';
+import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/calendar-constant';
 import { db } from './index';
 import { events } from './schema';
 import { faker } from '@faker-js/faker';
