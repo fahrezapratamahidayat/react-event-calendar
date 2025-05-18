@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CATEGORY_OPTIONS } from '@/constants/event-options';
+import { CATEGORY_OPTIONS } from '@/constants/calendar-constant';
 import { FolderIcon } from 'lucide-react';
 
 export function FilterCategory() {
