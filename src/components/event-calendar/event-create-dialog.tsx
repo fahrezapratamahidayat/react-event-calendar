@@ -22,11 +22,8 @@ import { ScrollArea } from '../ui/scroll-area';
 import { EventDetailsForm } from './event-detail-form';
 import { EventPreviewCalendar } from './event-preview-calendar';
 import { createEventSchema } from '@/lib/validations';
-
-const DEFAULT_START_TIME = '09:00';
-const DEFAULT_END_TIME = '10:00';
-const DEFAULT_COLOR = 'bg-red-600';
-const DEFAULT_CATEGORY = 'workshop';
+import { getColorClasses } from '@/lib/event-utils';
+import { EVENT_DEFAULTS } from '@/constants/calendar-constant';
 
 type EventFormValues = z.infer<typeof createEventSchema>;
 
@@ -35,11 +32,11 @@ const DEFAULT_FORM_VALUES: EventFormValues = {
   description: '',
   startDate: new Date(),
   endDate: new Date(),
-  category: DEFAULT_CATEGORY,
-  startTime: DEFAULT_START_TIME,
-  endTime: DEFAULT_END_TIME,
+  category: EVENT_DEFAULTS.CATEGORY,
+  startTime: EVENT_DEFAULTS.START_TIME,
+  endTime: EVENT_DEFAULTS.END_TIME,
   location: '',
-  color: DEFAULT_COLOR,
+  color: EVENT_DEFAULTS.COLOR,
   isRepeating: false,
 };
 
@@ -76,11 +73,13 @@ export default function EventCreateDialog() {
     }
   };
 
+  const startDate = form.watch('startDate');
+
   useEffect(() => {
-    const startDate = form.getValues('startDate');
-    const endDate = currentView === 'week' ? addDays(startDate, 7) : startDate;
-    form.setValue('endDate', endDate);
-  }, [currentView, form]);
+    const newEndDate =
+      currentView === 'week' ? addDays(startDate, 7) : startDate;
+    form.setValue('endDate', newEndDate);
+  }, [currentView, startDate, form]);
 
   useEffect(() => {
     if (isDialogAddOpen && quickAddDialogData.date) {
@@ -88,8 +87,11 @@ export default function EventCreateDialog() {
         ? `${String(quickAddDialogData.position.hour).padStart(2, '0')}:${String(quickAddDialogData.position.minute).padStart(2, '0')}`
         : '12:00';
 
+      const validColor = getColorClasses(EVENT_DEFAULTS.COLOR);
+
       form.reset({
         ...DEFAULT_FORM_VALUES,
+        color: validColor.bg,
         startDate: quickAddDialogData.date,
         endDate: quickAddDialogData.date,
         startTime: defaultTime,
