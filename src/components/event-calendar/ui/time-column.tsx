@@ -1,19 +1,20 @@
 import { cn } from '@/lib/utils';
 import { TimeFormatType } from '@/types/event';
 import { cva, type VariantProps } from 'class-variance-authority';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useCallback } from 'react';
 
 const timeColumnVariants = cva(
-  'flex h-16 w-full cursor-pointer items-center text-xs sm:text-sm',
+  'flex h-16 w-full cursor-pointer text-xs sm:text-sm',
   {
     variants: {
-      viewMode: {
+      variant: {
         day: 'text-muted-foreground pr-2 text-right justify-end',
-        week: 'text-muted-foreground justify-center border-r border-border px-2',
+        week: 'text-muted-foreground justify-center  border-border px-2',
+        single: 'text-muted-foreground pr-2 text-right justify-end',
       },
     },
     defaultVariants: {
-      viewMode: 'week',
+      variant: 'week',
     },
   },
 );
@@ -21,10 +22,14 @@ const timeColumnVariants = cva(
 interface TimeColumnProps extends VariantProps<typeof timeColumnVariants> {
   timeSlots: Date[];
   timeFormat: TimeFormatType;
-  onHover: (hour: number) => void;
-  onHoverMinute: (e: React.MouseEvent<HTMLButtonElement>, hour: number) => void;
+  onTimeHover: (hour: number) => void;
+  onPreciseHover: (
+    e: React.MouseEvent<HTMLButtonElement>,
+    hour: number,
+  ) => void;
   onLeave: () => void;
-  onSlotClick: () => void;
+  onTimeSlotClick: () => void;
+  className?: string;
 }
 
 export const TimeColumn = forwardRef<HTMLDivElement, TimeColumnProps>(
@@ -32,47 +37,45 @@ export const TimeColumn = forwardRef<HTMLDivElement, TimeColumnProps>(
     {
       timeSlots,
       timeFormat,
-      onHover,
-      onHoverMinute,
+      onTimeHover,
+      onPreciseHover,
       onLeave,
-      onSlotClick,
-      viewMode = 'week',
+      onTimeSlotClick,
+      variant = 'week',
+      className,
     },
     ref,
   ) => {
+    const formatTime = useCallback(
+      (date: Date): string => {
+        const hours = date.getHours();
+
+        if (timeFormat === '12') {
+          const hour12 = hours % 12 || 12;
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          return `${hour12} ${ampm}`;
+        }
+
+        return `${hours.toString().padStart(2, '0')}:00`;
+      },
+      [timeFormat],
+    );
+
     return (
-      <div
-        ref={ref}
-        className={cn(
-          'z-20 flex-shrink-0 shadow-sm',
-          viewMode === 'week' ? 'w-14 sm:w-32' : 'w-16',
-        )}
-      >
-        {timeSlots.map((time, index) => {
-          const hours = time.getHours();
-          let displayTime;
-
-          if (timeFormat === '12') {
-            const hour12 = hours % 12 || 12;
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            displayTime = `${hour12} ${ampm}`;
-          } else {
-            displayTime = `${hours.toString().padStart(2, '0')}:00`;
-          }
-
-          return (
-            <button
-              key={index}
-              className={timeColumnVariants({ viewMode })}
-              onClick={onSlotClick}
-              onMouseEnter={() => onHover(hours)}
-              onMouseMove={(e) => onHoverMinute(e, hours)}
-              onMouseLeave={onLeave}
-            >
-              {displayTime}
-            </button>
-          );
-        })}
+      <div ref={ref} className={cn('z-20 flex-shrink-0 shadow-sm', className)}>
+        {timeSlots.map((time, index) => (
+          <button
+            key={`time-slot-${index}`}
+            className={timeColumnVariants({ variant })}
+            onClick={onTimeSlotClick}
+            onMouseEnter={() => onTimeHover(time.getHours())}
+            onMouseMove={(e) => onPreciseHover(e, time.getHours())}
+            onMouseLeave={onLeave}
+            aria-label={`Time slot ${formatTime(time)}`}
+          >
+            {formatTime(time)}
+          </button>
+        ))}
       </div>
     );
   },
