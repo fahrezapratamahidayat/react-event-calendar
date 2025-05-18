@@ -75,7 +75,6 @@ export interface EventCalendarConfig {
   firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   viewConfigs?: Partial<CalendarViewConfigs>;
 }
-
 interface EventCalendarState {
   selectedEvent: EventTypes | null;
   currentView: CalendarViewType;
@@ -143,7 +142,7 @@ interface EventCalendarState {
 
 export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
   const defaultConfig: EventCalendarConfig = {
-    defaultView: CalendarViewType.MONTH,
+    defaultView: CalendarViewType.YEAR,
     defaultTimeFormat: TimeFormatType.HOUR_24,
     defaultViewMode: ViewModeType.CALENDAR,
     firstDayOfWeek: 0, // sunday
