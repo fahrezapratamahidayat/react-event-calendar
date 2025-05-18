@@ -4,7 +4,7 @@ import { useState, useMemo, useRef, useCallback } from 'react';
 import { formatDate, generateTimeSlots, isSameFullDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
 import { HoverPositionType } from '@/types/event';
-import { WeekHeader } from './ui/week-header';
+import { WeekDayHeaders } from './ui/week-days-header';
 import { TimeColumn } from './ui/time-column';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
@@ -55,9 +55,12 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
   const [hoverPosition, setHoverPosition] = useState<
     HoverPositionType | undefined
   >(undefined);
-
   const containerRef = useRef<HTMLDivElement>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  const timeColumnRef = useRef<HTMLDivElement>(null);
+
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
 
   const { weekNumber, weekDays, todayIndex } = useWeekDays(
     currentDate,
@@ -73,27 +76,27 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
     weekDays,
     HOUR_HEIGHT,
   );
+
   const multiDayEventRows = useMultiDayEventRows(multiDayEvents, weekDays);
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
 
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-
-  const handleTimeSlotHover = useCallback((hour: number) => {
-    setHoverPosition({ hour, minute: 0, dayIndex: -1 });
+  const handleTimeHover = useCallback((hour: number) => {
+    setHoverPosition((prev) => ({ ...prev, hour, minute: 0, dayIndex: -1 }));
   }, []);
 
   const handlePreciseHover = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>, hour: number) => {
-      if (!sidebarRef.current) return;
+    (event: React.MouseEvent<HTMLButtonElement>, hour: number) => {
+      if (!timeColumnRef.current) return;
 
-      const rect = e.currentTarget.getBoundingClientRect();
-      const relativeY = e.clientY - rect.top;
-      const minute = Math.floor((relativeY / rect.height) * 60);
-      const validMinute = Math.max(0, Math.min(59, minute));
+      const slotRect = event.currentTarget.getBoundingClientRect();
+      const cursorY = event.clientY - slotRect.top;
+      const minutes = Math.floor((cursorY / slotRect.height) * 60);
 
-      setHoverPosition({ hour, minute: validMinute, dayIndex: -1 });
+      setHoverPosition({
+        hour,
+        minute: Math.max(0, Math.min(59, minutes)),
+        dayIndex: -1,
+      });
     },
     [],
   );
@@ -102,128 +105,123 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
     setHoverPosition(undefined);
   }, []);
 
-  const handleTimeSlotInteraction = useCallback(() => {
-    if (!viewConfigs.day.enableTimeSlotClick) return;
+  const handleTimeSlotClick = useCallback(() => {
+    if (!viewConfigs.day.enableTimeSlotClick || !hoverPosition) return;
+
     openQuickAddDialog({
       date: currentDate,
       position: hoverPosition,
     });
   }, [
-    viewConfigs.day.enableTimeSlotClick,
-    openQuickAddDialog,
     currentDate,
     hoverPosition,
+    openQuickAddDialog,
+    viewConfigs.day.enableTimeSlotClick,
   ]);
 
-  const showEventDetail = useCallback((event: EventTypes) => {}, []);
+  const showEventDetail = useCallback((_event: EventTypes) => {}, []);
 
   return (
-    <div className="py- flex h-[650px] flex-col rounded-md border">
-      <ScrollArea className="h-full w-full rounded-md">
-        <div className="mb-2 min-w-full">
-          <div className="relative mb-2">
-            <div className="bg-accent border-border sticky top-0 z-30 flex flex-col items-center justify-center border-b pr-4">
-              <WeekHeader
-                weekNumber={weekNumber}
-                daysInWeek={weekDays}
-                todayIndex={todayIndex}
-                formatDate={formatDate}
-                locale={locale}
-                firstDayOfWeek={firstDayOfWeek}
-              />
-              {multiDayEventRows.length ? (
-                <div className="relative w-full flex-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32">
-                      <span className="w-full truncate text-xs font-medium">
-                        Multi Day Events
-                      </span>
-                    </div>
-                    <div className="relative flex-1">
-                      <MultiDayEventSection
-                        rows={multiDayEventRows}
-                        daysInWeek={weekDays}
-                        showEventDetail={showEventDetail}
-                        multiDayRowHeight={MULTI_DAY_ROW_HEIGHT}
-                      />
-                    </div>
-                  </div>
+    <div className="flex h-[760px] flex-col border">
+      <ScrollArea className="h-full w-full">
+        <div className="bg-accent border-border sticky top-0 z-30 flex flex-col items-center justify-center border-b pr-4">
+          <WeekDayHeaders
+            weekNumber={weekNumber}
+            daysInWeek={weekDays}
+            currentDayIndex={todayIndex}
+            formatDate={formatDate}
+            locale={locale}
+            firstDayOfWeek={firstDayOfWeek}
+            showWeekNumber={true}
+          />
+          {multiDayEventRows.length ? (
+            <div className="relative w-full flex-1">
+              <div className="flex items-center justify-between">
+                <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32">
+                  <span className="w-full truncate text-xs font-medium">
+                    Multi Day Events
+                  </span>
                 </div>
-              ) : null}
-            </div>
-            <div className="flex flex-1 overflow-hidden pr-4">
-              <TimeColumn
-                ref={sidebarRef}
-                timeSlots={timeSlots}
-                timeFormat={timeFormat}
-                onHover={handleTimeSlotHover}
-                onHoverMinute={handlePreciseHover}
-                onLeave={handleTimeLeave}
-                viewMode="day"
-                onSlotClick={handleTimeSlotInteraction}
-              />
-              <div
-                ref={containerRef}
-                className="relative flex-1 overflow-y-auto"
-              >
-                {viewConfigs.week.showCurrentTimeIndicator && (
-                  <CurrentTimeIndicator
-                    currentHour={currentHour}
-                    currentMinute={currentMinute}
-                    timeFormat={timeFormat}
-                    hourHeight={HOUR_HEIGHT}
+                <div className="relative flex-1">
+                  <MultiDayEventSection
+                    rows={multiDayEventRows}
+                    daysInWeek={weekDays}
+                    showEventDetail={showEventDetail}
+                    multiDayRowHeight={MULTI_DAY_ROW_HEIGHT}
                   />
-                )}
-                {hoverPosition && viewConfigs.week.showHoverTimeIndicator && (
-                  <HoverTimeIndicator
-                    hour={hoverPosition.hour}
-                    minute={hoverPosition.minute}
-                    timeFormat={timeFormat}
-                    hourHeight={HOUR_HEIGHT}
-                  />
-                )}
-                <TimeGrid
-                  timeSlots={timeSlots}
-                  daysInWeek={weekDays}
-                  todayIndex={todayIndex}
-                />
-                <div className="absolute inset-0">
-                  {singleDayEvents.map((event) => {
-                    const eventDate = new Date(event.startDate);
-                    const dayIndex = weekDays.findIndex((day) =>
-                      isSameFullDay(day, eventDate),
-                    );
-
-                    if (dayIndex === -1) return null;
-
-                    const position = eventsPositions[`${dayIndex}-${event.id}`];
-                    if (!position) return null;
-
-                    // Calculate width and horizontal position
-                    const OVERLAP_FACTOR = 0.5; // Nilai positif
-                    const columnWidth =
-                      (DAY_WIDTH_PERCENT +
-                        OVERLAP_FACTOR / position.totalColumns) /
-                      position.totalColumns;
-                    const leftPercent =
-                      dayIndex * DAY_WIDTH_PERCENT +
-                      position.column * columnWidth -
-                      OVERLAP_FACTOR / (position.totalColumns * 2);
-                    const rightPercent = 100 - (leftPercent + columnWidth);
-
-                    return (
-                      <EventDialogTrigger
-                        event={event}
-                        key={event.id}
-                        position={position}
-                        leftOffset={leftPercent}
-                        rightOffset={rightPercent}
-                        onClick={openEventDialog}
-                      />
-                    );
-                  })}
                 </div>
               </div>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex flex-1 overflow-hidden pr-4">
+          <TimeColumn
+            ref={timeColumnRef}
+            timeSlots={timeSlots}
+            timeFormat={timeFormat}
+            onTimeHover={handleTimeHover}
+            onPreciseHover={handlePreciseHover}
+            onLeave={handleTimeLeave}
+            onTimeSlotClick={handleTimeSlotClick}
+            variant="week"
+            className="w-14 sm:w-32"
+          />
+          <div ref={containerRef} className="relative flex-1 overflow-y-auto">
+            {viewConfigs.week.showCurrentTimeIndicator && (
+              <CurrentTimeIndicator
+                currentHour={currentHour}
+                currentMinute={currentMinute}
+                timeFormat={timeFormat}
+                hourHeight={HOUR_HEIGHT}
+              />
+            )}
+            {hoverPosition && viewConfigs.week.showHoverTimeIndicator && (
+              <HoverTimeIndicator
+                hour={hoverPosition.hour}
+                minute={hoverPosition.minute}
+                timeFormat={timeFormat}
+                hourHeight={HOUR_HEIGHT}
+              />
+            )}
+            <TimeGrid
+              timeSlots={timeSlots}
+              daysInWeek={weekDays}
+              todayIndex={todayIndex}
+            />
+            <div className="absolute inset-0">
+              {singleDayEvents.map((event) => {
+                const eventDate = new Date(event.startDate);
+                const dayIndex = weekDays.findIndex((day) =>
+                  isSameFullDay(day, eventDate),
+                );
+
+                if (dayIndex === -1) return null;
+
+                const position = eventsPositions[`${dayIndex}-${event.id}`];
+                if (!position) return null;
+
+                // Calculate width and horizontal position
+                const OVERLAP_FACTOR = 0.5; // Nilai positif
+                const columnWidth =
+                  (DAY_WIDTH_PERCENT + OVERLAP_FACTOR / position.totalColumns) /
+                  position.totalColumns;
+                const leftPercent =
+                  dayIndex * DAY_WIDTH_PERCENT +
+                  position.column * columnWidth -
+                  OVERLAP_FACTOR / (position.totalColumns * 2);
+                const rightPercent = 100 - (leftPercent + columnWidth);
+
+                return (
+                  <EventDialogTrigger
+                    event={event}
+                    key={event.id}
+                    position={position}
+                    leftOffset={leftPercent}
+                    rightOffset={rightPercent}
+                    onClick={openEventDialog}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
