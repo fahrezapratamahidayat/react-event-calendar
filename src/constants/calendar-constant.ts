@@ -1,3 +1,10 @@
+export const EVENT_DEFAULTS = {
+  START_TIME: '09:00',
+  END_TIME: '10:00',
+  COLOR: 'blue',
+  CATEGORY: 'workshop',
+} as const;
+
 export const EVENT_COLORS = [
   { value: 'red', label: 'Red' },
   { value: 'blue', label: 'Blue' },
@@ -16,11 +23,4 @@ export const CATEGORY_OPTIONS = [
   { value: 'conference', label: 'Konferensi' },
   { value: 'seminar', label: 'Seminar' },
   { value: 'social', label: 'Sosial' },
-];
-
-export const TOAST_MESSAGES = {
-  updateSuccess: 'Acara berhasil diubah',
-  updateError: 'Gagal mengubah acara',
-  deleteSuccess: 'Acara berhasil dihapus',
-  deleteError: 'Gagal menghapus acara',
-};
+] as const;
