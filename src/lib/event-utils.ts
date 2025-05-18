@@ -14,7 +14,7 @@ import {
   MultiDayEventRowType,
   TimeFormatType,
 } from '@/types/event';
-import { CATEGORY_OPTIONS } from '@/constants/event-options';
+import { CATEGORY_OPTIONS } from '@/constants/calendar-constant';
 import { EventTypes } from '@/db/schema';
 import { VIEW_CONFIG } from '@/components/event-calendar/event-list';
 
