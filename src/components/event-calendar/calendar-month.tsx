@@ -6,17 +6,18 @@ import {
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
-  addDays,
   startOfWeek,
   endOfWeek,
-  setDay,
-  getDay,
 } from 'date-fns';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
 import { DayCell } from './ui/day-cell';
+import { WeekDayHeaders } from './ui/week-days-header';
+import { useWeekDays } from '@/lib/event-utils';
+import { formatDate } from '@/lib/date';
 
+const DAYS_IN_WEEK = 7;
 interface CalendarMonthProps {
   events: EventTypes[];
   baseDate: Date;
@@ -25,6 +26,7 @@ interface CalendarMonthProps {
 export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
   const {
     timeFormat,
+    firstDayOfWeek,
     locale,
     weekStartDay,
     viewConfigs,
@@ -34,6 +36,7 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
   } = useEventCalendarStore(
     useShallow((state) => ({
       timeFormat: state.timeFormat,
+      firstDayOfWeek: state.firstDayOfWeek,
       viewConfigs: state.viewConfigs,
       locale: state.locale,
       weekStartDay: state.firstDayOfWeek,
@@ -45,21 +48,11 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
   const daysContainerRef = useRef<HTMLDivElement>(null);
   const [focusedDate, setFocusedDate] = useState<Date | null>(null);
 
-  // Calculate dynamic week start
-  const dynamicWeekStartsOn = useMemo(() => {
-    return (
-      weekStartDay ?? (getDay(startOfMonth(baseDate)) as typeof weekStartDay)
-    );
-  }, [baseDate, weekStartDay]);
-
-  // Generate weekday headers
-  const weekDays = useMemo(() => {
-    return Array.from({ length: 7 }).map((_, i) =>
-      format(addDays(setDay(new Date(), dynamicWeekStartsOn), i), 'EEE', {
-        locale,
-      }),
-    );
-  }, [locale, dynamicWeekStartsOn]);
+  const { weekNumber, weekDays, todayIndex } = useWeekDays(
+    baseDate,
+    DAYS_IN_WEEK,
+    locale,
+  );
 
   // Calculate visible days in month
   const visibleDays = useMemo(() => {
@@ -95,21 +88,19 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
   };
 
   return (
-    <div className="flex flex-col rounded-md border py-2">
-      <div className="mb-1 grid grid-cols-7 gap-1">
-        {weekDays.map((dayName, index) => (
-          <div
-            key={`weekday-${index}`}
-            className="text-primary py-2 text-center text-sm font-medium"
-            aria-label={dayName}
-          >
-            {dayName}
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-col border py-2">
+      <WeekDayHeaders
+        weekNumber={weekNumber}
+        daysInWeek={weekDays}
+        currentDayIndex={todayIndex}
+        formatDate={formatDate}
+        locale={locale}
+        firstDayOfWeek={firstDayOfWeek}
+        showWeekNumber={false}
+      />
       <div
         ref={daysContainerRef}
-        className="grid grid-cols-7 gap-1 p-5 sm:gap-2"
+        className="grid grid-cols-7 gap-1 p-2 sm:gap-2"
         role="grid"
         aria-label="Month calendar grid"
       >
