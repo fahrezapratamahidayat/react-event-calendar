@@ -21,9 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/event-options';
+import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/calendar-constant';
 import { ColorOptionItem } from './ui/color-option-item';
 import { z } from 'zod';
+import { getColorClasses } from '@/lib/event-utils';
 
 type EventFormValues = z.infer<typeof eventFormSchema>;
 
@@ -139,7 +140,7 @@ export const EventDetailsForm = memo(
                     Location <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="location event" {...field} />
+                    <Input placeholder="Location event" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -192,13 +193,16 @@ export const EventDetailsForm = memo(
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {EVENT_COLORS.map((option) => (
-                        <ColorOptionItem
-                          key={option.value}
-                          value={option.value}
-                          label={option.label}
-                        />
-                      ))}
+                      {EVENT_COLORS.map((option) => {
+                        const validColor = getColorClasses(option.value);
+                        return (
+                          <ColorOptionItem
+                            key={option.value}
+                            value={validColor.bg}
+                            label={option.label}
+                          />
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                   <FormMessage />
