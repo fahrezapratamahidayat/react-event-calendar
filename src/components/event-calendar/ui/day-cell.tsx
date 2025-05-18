@@ -82,7 +82,7 @@ export function DayCell({
         <span
           className={cn(
             'flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium',
-            isToday && 'text-primary bg-blue-500',
+            isToday && 'bg-blue-500 text-white',
             !isWithinMonth && 'text-muted-foreground',
           )}
         >
