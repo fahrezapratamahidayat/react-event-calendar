@@ -47,6 +47,10 @@ const eslintConfig = [
       'react/prop-types': 'off',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+      //   'no-use-before-define': [
+      //     'error',
+      //     { functions: true, classes: true, variables: true },
+      //   ],
 
       'jsx-a11y/alt-text': 'error',
       'jsx-a11y/aria-props': 'error',
