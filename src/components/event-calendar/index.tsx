@@ -17,7 +17,7 @@ import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { CalendarMonth } from './calendar-month';
 import { MonthDayEventsDialog } from './month-day-events-dialog';
 import EventCreateDialog from './event-create-dialog';
-import { CalendarTabs } from './ui/calendar-tabs';
+import { CalendarTabs } from './calendar-tabs';
 import { useShallow } from 'zustand/shallow';
 import { FilterContainer } from './ui/filter-container';
 import { getCategories, getEvents } from '@/app/actions';
@@ -34,6 +34,7 @@ import {
 } from 'date-fns';
 import { useQueryState } from 'nuqs';
 import { parseAsIsoDate } from 'nuqs/server';
+import { CalendarDaysView } from './calendar-days-view';
 
 interface EventCalendarProps {
   initialDate: Date;
@@ -157,6 +158,13 @@ export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
       case 'month':
         return (
           <CalendarMonth events={eventsData.events} baseDate={initialDate} />
+        );
+      case 'year':
+        return (
+          <CalendarDaysView
+            events={eventsData.events}
+            currentDate={initialDate}
+          />
         );
       default:
         return (
