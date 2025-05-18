@@ -34,12 +34,14 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
         openEventDialog: state.openEventDialog,
       })),
     );
-
   const [hoverPosition, setHoverPosition] = useState<
     HoverPositionType | undefined
   >(undefined);
+  const timeColumnRef = useRef<HTMLDivElement>(null);
 
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
 
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
@@ -57,24 +59,23 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
   const eventsPositions = useDayEventPositions(events, HOUR_HEIGHT);
 
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-
-  const handleTimeSlotHover = useCallback((hour: number) => {
-    setHoverPosition({ hour, minute: 0, dayIndex: -1 });
+  const handleTimeHover = useCallback((hour: number) => {
+    setHoverPosition((prev) => ({ ...prev, hour, minute: 0, dayIndex: -1 }));
   }, []);
 
   const handlePreciseHover = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>, hour: number) => {
-      if (!sidebarRef.current) return;
+      if (!timeColumnRef.current) return;
 
       const slotRect = event.currentTarget.getBoundingClientRect();
       const cursorY = event.clientY - slotRect.top;
       const minutes = Math.floor((cursorY / slotRect.height) * 60);
-      const clampedMinutes = Math.max(0, Math.min(59, minutes));
 
-      setHoverPosition({ hour, minute: clampedMinutes, dayIndex: -1 });
+      setHoverPosition({
+        hour,
+        minute: Math.max(0, Math.min(59, minutes)),
+        dayIndex: -1,
+      });
     },
     [],
   );
@@ -83,8 +84,8 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
     setHoverPosition(undefined);
   }, []);
 
-  const handleTimeSlotInteraction = useCallback(() => {
-    if (!viewConfigs.day.enableTimeSlotClick) return;
+  const handleTimeSlotClick = useCallback(() => {
+    if (!viewConfigs.day.enableTimeSlotClick || !hoverPosition) return;
 
     openQuickAddDialog({
       date: currentDate,
@@ -100,65 +101,63 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
   return (
     <div className="flex h-[760px] flex-col py-3">
       <ScrollArea className="h-full w-full rounded-md px-4">
-        <div className="mb-2 min-w-full">
-          <div className="relative mt-2 mb-2">
-            <div className="absolute left-0 z-10 w-16">
-              <TimeColumn
-                ref={sidebarRef}
-                timeSlots={timeSlots}
+        <div className="relative mt-2 mb-2">
+          <div className="absolute left-0 z-10 w-13">
+            <TimeColumn
+              ref={timeColumnRef}
+              timeSlots={timeSlots}
+              timeFormat={timeFormat}
+              onTimeHover={handleTimeHover}
+              onPreciseHover={handlePreciseHover}
+              onLeave={handleTimeLeave}
+              onTimeSlotClick={handleTimeSlotClick}
+              variant="day"
+            />
+          </div>
+          <div className="relative ml-16">
+            {viewConfigs.day.showCurrentTimeIndicator && (
+              <CurrentTimeIndicator
+                currentHour={currentHour}
+                currentMinute={currentMinute}
                 timeFormat={timeFormat}
-                onHover={handleTimeSlotHover}
-                onHoverMinute={handlePreciseHover}
-                onLeave={handleTimeLeave}
-                viewMode="day"
-                onSlotClick={handleTimeSlotInteraction}
+                hourHeight={HOUR_HEIGHT}
               />
-            </div>
-            <div className="relative ml-16">
-              {viewConfigs.day.showCurrentTimeIndicator && (
-                <CurrentTimeIndicator
-                  currentHour={currentHour}
-                  currentMinute={currentMinute}
-                  timeFormat={timeFormat}
-                  hourHeight={HOUR_HEIGHT}
-                />
-              )}
-              {hoverPosition && viewConfigs.day.showHoverTimeIndicator && (
-                <HoverTimeIndicator
-                  hour={hoverPosition.hour}
-                  minute={hoverPosition.minute}
-                  timeFormat={timeFormat}
-                  hourHeight={HOUR_HEIGHT}
-                />
-              )}
-              {timeSlots.map((time, index) => (
-                <div
-                  key={index}
-                  data-testid={`time-grid-${index}`}
-                  className={cn('border-border h-16 border-t')}
-                />
-              ))}
-              {filteredEvents.map((event) => {
-                const position = eventsPositions[event.id];
-                if (!position) return null;
+            )}
+            {hoverPosition && viewConfigs.day.showHoverTimeIndicator && (
+              <HoverTimeIndicator
+                hour={hoverPosition.hour}
+                minute={hoverPosition.minute}
+                timeFormat={timeFormat}
+                hourHeight={HOUR_HEIGHT}
+              />
+            )}
+            {timeSlots.map((time, index) => (
+              <div
+                key={index}
+                data-testid={`time-grid-${index}`}
+                className={cn('border-border h-16 border-t')}
+              />
+            ))}
+            {filteredEvents.map((event) => {
+              const position = eventsPositions[event.id];
+              if (!position) return null;
 
-                const columnWidth = COLUMN_WIDTH_TOTAL / position.totalColumns;
-                const leftPercent = position.column * columnWidth;
-                const rightPercent =
-                  COLUMN_WIDTH_TOTAL - (leftPercent + columnWidth);
+              const columnWidth = COLUMN_WIDTH_TOTAL / position.totalColumns;
+              const leftPercent = position.column * columnWidth;
+              const rightPercent =
+                COLUMN_WIDTH_TOTAL - (leftPercent + columnWidth);
 
-                return (
-                  <EventDialogTrigger
-                    event={event}
-                    key={event.id}
-                    position={position}
-                    leftOffset={leftPercent}
-                    rightOffset={rightPercent}
-                    onClick={openEventDialog}
-                  />
-                );
-              })}
-            </div>
+              return (
+                <EventDialogTrigger
+                  event={event}
+                  key={event.id}
+                  position={position}
+                  leftOffset={leftPercent}
+                  rightOffset={rightPercent}
+                  onClick={openEventDialog}
+                />
+              );
+            })}
           </div>
         </div>
       </ScrollArea>
