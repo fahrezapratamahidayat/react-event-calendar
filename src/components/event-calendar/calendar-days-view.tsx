@@ -35,7 +35,7 @@ interface CalendarDayViewProps {
 export function CalendarDaysView({
   events,
   currentDate,
-  daysCount = 9,
+  daysCount = 16,
 }: CalendarDayViewProps) {
   const {
     timeFormat,
