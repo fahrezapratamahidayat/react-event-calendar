@@ -1,7 +1,7 @@
 import { EventPosition } from '@/types/event';
 import { cn } from '@/lib/utils';
-import { Button } from '../../ui/button';
-import { calculateEventDuration, formatTime } from '@/lib/date';
+import { Button } from '../ui/button';
+import { calculateDuration, formatTimeDisplay } from '@/lib/date';
 import { EventTypes } from '@/db/schema';
 import { getColorClasses } from '@/lib/event-utils';
 
@@ -51,11 +51,12 @@ export const EventDialogTrigger = ({
     >
       <div className="text-xs font-medium sm:truncate">{event.title}</div>
       <div className="text-xs sm:truncate">
-        {formatTime(event.startTime, '12')} - {formatTime(event.endTime, '12')}
+        {formatTimeDisplay(event.startTime, '12')} -{' '}
+        {formatTimeDisplay(event.endTime, '12')}
       </div>
       {position?.height && position.height > 40 && (
         <div className="mt-1 text-xs sm:truncate">
-          {calculateEventDuration?.(event.startTime, event.endTime)} Hour
+          {calculateDuration?.(event.startTime, event.endTime)} Hour
         </div>
       )}
     </Button>
