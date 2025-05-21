@@ -6,7 +6,7 @@ import { isSameDay } from 'date-fns';
 import { generateTimeSlots } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import { HoverPositionType } from '@/types/event';
-import { EventDialogTrigger } from './ui/event-dialog-trigger';
+import { EventDialogTrigger } from './event-dialog-trigger';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { useDayEventPositions } from '@/lib/event-utils';
@@ -25,11 +25,11 @@ interface CalendarDayProps {
   currentDate: Date;
 }
 export function CalendarDay({ events, currentDate }: CalendarDayProps) {
-  const { timeFormat, viewConfigs, openQuickAddDialog, openEventDialog } =
+  const { timeFormat, viewSettings, openQuickAddDialog, openEventDialog } =
     useEventCalendarStore(
       useShallow((state) => ({
         timeFormat: state.timeFormat,
-        viewConfigs: state.viewConfigs,
+        viewSettings: state.viewSettings,
         openQuickAddDialog: state.openQuickAddDialog,
         openEventDialog: state.openEventDialog,
       })),
@@ -85,7 +85,7 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
   }, []);
 
   const handleTimeSlotClick = useCallback(() => {
-    if (!viewConfigs.day.enableTimeSlotClick || !hoverPosition) return;
+    if (!viewSettings.day.enableTimeSlotClick || !hoverPosition) return;
 
     openQuickAddDialog({
       date: currentDate,
@@ -95,7 +95,7 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
     currentDate,
     hoverPosition,
     openQuickAddDialog,
-    viewConfigs.day.enableTimeSlotClick,
+    viewSettings.day.enableTimeSlotClick,
   ]);
 
   return (
@@ -115,7 +115,7 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
             />
           </div>
           <div className="relative ml-16">
-            {viewConfigs.day.showCurrentTimeIndicator && (
+            {viewSettings.day.showCurrentTimeIndicator && (
               <CurrentTimeIndicator
                 currentHour={currentHour}
                 currentMinute={currentMinute}
@@ -123,7 +123,7 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
                 hourHeight={HOUR_HEIGHT}
               />
             )}
-            {hoverPosition && viewConfigs.day.showHoverTimeIndicator && (
+            {hoverPosition && viewSettings.day.showHoverTimeIndicator && (
               <HoverTimeIndicator
                 hour={hoverPosition.hour}
                 minute={hoverPosition.minute}

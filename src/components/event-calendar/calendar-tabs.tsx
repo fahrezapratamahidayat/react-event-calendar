@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { CalendarViewType } from '@/types/event';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
+import { Separator } from '../ui/separator';
+import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 interface CalendarTabsProps {
   viewType: CalendarViewType;
@@ -22,12 +26,18 @@ interface CalendarTabsProps {
 type TabConfig = {
   label: string;
   value: CalendarViewType;
+  hasDropdown?: boolean;
 };
 
 const tabsConfig: TabConfig[] = [
   {
     label: 'Day',
     value: CalendarViewType.DAY,
+  },
+  {
+    label: 'Days',
+    value: CalendarViewType.DAYS,
+    hasDropdown: true,
   },
   {
     label: 'Week',
@@ -42,6 +52,8 @@ const tabsConfig: TabConfig[] = [
     value: CalendarViewType.YEAR,
   },
 ];
+
+const daysOptions = [3, 5, 7, 10, 14, 30];
 
 const transition = {
   type: 'tween',
@@ -72,6 +84,26 @@ export function CalendarTabs({
   const navRef = useRef<HTMLDivElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const { daysCount: storeDaysCount, setDaysCount: setStoreDaysCount } =
+    useEventCalendarStore();
+  const [queryDaysCount, setQueryDaysCount] = useQueryState(
+    'daysCount',
+    parseAsInteger.withDefault(7).withOptions({
+      shallow: false,
+      throttleMs: 3,
+      startTransition,
+    }),
+  );
+
+  const [view, setView] = useQueryState(
+    'view',
+    parseAsString.withOptions({
+      shallow: false,
+      throttleMs: 3,
+      startTransition,
+    }),
+  );
 
   useEffect(() => {
     setIsMounted(true);
@@ -122,6 +154,43 @@ export function CalendarTabs({
   );
   const dropdownRect = dropdownButtonRef.current?.getBoundingClientRect();
 
+  const handleTabClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const tabValue = e.currentTarget.dataset.value as CalendarViewType;
+    const hasDropdown = e.currentTarget.dataset.dropdown === 'true';
+
+    if (tabValue && !disabledViews.includes(tabValue)) {
+      // Jika tab memiliki dropdown, tidak perlu melakukan apa-apa saat klik (dropdown akan muncul)
+      if (!hasDropdown) {
+        onChange(tabValue);
+        setView(tabValue);
+      }
+    }
+  };
+
+  const handleDropdownClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    const tabValue = e.currentTarget.dataset.value as CalendarViewType;
+
+    if (tabValue && !disabledViews.includes(tabValue)) {
+      onChange(tabValue);
+      setView(tabValue);
+    }
+  };
+
+  const handleDaysOptionClick = async (days: number) => {
+    setStoreDaysCount(days);
+
+    try {
+      await setQueryDaysCount(days);
+
+      onChange(CalendarViewType.DAYS);
+      setView(CalendarViewType.DAYS);
+    } catch (error) {
+      console.error('Failed to update URL state:', error);
+      setStoreDaysCount(queryDaysCount);
+    }
+  };
   if (!isMounted) return null;
 
   return (
@@ -133,6 +202,53 @@ export function CalendarTabs({
       >
         {visibleTabs.map((tab, i) => {
           const isActive = viewType === tab.value;
+
+          if (tab.hasDropdown) {
+            return (
+              <DropdownMenu key={tab.value}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    ref={(el) => {
+                      if (el) desktopButtonRefs.current[i] = el;
+                    }}
+                    disabled={disabledViews.includes(tab.value)}
+                    data-value={tab.value}
+                    data-dropdown="true"
+                    onPointerEnter={() => setHoveredTabIndex(i)}
+                    onFocus={() => setHoveredTabIndex(i)}
+                    className={cn(
+                      'relative z-20 flex h-8 cursor-pointer items-center gap-1 rounded-md bg-transparent px-4 text-sm select-none',
+                      isActive
+                        ? 'text-foreground font-medium'
+                        : 'text-muted-foreground',
+                      disabledViews.includes(tab.value) &&
+                        'cursor-not-allowed opacity-50',
+                    )}
+                    aria-selected={isActive}
+                    role="tab"
+                  >
+                    {tab.label} ({storeDaysCount})
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {daysOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option}
+                      onClick={() => handleDaysOptionClick(option)}
+                      className={cn(
+                        'cursor-pointer',
+                        storeDaysCount === option && 'bg-muted font-medium',
+                      )}
+                    >
+                      {option} hari
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            );
+          }
+
           return (
             <button
               key={tab.value}
@@ -140,9 +256,8 @@ export function CalendarTabs({
                 if (el) desktopButtonRefs.current[i] = el;
               }}
               disabled={disabledViews.includes(tab.value)}
-              onClick={() =>
-                !disabledViews.includes(tab.value) && onChange(tab.value)
-              }
+              onClick={handleTabClick}
+              data-value={tab.value}
               onPointerEnter={() => setHoveredTabIndex(i)}
               onFocus={() => setHoveredTabIndex(i)}
               className={cn(
@@ -196,6 +311,8 @@ export function CalendarTabs({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Mobile view */}
       <div
         ref={mobileNavRef}
         className="relative z-0 flex items-center justify-start py-2 md:hidden"
@@ -204,16 +321,61 @@ export function CalendarTabs({
         {primaryTabs.map((tab, i) => {
           const isActive = viewType === tab.value;
 
+          if (tab.hasDropdown) {
+            return (
+              <DropdownMenu key={tab.value}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    ref={(el) => {
+                      if (el) mobileButtonRefs.current[i] = el;
+                    }}
+                    data-value={tab.value}
+                    data-dropdown="true"
+                    disabled={disabledViews.includes(tab.value)}
+                    onPointerEnter={() => setHoveredMobileTabIndex(i)}
+                    onFocus={() => setHoveredMobileTabIndex(i)}
+                    className={cn(
+                      'relative z-20 flex h-8 cursor-pointer items-center gap-1 rounded-md bg-transparent px-4 text-sm select-none',
+                      isActive
+                        ? 'text-foreground font-medium'
+                        : 'text-muted-foreground',
+                      disabledViews.includes(tab.value) &&
+                        'cursor-not-allowed opacity-50',
+                    )}
+                    aria-selected={isActive}
+                    role="tab"
+                  >
+                    {tab.label} ({storeDaysCount})
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {daysOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option}
+                      onClick={() => handleDaysOptionClick(option)}
+                      className={cn(
+                        'cursor-pointer',
+                        storeDaysCount === option && 'bg-muted font-medium',
+                      )}
+                    >
+                      {option} hari
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            );
+          }
+
           return (
             <button
               key={tab.value}
               ref={(el) => {
                 if (el) mobileButtonRefs.current[i] = el;
               }}
+              data-value={tab.value}
               disabled={disabledViews.includes(tab.value)}
-              onClick={() =>
-                !disabledViews.includes(tab.value) && onChange(tab.value)
-              }
+              onClick={handleTabClick}
               onPointerEnter={() => setHoveredMobileTabIndex(i)}
               onFocus={() => setHoveredMobileTabIndex(i)}
               className={cn(
@@ -231,6 +393,7 @@ export function CalendarTabs({
             </button>
           );
         })}
+
         <AnimatePresence>
           {hoveredMobileRect && mobileNavRect && (
             <motion.div
@@ -266,6 +429,7 @@ export function CalendarTabs({
             />
           )}
         </AnimatePresence>
+
         {hasSecondaryTabs && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -287,7 +451,8 @@ export function CalendarTabs({
               {secondaryTabs.map((tab) => (
                 <DropdownMenuItem
                   key={tab.value}
-                  onClick={() => onChange(tab.value)}
+                  data-value={tab.value}
+                  onClick={handleDropdownClick}
                   disabled={disabledViews.includes(tab.value)}
                   className={cn(
                     'cursor-pointer',
@@ -300,6 +465,7 @@ export function CalendarTabs({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
+
         <AnimatePresence>
           {dropdownRect && mobileNavRect && isSecondaryTabActive && (
             <motion.div

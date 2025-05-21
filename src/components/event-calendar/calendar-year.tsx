@@ -40,19 +40,19 @@ export function CalendarYear({ events, currentDate }: CalendarYearProps) {
 
   const {
     locale,
-    viewConfigs,
+    viewSettings,
     openQuickAddDialog,
     openEventDialog,
     openDayEventsDialog,
-    setCurrentView,
+    setView,
   } = useEventCalendarStore(
     useShallow((state) => ({
       locale: state.locale,
-      viewConfigs: state.viewConfigs,
+      viewSettings: state.viewSettings,
       openQuickAddDialog: state.openQuickAddDialog,
       openEventDialog: state.openEventDialog,
       openDayEventsDialog: state.openDayEventsDialog,
-      setCurrentView: state.setCurrentView,
+      setView: state.setView,
     })),
   );
 
@@ -92,9 +92,9 @@ export function CalendarYear({ events, currentDate }: CalendarYearProps) {
 
   const handleMonthClick = useCallback(
     (month: Date) => {
-      setCurrentView(CalendarViewType.MONTH);
+      setView(CalendarViewType.MONTH);
     },
-    [setCurrentView],
+    [setView],
   );
 
   const handleDateClick = useCallback(
@@ -139,7 +139,7 @@ export function CalendarYear({ events, currentDate }: CalendarYearProps) {
               'group flex flex-col rounded-lg border p-3 shadow-sm transition-all',
               'hover:border-primary hover:shadow-md',
               isCurrentMonth &&
-                viewConfigs.year.highlightCurrentMonth &&
+                viewSettings.year.highlightCurrentMonth &&
                 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/10',
             )}
           >

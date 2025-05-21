@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { formatDate, generateTimeSlots, isSameFullDay } from '@/lib/date';
+import { formatDate, generateTimeSlots, isSameDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
 import { HoverPositionType } from '@/types/event';
 import { WeekDayHeaders } from './ui/week-days-header';
@@ -10,7 +10,7 @@ import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { MultiDayEventSection } from './ui/multi-day-event';
 import { TimeGrid } from './ui/time-grid';
-import { EventDialogTrigger } from './ui/event-dialog-trigger';
+import { EventDialogTrigger } from './event-dialog-trigger';
 import {
   useEventPositions,
   useFilteredEvents,
@@ -38,13 +38,13 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
     timeFormat,
     locale,
     firstDayOfWeek,
-    viewConfigs,
+    viewSettings,
     openQuickAddDialog,
     openEventDialog,
   } = useEventCalendarStore(
     useShallow((state) => ({
       timeFormat: state.timeFormat,
-      viewConfigs: state.viewConfigs,
+      viewSettings: state.viewSettings,
       locale: state.locale,
       firstDayOfWeek: state.firstDayOfWeek,
       openDayEventsDialog: state.openDayEventsDialog,
@@ -106,7 +106,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
   }, []);
 
   const handleTimeSlotClick = useCallback(() => {
-    if (!viewConfigs.day.enableTimeSlotClick || !hoverPosition) return;
+    if (!viewSettings.day.enableTimeSlotClick || !hoverPosition) return;
 
     openQuickAddDialog({
       date: currentDate,
@@ -116,7 +116,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
     currentDate,
     hoverPosition,
     openQuickAddDialog,
-    viewConfigs.day.enableTimeSlotClick,
+    viewSettings.day.enableTimeSlotClick,
   ]);
 
   const showEventDetail = useCallback((_event: EventTypes) => {}, []);
@@ -167,7 +167,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
             className="w-14 sm:w-32"
           />
           <div ref={containerRef} className="relative flex-1 overflow-y-auto">
-            {viewConfigs.week.showCurrentTimeIndicator && (
+            {viewSettings.week.showCurrentTimeIndicator && (
               <CurrentTimeIndicator
                 currentHour={currentHour}
                 currentMinute={currentMinute}
@@ -175,7 +175,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
                 hourHeight={HOUR_HEIGHT}
               />
             )}
-            {hoverPosition && viewConfigs.week.showHoverTimeIndicator && (
+            {hoverPosition && viewSettings.week.showHoverTimeIndicator && (
               <HoverTimeIndicator
                 hour={hoverPosition.hour}
                 minute={hoverPosition.minute}
@@ -192,7 +192,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
               {singleDayEvents.map((event) => {
                 const eventDate = new Date(event.startDate);
                 const dayIndex = weekDays.findIndex((day) =>
-                  isSameFullDay(day, eventDate),
+                  isSameDay(day, eventDate),
                 );
 
                 if (dayIndex === -1) return null;

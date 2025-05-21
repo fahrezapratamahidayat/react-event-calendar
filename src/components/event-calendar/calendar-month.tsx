@@ -29,7 +29,7 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
     firstDayOfWeek,
     locale,
     weekStartDay,
-    viewConfigs,
+    viewSettings,
     openDayEventsDialog,
     openEventDialog,
     openQuickAddDialog,
@@ -37,7 +37,7 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
     useShallow((state) => ({
       timeFormat: state.timeFormat,
       firstDayOfWeek: state.firstDayOfWeek,
-      viewConfigs: state.viewConfigs,
+      viewSettings: state.viewSettings,
       locale: state.locale,
       weekStartDay: state.firstDayOfWeek,
       openDayEventsDialog: state.openDayEventsDialog,
@@ -112,7 +112,7 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
             eventsByDate={eventsGroupedByDate}
             locale={locale}
             timeFormat={timeFormat}
-            viewConfigs={viewConfigs}
+            viewSettings={viewSettings}
             focusedDate={focusedDate}
             onQuickAdd={(date) => openQuickAddDialog({ date })}
             onFocusDate={setFocusedDate}

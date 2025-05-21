@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { formatDate, generateTimeSlots, isSameFullDay } from '@/lib/date';
+import { formatDate, generateTimeSlots, isSameDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
 import { HoverPositionType } from '@/types/event';
 import { WeekDayHeaders } from './ui/week-days-header';
@@ -9,7 +9,7 @@ import { TimeColumn } from './ui/time-column';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { TimeGrid } from './ui/time-grid';
-import { EventDialogTrigger } from './ui/event-dialog-trigger';
+import { EventDialogTrigger } from './event-dialog-trigger';
 import {
   useEventPositions,
   useFilteredEvents,
@@ -41,13 +41,13 @@ export function CalendarDaysView({
     timeFormat,
     locale,
     firstDayOfWeek,
-    viewConfigs,
+    viewSettings,
     openQuickAddDialog,
     openEventDialog,
   } = useEventCalendarStore(
     useShallow((state) => ({
       timeFormat: state.timeFormat,
-      viewConfigs: state.viewConfigs,
+      viewSettings: state.viewSettings,
       locale: state.locale,
       firstDayOfWeek: state.firstDayOfWeek,
       openDayEventsDialog: state.openDayEventsDialog,
@@ -108,13 +108,13 @@ export function CalendarDaysView({
   }, []);
 
   const handleTimeSlotClick = useCallback(() => {
-    if (!viewConfigs.day.enableTimeSlotClick || !hoverPosition) return;
+    if (!viewSettings.day.enableTimeSlotClick || !hoverPosition) return;
     openQuickAddDialog({ date: currentDate, position: hoverPosition });
   }, [
     currentDate,
     hoverPosition,
     openQuickAddDialog,
-    viewConfigs.day.enableTimeSlotClick,
+    viewSettings.day.enableTimeSlotClick,
   ]);
 
   return (
@@ -156,7 +156,7 @@ export function CalendarDaysView({
             className="w-14 flex-shrink-0 border-r sm:w-20"
           />
           <div ref={containerRef} className="relative flex-1 overflow-y-auto">
-            {viewConfigs.day.showCurrentTimeIndicator && (
+            {viewSettings.day.showCurrentTimeIndicator && (
               <CurrentTimeIndicator
                 currentHour={currentHour}
                 currentMinute={currentMinute}
@@ -164,7 +164,7 @@ export function CalendarDaysView({
                 hourHeight={HOUR_HEIGHT}
               />
             )}
-            {hoverPosition && viewConfigs.day.showHoverTimeIndicator && (
+            {hoverPosition && viewSettings.day.showHoverTimeIndicator && (
               <HoverTimeIndicator
                 hour={hoverPosition.hour}
                 minute={hoverPosition.minute}
@@ -182,7 +182,7 @@ export function CalendarDaysView({
               {singleDayEvents.map((event) => {
                 const eventDate = new Date(event.startDate);
                 const dayIndex = weekDays.findIndex((day) =>
-                  isSameFullDay(day, eventDate),
+                  isSameDay(day, eventDate),
                 );
                 if (dayIndex === -1) return null;
 
