@@ -3,21 +3,20 @@ import { TimeFormatType } from '@/types/event';
 import { cva, type VariantProps } from 'class-variance-authority';
 import React, { forwardRef, useCallback } from 'react';
 
-const timeColumnVariants = cva(
-  'flex h-16 w-full cursor-pointer text-xs sm:text-sm',
-  {
-    variants: {
-      variant: {
-        day: 'text-muted-foreground pr-2 text-right justify-end',
-        week: 'text-muted-foreground justify-center  border-border px-2',
-        single: 'text-muted-foreground pr-2 text-right justify-end',
-      },
-    },
-    defaultVariants: {
-      variant: 'week',
+const timeColumnVariants = cva('flex h-16 w-full cursor-pointer ', {
+  variants: {
+    variant: {
+      day: 'text-muted-foreground pr-2 text-right justify-end text-xs sm:text-sm',
+      days: 'text-muted-foreground pr-2 text-right justify-end',
+      week: 'text-muted-foreground justify-center  border-border px-2 text-xs sm:text-sm',
+      single:
+        'text-muted-foreground pr-2 text-right justify-end text-xs sm:text-sm',
     },
   },
-);
+  defaultVariants: {
+    variant: 'week',
+  },
+});
 
 interface TimeColumnProps extends VariantProps<typeof timeColumnVariants> {
   timeSlots: Date[];
