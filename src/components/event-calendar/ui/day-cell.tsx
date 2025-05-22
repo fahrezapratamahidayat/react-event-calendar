@@ -2,7 +2,7 @@
 
 import { Clock, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatTime } from '@/lib/date';
+import { formatTimeDisplay } from '@/lib/date';
 import { Button } from '@/components/ui/button';
 import { EventTypes } from '@/db/schema';
 import { format, isSameDay, isSameMonth, Locale } from 'date-fns';
@@ -16,7 +16,7 @@ interface DayCellProps {
   eventsByDate: Record<string, EventTypes[]>;
   locale: Locale;
   timeFormat: TimeFormatType;
-  viewConfigs: CalendarViewConfigs;
+  viewSettings: CalendarViewConfigs;
   focusedDate: Date | null;
   onQuickAdd: (date: Date) => void;
   onFocusDate: (date: Date) => void;
@@ -30,7 +30,7 @@ export function DayCell({
   eventsByDate,
   locale,
   timeFormat,
-  viewConfigs,
+  viewSettings,
   focusedDate,
   onQuickAdd,
   onFocusDate,
@@ -55,13 +55,13 @@ export function DayCell({
         dayEvents.length === 0 ? 'add new event' : 'view events'
       }`}
       className={cn(
-        'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border p-1 transition-all sm:h-[130px] sm:p-2',
+        'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border transition-all sm:h-[130px] sm:p-2',
         'hover:border-primary focus:ring-primary hover:shadow-sm focus:ring-2 focus:outline-none',
         !isWithinMonth &&
-          (viewConfigs.month.hideOutsideDays
+          (viewSettings.month.hideOutsideDays
             ? 'hidden'
             : 'bg-muted/20 opacity-50'),
-        isFocused && 'ring-2 ring-blue-500',
+        // isFocused && 'ring-2 ring-blue-500',
       )}
       onClick={() => {
         if (dayEvents.length === 0) {
@@ -78,10 +78,10 @@ export function DayCell({
       }}
       onFocus={() => onFocusDate(date)}
     >
-      <div className="mb-1 flex items-center justify-between">
+      <div className="mb-0 flex items-center justify-between sm:mb-1">
         <span
           className={cn(
-            'flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium',
+            'flex h-6 w-6 items-center justify-center rounded-full border text-xs font-medium',
             isToday && 'bg-blue-500 text-white',
             !isWithinMonth && 'text-muted-foreground',
           )}
@@ -107,11 +107,11 @@ export function DayCell({
               <span className="truncate font-medium text-white">
                 {firstEvent.title}
               </span>
-              <div className="flex items-center truncate text-white/90">
+              <div className="hidden items-center truncate text-white sm:flex">
                 <Clock className="mr-1 h-3 w-3" />
                 <span className="truncate">
-                  {formatTime(firstEvent.startTime, timeFormat)} -{' '}
-                  {formatTime(firstEvent.endTime, timeFormat)}
+                  {formatTimeDisplay(firstEvent.startTime, timeFormat)} -{' '}
+                  {formatTimeDisplay(firstEvent.endTime, timeFormat)}
                 </span>
               </div>
             </button>
@@ -120,11 +120,13 @@ export function DayCell({
             <Button
               variant="ghost"
               size="sm"
-              className="mt-auto h-5 w-full gap-1 truncate p-5 px-1 text-xs"
+              className="h-1.5 w-full gap-1 truncate p-2 text-xs sm:mt-auto sm:h-5 sm:p-5 sm:px-1"
               onClick={() => onShowDayEvents(date)}
             >
-              <Plus className="h-3 w-3" />
-              <span>{dayEvents.length - 1} more</span>
+              <Plus className="h-1.5 w-1.5" />
+              <span className="hidden sm:block">
+                {dayEvents.length - 1} more
+              </span>
             </Button>
           ) : (
             <Button
@@ -142,7 +144,7 @@ export function DayCell({
               }}
             >
               <Plus className="h-3 w-3" />
-              <span>Add</span>
+              <span className="hidden sm:block">Add</span>
             </Button>
           )}
         </div>
