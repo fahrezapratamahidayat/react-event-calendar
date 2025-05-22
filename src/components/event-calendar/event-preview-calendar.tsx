@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { calculateEventDuration, formatTime } from '@/lib/date';
+import { calculateDuration, formatTimeDisplay } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import { eventFormSchema } from '@/lib/validations';
 import { TimeFormatType } from '@/types/event';
@@ -115,11 +115,11 @@ export const EventPreviewCalendar = ({
                   <div className="text-muted-foreground mt-1 flex items-center text-xs">
                     <Clock className="mr-1 h-3 w-3" />
                     <span>
-                      {formatTime(watchedValues.startTime, timeFormat)} -{' '}
-                      {formatTime(watchedValues.endTime, timeFormat)}
+                      {formatTimeDisplay(watchedValues.startTime, timeFormat)} -{' '}
+                      {formatTimeDisplay(watchedValues.endTime, timeFormat)}
                       <span className="ml-1">
                         (
-                        {calculateEventDuration(
+                        {calculateDuration(
                           watchedValues.startTime,
                           watchedValues.endTime,
                         )}
@@ -165,11 +165,11 @@ export const EventPreviewCalendar = ({
                   <p className="text-muted-foreground text-sm">
                     {watchedValues.startTime && watchedValues.endTime ? (
                       <>
-                        {formatTime(watchedValues.startTime, timeFormat)} -{' '}
-                        {formatTime(watchedValues.endTime, timeFormat)}
+                        {formatTimeDisplay(watchedValues.startTime, timeFormat)}{' '}
+                        - {formatTimeDisplay(watchedValues.endTime, timeFormat)}
                         <span className="ml-2">
                           (
-                          {calculateEventDuration(
+                          {calculateDuration(
                             watchedValues.startTime,
                             watchedValues.endTime,
                           )}{' '}
