@@ -28,7 +28,7 @@ export async function seedEvents() {
 
     const MONTH_RANGE = 6;
     const TODAY = new Date();
-    const EVENT_COUNT = 500;
+    const EVENT_COUNT = 300;
 
     const fakeEvents = Array.from({ length: EVENT_COUNT }, (_, i) => {
       const randomMonth = faker.number.int({
