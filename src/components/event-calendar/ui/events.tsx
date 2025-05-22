@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EventTypes } from '@/db/schema';
-import { formatTime } from '@/lib/date';
+import { formatTimeDisplay } from '@/lib/date';
 import { cn } from '@/lib/utils';
 import { CalendarViewType, TimeFormatType } from '@/types/event';
 import { endOfWeek, format, Locale, startOfWeek } from 'date-fns';
@@ -102,8 +102,8 @@ const EventItem = memo(
         <div className="flex items-center gap-1.5">
           <Clock className="h-3 w-3" />
           <span>
-            {formatTime(event.startTime, timeFormat)} -{' '}
-            {formatTime(event.endTime, timeFormat)}
+            {formatTimeDisplay(event.startTime, timeFormat)} -{' '}
+            {formatTimeDisplay(event.endTime, timeFormat)}
           </span>
         </div>
 
