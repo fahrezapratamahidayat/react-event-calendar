@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
-import { formatDate, formatTime } from '@/lib/date';
+import { formatDate, formatTimeDisplay } from '@/lib/date';
 import { EventTypes } from '@/db/schema';
 import { useMemo } from 'react';
 import { TimeFormatType } from '@/types/event';
@@ -40,15 +40,15 @@ const TimeInfo = ({
   <div className={cn('flex items-center', className)}>
     <Clock className="mr-1 h-3.5 w-3.5" />
     <span>
-      {formatTime(startTime, timeFormat)}
-      {endTime && ` - ${formatTime(endTime, timeFormat)}`}
+      {formatTimeDisplay(startTime, timeFormat)}
+      {endTime && ` - ${formatTimeDisplay(endTime, timeFormat)}`}
     </span>
   </div>
 );
 
 const EventCard = ({ event, timeFormat, onClick }: EventCardProps) => {
   const validColor = getColorClasses(event.color);
-  const { bg, border } = validColor;
+  const { bg, border, badge } = validColor;
   return (
     <Card
       key={event.id}
@@ -70,7 +70,7 @@ const EventCard = ({ event, timeFormat, onClick }: EventCardProps) => {
             <h3 className="text-base leading-tight font-medium">
               {event.title}
             </h3>
-            <Badge variant="outline" className={`${bg}`}>
+            <Badge variant="default" className={`${badge.bg}`}>
               {event.category}
             </Badge>
           </div>
