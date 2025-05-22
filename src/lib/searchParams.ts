@@ -1,5 +1,6 @@
 import {
   createSearchParamsCache,
+  parseAsInteger,
   parseAsIsoDate,
   parseAsString,
 } from 'nuqs/server';
@@ -9,4 +10,5 @@ export const searchParamsCache = createSearchParamsCache({
   view: parseAsString.withDefault('month'),
   title: parseAsString.withDefault(''),
   category: parseAsString.withDefault(''),
+  daysCount: parseAsInteger.withDefault(7),
 });
