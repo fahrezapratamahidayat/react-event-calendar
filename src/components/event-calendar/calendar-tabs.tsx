@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useTransition } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useTransition,
+  useMemo,
+} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { CalendarViewType } from '@/types/event';
@@ -10,10 +16,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
-import { Separator } from '../ui/separator';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 interface CalendarTabsProps {
@@ -53,7 +57,7 @@ const tabsConfig: TabConfig[] = [
   },
 ];
 
-const daysOptions = [3, 5, 7, 10, 14, 30];
+const daysOptions = [3, 5, 7, 10, 14, 31];
 
 const transition = {
   type: 'tween',
@@ -84,10 +88,12 @@ export function CalendarTabs({
   const navRef = useRef<HTMLDivElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
+
   const { daysCount: storeDaysCount, setDaysCount: setStoreDaysCount } =
     useEventCalendarStore();
-  const [queryDaysCount, setQueryDaysCount] = useQueryState(
+
+  const [, setQueryDaysCount] = useQueryState(
     'daysCount',
     parseAsInteger.withDefault(7).withOptions({
       shallow: false,
@@ -96,7 +102,7 @@ export function CalendarTabs({
     }),
   );
 
-  const [view, setView] = useQueryState(
+  const [, setView] = useQueryState(
     'view',
     parseAsString.withOptions({
       shallow: false,
@@ -111,12 +117,14 @@ export function CalendarTabs({
     mobileButtonRefs.current = new Array(tabsConfig.length).fill(null);
   }, []);
 
-  const visibleTabs = tabsConfig.filter(
-    (tab) => !disabledViews.includes(tab.value),
+  const visibleTabs = useMemo(
+    () => tabsConfig.filter((tab) => !disabledViews.includes(tab.value)),
+    [disabledViews],
   );
 
-  const selectedTabIndex = visibleTabs.findIndex(
-    (tab) => tab.value === viewType,
+  const selectedTabIndex = useMemo(
+    () => visibleTabs.findIndex((tab) => tab.value === viewType),
+    [visibleTabs, viewType],
   );
 
   const navRect = navRef.current?.getBoundingClientRect();
@@ -125,13 +133,19 @@ export function CalendarTabs({
   const selectedDesktopRect =
     desktopButtonRefs.current[selectedTabIndex]?.getBoundingClientRect();
 
-  const primaryTabs = visibleTabs.slice(0, 2);
-  const secondaryTabs = visibleTabs.slice(2);
+  const [primaryTabs, secondaryTabs] = useMemo(() => {
+    const primary = visibleTabs.slice(0, 2);
+    const secondary = visibleTabs.slice(2);
+    return [primary, secondary];
+  }, [visibleTabs]);
+
   const hasSecondaryTabs = secondaryTabs.length > 0;
 
-  const primarySelectedTabIndex = primaryTabs.findIndex(
-    (tab) => tab.value === viewType,
+  const primarySelectedTabIndex = useMemo(
+    () => primaryTabs.findIndex((tab) => tab.value === viewType),
+    [primaryTabs, viewType],
   );
+
   const selectedMobileRect =
     primarySelectedTabIndex !== -1
       ? mobileButtonRefs.current[
@@ -149,9 +163,11 @@ export function CalendarTabs({
       ? mobileButtonRefs.current[hoveredMobileTabIndex]?.getBoundingClientRect()
       : null;
 
-  const isSecondaryTabActive = secondaryTabs.some(
-    (tab) => tab.value === viewType,
+  const isSecondaryTabActive = useMemo(
+    () => secondaryTabs.some((tab) => tab.value === viewType),
+    [secondaryTabs, viewType],
   );
+
   const dropdownRect = dropdownButtonRef.current?.getBoundingClientRect();
 
   const handleTabClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -159,12 +175,9 @@ export function CalendarTabs({
     const tabValue = e.currentTarget.dataset.value as CalendarViewType;
     const hasDropdown = e.currentTarget.dataset.dropdown === 'true';
 
-    if (tabValue && !disabledViews.includes(tabValue)) {
-      // Jika tab memiliki dropdown, tidak perlu melakukan apa-apa saat klik (dropdown akan muncul)
-      if (!hasDropdown) {
-        onChange(tabValue);
-        setView(tabValue);
-      }
+    if (tabValue && !disabledViews.includes(tabValue) && !hasDropdown) {
+      onChange(tabValue);
+      setView(tabValue);
     }
   };
 
@@ -180,17 +193,15 @@ export function CalendarTabs({
 
   const handleDaysOptionClick = async (days: number) => {
     setStoreDaysCount(days);
-
     try {
       await setQueryDaysCount(days);
-
       onChange(CalendarViewType.DAYS);
       setView(CalendarViewType.DAYS);
     } catch (error) {
       console.error('Failed to update URL state:', error);
-      setStoreDaysCount(queryDaysCount);
     }
   };
+
   if (!isMounted) return null;
 
   return (
@@ -311,8 +322,6 @@ export function CalendarTabs({
           )}
         </AnimatePresence>
       </div>
-
-      {/* Mobile view */}
       <div
         ref={mobileNavRef}
         className="relative z-0 flex items-center justify-start py-2 md:hidden"
