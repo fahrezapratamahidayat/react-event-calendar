@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
-import { add30Minutes } from '@/lib/date';
+import { addMinutesToTime } from '@/lib/date';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDays } from 'date-fns';
 import { Save } from 'lucide-react';
@@ -22,8 +22,8 @@ import { ScrollArea } from '../ui/scroll-area';
 import { EventDetailsForm } from './event-detail-form';
 import { EventPreviewCalendar } from './event-preview-calendar';
 import { createEventSchema } from '@/lib/validations';
-import { getColorClasses } from '@/lib/event-utils';
 import { EVENT_DEFAULTS } from '@/constants/calendar-constant';
+import { useShallow } from 'zustand/shallow';
 
 type EventFormValues = z.infer<typeof createEventSchema>;
 
@@ -42,14 +42,24 @@ const DEFAULT_FORM_VALUES: EventFormValues = {
 
 export default function EventCreateDialog() {
   const {
-    isDialogAddOpen,
+    isQuickAddDialogOpen,
     closeQuickAddDialog,
     currentView,
     locale,
     timeFormat,
     isSubmitting,
-    quickAddDialogData,
-  } = useEventCalendarStore();
+    quickAddData,
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      isQuickAddDialogOpen: state.isQuickAddDialogOpen,
+      closeQuickAddDialog: state.closeQuickAddDialog,
+      currentView: state.currentView,
+      locale: state.locale,
+      timeFormat: state.timeFormat,
+      isSubmitting: state.isSubmitting,
+      quickAddData: state.quickAddData,
+    })),
+  );
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(createEventSchema),
@@ -82,27 +92,24 @@ export default function EventCreateDialog() {
   }, [currentView, startDate, form]);
 
   useEffect(() => {
-    if (isDialogAddOpen && quickAddDialogData.date) {
-      const defaultTime = quickAddDialogData.position
-        ? `${String(quickAddDialogData.position.hour).padStart(2, '0')}:${String(quickAddDialogData.position.minute).padStart(2, '0')}`
+    if (isQuickAddDialogOpen && quickAddData.date) {
+      const defaultTime = quickAddData.position
+        ? `${String(quickAddData.position.hour).padStart(2, '0')}:${String(quickAddData.position.minute).padStart(2, '0')}`
         : '12:00';
-
-      const validColor = getColorClasses(EVENT_DEFAULTS.COLOR);
 
       form.reset({
         ...DEFAULT_FORM_VALUES,
-        color: validColor.bg,
-        startDate: quickAddDialogData.date,
-        endDate: quickAddDialogData.date,
+        startDate: quickAddData.date,
+        endDate: quickAddData.date,
         startTime: defaultTime,
-        endTime: add30Minutes(defaultTime),
+        endTime: addMinutesToTime(defaultTime),
       });
     }
-  }, [isDialogAddOpen, quickAddDialogData, form]);
+  }, [isQuickAddDialogOpen, quickAddData, form]);
 
   return (
     <Dialog
-      open={isDialogAddOpen}
+      open={isQuickAddDialogOpen}
       onOpenChange={(open) => !open && closeQuickAddDialog()}
     >
       <DialogContent className="sm:max-w-[550px]">
@@ -118,7 +125,7 @@ export default function EventCreateDialog() {
             <TabsTrigger value="preview">Preview</TabsTrigger>
           </TabsList>
           <TabsContent value="edit" className="mt-4">
-            <ScrollArea className="h-[500px] w-full pr-4">
+            <ScrollArea className="h-[500px] w-full">
               <EventDetailsForm
                 form={form}
                 onSubmit={handleSubmit}
@@ -127,7 +134,7 @@ export default function EventCreateDialog() {
             </ScrollArea>
           </TabsContent>
           <TabsContent value="preview" className="mt-4">
-            <ScrollArea className="h-[500px] w-full pr-4">
+            <ScrollArea className="h-[500px] w-full">
               <EventPreviewCalendar
                 watchedValues={watchedValues}
                 locale={locale}
