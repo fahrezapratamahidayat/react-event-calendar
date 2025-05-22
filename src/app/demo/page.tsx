@@ -6,8 +6,6 @@ import { CalendarViewType } from '@/types/event';
 import { Suspense } from 'react';
 import { ModeToggle } from '@/components/mode-toggel';
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface DemoPageProps {
   searchParams: Promise<SearchParams>;
@@ -21,6 +19,7 @@ export default async function DemoPage(props: DemoPageProps) {
       ...search,
       date: search.date.toISOString(),
       view: search.view as CalendarViewType,
+      daysCount: Number(search.daysCount),
     }),
     getCategories(),
   ]);
