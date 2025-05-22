@@ -198,8 +198,9 @@ export const EventDetailsForm = memo(
                         return (
                           <ColorOptionItem
                             key={option.value}
-                            value={validColor.bg}
+                            value={option.value}
                             label={option.label}
+                            className={validColor.bg}
                           />
                         );
                       })}
