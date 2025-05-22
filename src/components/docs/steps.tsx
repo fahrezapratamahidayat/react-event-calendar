@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Terminal, Database, Code, Settings, Circle } from 'lucide-react';
-import { typography } from '@/lib/typography';
 
 interface StepsProps {
   children: React.ReactNode;
@@ -36,7 +35,7 @@ interface StepsItemProps {
   isLast?: boolean;
 }
 
-function getIconFromTitle(title: string, index?: number) {
+function getIconFromTitle(title: string) {
   const lowercaseTitle = title.toLowerCase();
 
   if (lowercaseTitle.includes('node')) return <Terminal className="h-4 w-4" />;
@@ -49,14 +48,8 @@ function getIconFromTitle(title: string, index?: number) {
   return <Circle className="h-4 w-4" />;
 }
 
-export function StepsItem({
-  icon,
-  title,
-  children,
-  index,
-  isLast = false,
-}: StepsItemProps) {
-  const finalIcon = icon || getIconFromTitle(title, index);
+export function StepsItem({ icon, title, children }: StepsItemProps) {
+  const finalIcon = icon || getIconFromTitle(title);
 
   return (
     <div className="steps-item mb-8 last:mb-0">
@@ -64,7 +57,7 @@ export function StepsItem({
         {finalIcon}
       </div>
       <div>
-        <h3 className={typography.h4()}>{title}</h3>
+        <h3>{title}</h3>
         <div className="">{children}</div>
       </div>
     </div>
