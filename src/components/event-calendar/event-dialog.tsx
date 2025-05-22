@@ -19,6 +19,8 @@ import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { eventFormSchema } from '@/lib/validations';
 import { EventDetailsForm } from './event-detail-form';
 import { EventTypes } from '@/db/schema';
+import { getColorClasses } from '@/lib/event-utils';
+import { EVENT_DEFAULTS } from '@/constants/calendar-constant';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
@@ -68,11 +70,9 @@ export default function EventDialog() {
     mode: 'onChange',
   });
 
-  // Update form when selected event changes
   useEffect(() => {
     if (selectedEvent) {
       try {
-        // Convert dates safely
         const startDate = ensureDate(selectedEvent.startDate);
         const endDate = ensureDate(selectedEvent.endDate);
 
@@ -85,7 +85,7 @@ export default function EventDialog() {
           startTime: selectedEvent.startTime || DEFAULT_START_TIME,
           endTime: selectedEvent.endTime || DEFAULT_END_TIME,
           location: selectedEvent.location || '',
-          color: selectedEvent.color || DEFAULT_COLOR,
+          color: selectedEvent.color,
         });
       } catch (error) {
         console.error('Error resetting form with event data:', error);
