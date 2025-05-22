@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
 import { TimeFormatToggle } from './ui/time-format-toggel';
 import { TodayButton } from './ui/today-button';
@@ -34,6 +34,7 @@ import {
 } from 'date-fns';
 import { useQueryState } from 'nuqs';
 import { parseAsIsoDate } from 'nuqs/server';
+import { CalendarYear } from './calendar-year';
 import { CalendarDaysView } from './calendar-days-view';
 
 interface EventCalendarProps {
@@ -58,21 +59,21 @@ export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
     locale,
     timeFormat,
     currentView,
-    setCurrentView,
+    setView,
     setTimeFormat,
-    setViewMode,
+    daysCount,
+    setMode,
     openQuickAddDialog,
   } = useEventCalendarStore(
     useShallow((state) => ({
-      initialize: state.initialize,
-      setLoading: state.setLoading,
       viewMode: state.viewMode,
       locale: state.locale,
       timeFormat: state.timeFormat,
       currentView: state.currentView,
-      setCurrentView: state.setCurrentView,
+      setView: state.setView,
       setTimeFormat: state.setTimeFormat,
-      setViewMode: state.setViewMode,
+      daysCount: state.daysCount,
+      setMode: state.setMode,
       openQuickAddDialog: state.openQuickAddDialog,
     })),
   );
@@ -128,16 +129,16 @@ export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
 
   const handleViewModeChange = useCallback(
     (mode: ViewModeType) => {
-      setViewMode(mode);
+      setMode(mode);
     },
-    [setViewMode],
+    [setMode],
   );
 
   const handleViewTypeChange = useCallback(
     (viewType: CalendarViewType) => {
-      setCurrentView(viewType);
+      setView(viewType);
     },
-    [setCurrentView],
+    [setView],
   );
 
   const renderCalendarView = useMemo(() => {
@@ -151,6 +152,14 @@ export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
         return (
           <CalendarDay events={eventsData.events} currentDate={initialDate} />
         );
+      case 'days':
+        return (
+          <CalendarDaysView
+            events={eventsData.events}
+            daysCount={daysCount}
+            currentDate={initialDate}
+          />
+        );
       case 'week':
         return (
           <CalendarWeek events={eventsData.events} currentDate={initialDate} />
@@ -161,10 +170,7 @@ export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
         );
       case 'year':
         return (
-          <CalendarDaysView
-            events={eventsData.events}
-            currentDate={initialDate}
-          />
+          <CalendarYear events={eventsData.events} currentDate={initialDate} />
         );
       default:
         return (
