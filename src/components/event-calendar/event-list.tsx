@@ -2,11 +2,14 @@
 import { useCallback } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
+  addDays,
+  endOfDay,
   isSameDay,
   isSameMonth,
   isSameWeek,
   isSameYear,
-  Locale,
+  isWithinInterval,
+  startOfDay,
 } from 'date-fns';
 import { CalendarViewType, TimeFormatType } from '@/types/event';
 import { EventGroup, NoEvents } from './ui/events';
@@ -27,11 +30,20 @@ export const VIEW_CONFIG = {
     filterFn: (eventDate: Date, currentDate: Date) =>
       isSameDay(eventDate, currentDate),
   },
+  [CalendarViewType.DAYS]: {
+    groupFormat: 'EEEE, d MMMM',
+    titleFormat: 'd MMMM yyyy',
+    filterFn: (eventDate: Date, currentDate: Date, daysCount: number = 7) => {
+      const start = startOfDay(currentDate);
+      const end = endOfDay(addDays(currentDate, daysCount - 1));
+      return isWithinInterval(eventDate, { start, end });
+    },
+  },
   [CalendarViewType.WEEK]: {
     groupFormat: 'yyyy-MM-dd',
     titleFormat: 'EEEE, d MMMM yyyy',
-    filterFn: (eventDate: Date, currentDate: Date, locale?: Locale) =>
-      isSameWeek(eventDate, currentDate, { locale }),
+    filterFn: (eventDate: Date, currentDate: Date) =>
+      isSameWeek(eventDate, currentDate),
   },
   [CalendarViewType.MONTH]: {
     groupFormat: 'yyyy-MM-dd',
@@ -82,12 +94,7 @@ export function EventsList({ events, currentDate }: EventsListProps) {
       })),
     );
 
-  const filteredEvents = useEventFilter(
-    events,
-    currentDate,
-    currentView,
-    locale,
-  );
+  const filteredEvents = useEventFilter(events, currentDate, currentView);
 
   const groupedEvents = useEventGrouper(
     filteredEvents,
