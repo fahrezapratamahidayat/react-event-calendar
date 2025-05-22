@@ -1,13 +1,9 @@
 'use client';
 
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef } from 'react';
 import { formatDate, generateTimeSlots, isSameDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
-import { HoverPositionType } from '@/types/event';
 import { WeekDayHeaders } from './ui/week-days-header';
-import { TimeColumn } from './ui/time-column';
-import { CurrentTimeIndicator } from './ui/current-time-indicator';
-import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { TimeGrid } from './ui/time-grid';
 import { EventDialogTrigger } from './event-dialog-trigger';
 import {
@@ -37,34 +33,15 @@ export function CalendarDaysView({
   currentDate,
   daysCount = 16,
 }: CalendarDayViewProps) {
-  const {
-    timeFormat,
-    locale,
-    firstDayOfWeek,
-    viewSettings,
-    openQuickAddDialog,
-    openEventDialog,
-  } = useEventCalendarStore(
+  const { locale, firstDayOfWeek, openEventDialog } = useEventCalendarStore(
     useShallow((state) => ({
-      timeFormat: state.timeFormat,
-      viewSettings: state.viewSettings,
       locale: state.locale,
       firstDayOfWeek: state.firstDayOfWeek,
-      openDayEventsDialog: state.openDayEventsDialog,
-      openQuickAddDialog: state.openQuickAddDialog,
       openEventDialog: state.openEventDialog,
     })),
   );
 
-  const [hoverPosition, setHoverPosition] = useState<
-    HoverPositionType | undefined
-  >(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
-  const timeColumnRef = useRef<HTMLDivElement>(null);
-
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
 
   const dayWidthPercent = 100 / daysCount;
 
@@ -82,47 +59,11 @@ export function CalendarDaysView({
   const multiDayEventRows = useMultiDayEventRows(multiDayEvents, weekDays);
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
 
-  const handleTimeHover = useCallback((hour: number) => {
-    setHoverPosition((prev) => ({ ...prev, hour, minute: 0, dayIndex: -1 }));
-  }, []);
-
-  const handlePreciseHover = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>, hour: number) => {
-      if (!timeColumnRef.current) return;
-
-      const slotRect = event.currentTarget.getBoundingClientRect();
-      const cursorY = event.clientY - slotRect.top;
-      const minutes = Math.floor((cursorY / slotRect.height) * 60);
-
-      setHoverPosition({
-        hour,
-        minute: Math.max(0, Math.min(59, minutes)),
-        dayIndex: -1,
-      });
-    },
-    [],
-  );
-
-  const handleTimeLeave = useCallback(() => {
-    setHoverPosition(undefined);
-  }, []);
-
-  const handleTimeSlotClick = useCallback(() => {
-    if (!viewSettings.day.enableTimeSlotClick || !hoverPosition) return;
-    openQuickAddDialog({ date: currentDate, position: hoverPosition });
-  }, [
-    currentDate,
-    hoverPosition,
-    openQuickAddDialog,
-    viewSettings.day.enableTimeSlotClick,
-  ]);
-
   return (
     <div className="flex h-[760px] flex-col overflow-hidden border">
       <ScrollArea className="h-full w-full">
         <div className="bg-accent border-border sticky top-0 z-30 border-b">
           <div className="flex py-2">
-            <div className="w-14 flex-shrink-0 sm:w-17" />
             <WeekDayHeaders
               daysInWeek={weekDays}
               currentDayIndex={todayIndex}
@@ -144,34 +85,7 @@ export function CalendarDaysView({
           )}
         </div>
         <div className="flex flex-1 overflow-hidden">
-          <TimeColumn
-            ref={timeColumnRef}
-            timeSlots={timeSlots}
-            timeFormat={timeFormat}
-            onTimeHover={handleTimeHover}
-            onPreciseHover={handlePreciseHover}
-            onLeave={handleTimeLeave}
-            onTimeSlotClick={handleTimeSlotClick}
-            variant={daysCount === 1 ? 'single' : 'week'}
-            className="w-14 flex-shrink-0 border-r sm:w-20"
-          />
           <div ref={containerRef} className="relative flex-1 overflow-y-auto">
-            {viewSettings.day.showCurrentTimeIndicator && (
-              <CurrentTimeIndicator
-                currentHour={currentHour}
-                currentMinute={currentMinute}
-                timeFormat={timeFormat}
-                hourHeight={HOUR_HEIGHT}
-              />
-            )}
-            {hoverPosition && viewSettings.day.showHoverTimeIndicator && (
-              <HoverTimeIndicator
-                hour={hoverPosition.hour}
-                minute={hoverPosition.minute}
-                timeFormat={timeFormat}
-                hourHeight={HOUR_HEIGHT}
-              />
-            )}
             <TimeGrid
               timeSlots={timeSlots}
               daysInWeek={weekDays}
