@@ -37,10 +37,9 @@ export function ViewModeToggle({
           <TooltipTrigger asChild>
             <Button
               type="button"
-              variant={mode === ViewModeType.CALENDAR ? 'secondary' : 'ghost'}
+              variant={mode === ViewModeType.CALENDAR ? 'default' : 'ghost'}
               className={cn(
                 'group relative h-9 rounded-none rounded-l-md px-3 transition-all',
-                mode !== ViewModeType.CALENDAR && 'hover:bg-secondary/50',
               )}
               onClick={() => onChange(ViewModeType.CALENDAR)}
               aria-label="Calendar view"
@@ -86,10 +85,9 @@ export function ViewModeToggle({
           <TooltipTrigger asChild>
             <Button
               type="button"
-              variant={mode === ViewModeType.LIST ? 'secondary' : 'ghost'}
+              variant={mode === ViewModeType.LIST ? 'default' : 'ghost'}
               className={cn(
                 'group relative h-9 rounded-none rounded-r-md px-3 transition-all',
-                mode !== ViewModeType.LIST && 'hover:bg-secondary/50',
               )}
               onClick={() => onChange(ViewModeType.LIST)}
               aria-label="List view"
