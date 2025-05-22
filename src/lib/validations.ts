@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { validateDateTimeOrder } from './date';
+import { validateTimeOrder } from './date';
 
 const timeRegex = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/; // HH:MM or HH:MM:SS
-const colorRegex = /^bg-[a-z]+-\d{2,3}$/; // Tailwind class pattern
 
 const baseEventSchema = z.object({
   id: z.string().uuid(),
@@ -14,7 +13,7 @@ const baseEventSchema = z.object({
   endTime: z.string().regex(timeRegex),
   location: z.string().min(1).max(256),
   category: z.string().min(1).max(100),
-  color: z.string().regex(colorRegex),
+  color: z.string().min(1).max(25),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -30,7 +29,7 @@ export const createEventSchema = z.object({
   category: z.string().min(1).max(100),
   isRepeating: z.boolean().default(false).optional(),
   repeatingType: z.enum(['daily', 'weekly', 'monthly']).optional(),
-  color: z.string().regex(colorRegex),
+  color: z.string().min(1).max(25),
 });
 
 export const eventFormSchema = baseEventSchema
@@ -51,10 +50,18 @@ export const eventFormSchema = baseEventSchema
     message: 'Repeating type is required for repeating events',
     path: ['repeatingType'],
   })
-  .refine(validateDateTimeOrder, {
-    message: 'End time must be later than start time.',
-    path: ['endTime'],
-  });
+  .refine(
+    (data) => {
+      if (data.startDate.toDateString() !== data.endDate.toDateString()) {
+        return data.endDate > data.startDate;
+      }
+      return validateTimeOrder(data.startTime, data.endTime);
+    },
+    {
+      message: 'End time must be later than start time.',
+      path: ['endTime'],
+    },
+  );
 
 export const UpdateEventSchema = createEventSchema.partial();
 
