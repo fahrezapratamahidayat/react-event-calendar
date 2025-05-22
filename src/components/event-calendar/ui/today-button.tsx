@@ -30,6 +30,7 @@ export function TodayButton({
   useEffect(() => {
     const checks = {
       [CalendarViewType.DAY]: isToday,
+      [CalendarViewType.DAYS]: isToday,
       [CalendarViewType.WEEK]: isThisWeek,
       [CalendarViewType.MONTH]: isThisMonth,
       [CalendarViewType.YEAR]: isThisYear,
@@ -51,6 +52,7 @@ export function TodayButton({
   const getButtonLabel = () => {
     const labels = {
       [CalendarViewType.DAY]: 'Today',
+      [CalendarViewType.DAYS]: 'Today',
       [CalendarViewType.WEEK]: 'This week',
       [CalendarViewType.MONTH]: 'This month',
       [CalendarViewType.YEAR]: 'This year',
