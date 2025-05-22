@@ -27,6 +27,7 @@ export interface QuickAddDialogData {
 
 export enum CalendarViewType {
   DAY = 'day',
+  DAYS = 'days',
   WEEK = 'week',
   MONTH = 'month',
   YEAR = 'year',
