@@ -53,7 +53,6 @@ export function WeekDayHeaders({
             key={dayIndex}
             className={cn(
               'flex flex-1 flex-col items-center justify-center p-0 font-medium sm:p-2',
-              !showWeekNumber && 'ml-7 sm:p-0', // styling for calendar month
             )}
           >
             <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
