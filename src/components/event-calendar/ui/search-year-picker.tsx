@@ -103,7 +103,7 @@ export function SearchYearPicker({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              'w-[120px] justify-between font-normal',
+              'w-[120px] justify-between text-xs font-normal',
               !year && 'text-muted-foreground',
               className,
             )}
