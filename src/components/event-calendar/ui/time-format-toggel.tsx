@@ -113,6 +113,7 @@ export function TimeFormatToggle({
                       opacity: 0,
                     }}
                     transition={{ duration: 0.2 }}
+                    className="text-xs"
                   >
                     {format === TimeFormatType.HOUR_24 ? '24h' : '12h'}
                   </motion.span>
