@@ -157,7 +157,7 @@ export function SearchDayPicker({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              'w-[130px] justify-between font-normal',
+              'w-[130px] justify-between text-xs font-normal',
               !selectedDay && 'text-muted-foreground',
               className,
             )}
