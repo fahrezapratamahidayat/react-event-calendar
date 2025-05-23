@@ -291,40 +291,58 @@ export function useMultiDayEventRows(
 export function useDayEventPositions(events: EventTypes[], hourHeight: number) {
   return useMemo(() => {
     const positions: Record<string, EventPosition> = {};
-    const columns: number[][] = [];
 
-    // Convert and sort events by time
-    const timeRanges = events
-      .map((event) => ({
-        event,
-        start: convertTimeToMinutes(event.startTime),
-        end: convertTimeToMinutes(event.endTime),
-      }))
-      .sort((a, b) => a.start - b.start);
+    // Convert event times to minutes for easier comparison
+    const timeRanges = events.map((event) => {
+      const start = convertTimeToMinutes(event.startTime);
+      const end = convertTimeToMinutes(event.endTime);
+      return { event, start, end };
+    });
+
+    // Sort by start time
+    timeRanges.sort((a, b) => a.start - b.start);
+
+    // Algorithm to determine columns (prevent overlap)
+    const columns: number[][] = []; // Store end times for each column
 
     timeRanges.forEach(({ event, start, end }) => {
       let columnIndex = 0;
 
-      // Find available column
-      while (columns[columnIndex]?.some((endTime) => start < endTime)) {
+      while (true) {
+        if (!columns[columnIndex]) {
+          columns[columnIndex] = [];
+        }
+
+        // Check if this column is available
+        const available = !columns[columnIndex].some(
+          (endTime) => start < endTime,
+        );
+
+        if (available) {
+          // Add end time to this column
+          columns[columnIndex].push(end);
+
+          // Calculate position and size
+          const top = (start / 60) * hourHeight;
+          const height = ((end - start) / 60) * hourHeight;
+
+          positions[event.id] = {
+            id: event.id,
+            top,
+            height,
+            column: columnIndex,
+            totalColumns: 0, // Will be updated later
+          };
+          break;
+        }
         columnIndex++;
       }
+    });
 
-      // Initialize column if needed
-      if (!columns[columnIndex]) {
-        columns[columnIndex] = [];
-      }
-
-      columns[columnIndex].push(end);
-
-      // Calculate position
-      positions[event.id] = {
-        id: event.id,
-        top: (start / 60) * hourHeight,
-        height: ((end - start) / 60) * hourHeight,
-        column: columnIndex,
-        totalColumns: columns.length,
-      };
+    // Update totalColumns for all events
+    const totalColumns = columns.length;
+    Object.values(positions).forEach((pos) => {
+      pos.totalColumns = totalColumns;
     });
 
     return positions;
