@@ -14,7 +14,7 @@ import { CalendarIcon, Clock, MapPin, Tag } from 'lucide-react';
 import { z } from 'zod';
 import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
-import { getCategoryLabel, getContrastColor } from '@/lib/event-utils';
+import { getCategoryLabel, getContrastColor } from '@/lib/event';
 
 type EventFormValues = z.infer<typeof eventFormSchema>;
 
