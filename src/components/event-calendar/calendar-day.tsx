@@ -9,7 +9,7 @@ import { HoverPositionType } from '@/types/event';
 import { EventDialogTrigger } from './event-dialog-trigger';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
-import { useDayEventPositions } from '@/lib/event-utils';
+import { useDayEventPositions } from '@/lib/event';
 import { TimeColumn } from './ui/time-column';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
