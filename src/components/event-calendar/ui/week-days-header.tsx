@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { FormatOptions, Locale } from 'date-fns';
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 
 interface WeekDayHeadersProps {
   weekNumber?: number;
@@ -14,7 +15,10 @@ interface WeekDayHeadersProps {
   locale: Locale;
   firstDayOfWeek: number;
   showWeekNumber?: boolean;
+  showDayNumber?: boolean;
   className?: string;
+  dayNumberClassName?: string;
+  highlightToday?: boolean;
 }
 
 export function WeekDayHeaders({
@@ -25,7 +29,10 @@ export function WeekDayHeaders({
   locale,
   firstDayOfWeek,
   showWeekNumber = false,
+  showDayNumber = false,
   className,
+  dayNumberClassName,
+  highlightToday = true,
 }: WeekDayHeadersProps) {
   const reorderedDays = useMemo(() => {
     const ordered = [...daysInWeek];
@@ -37,39 +44,50 @@ export function WeekDayHeaders({
   return (
     <div className={cn('flex w-full items-center justify-around', className)}>
       {showWeekNumber && (
-        <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32"
+        >
           <div className="text-muted-foreground text-xs sm:text-sm">Week</div>
           <div className="text-muted-foreground text-xs sm:text-sm">
             {weekNumber}
           </div>
-        </div>
+        </motion.div>
       )}
       {reorderedDays.map((day, dayIndex) => {
         const originalIndex = (dayIndex + firstDayOfWeek) % 7;
-        const isToday = currentDayIndex === originalIndex;
+        const isToday = highlightToday && currentDayIndex === originalIndex;
 
         return (
-          <div
+          <motion.div
             key={dayIndex}
             className={cn(
               'flex flex-1 flex-col items-center justify-center p-0 font-medium sm:p-2',
             )}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: dayIndex * 0.05 }}
           >
             <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
               {formatDate(day, 'EEE', { locale })}
             </div>
-            <div className="flex items-center justify-center">
-              <span
-                className={cn(
-                  'flex h-8 w-8 items-center justify-center text-xs sm:text-sm',
-                  isToday &&
-                    'text-primary bg-primary/10 rounded-full font-bold',
-                )}
-              >
-                {formatDate(day, 'd', { locale })}
-              </span>
-            </div>
-          </div>
+            {showDayNumber && (
+              <div className="flex items-center justify-center">
+                <span
+                  className={cn(
+                    'flex h-8 w-8 items-center justify-center text-xs sm:text-sm',
+                    isToday &&
+                      'text-primary bg-primary/10 rounded-full font-bold',
+                    dayNumberClassName,
+                  )}
+                >
+                  {formatDate(day, 'd', { locale })}
+                </span>
+              </div>
+            )}
+          </motion.div>
         );
       })}
     </div>
