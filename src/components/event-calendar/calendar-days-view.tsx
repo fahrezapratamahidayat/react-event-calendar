@@ -11,7 +11,7 @@ import {
   useFilteredEvents,
   useMultiDayEventRows,
   useWeekDays,
-} from '@/lib/event-utils';
+} from '@/lib/event';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
