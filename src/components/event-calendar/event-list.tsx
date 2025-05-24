@@ -15,7 +15,7 @@ import { CalendarViewType, TimeFormatType } from '@/types/event';
 import { EventGroup, NoEvents } from './ui/events';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { EventTypes } from '@/db/schema';
-import { useEventFilter, useEventGrouper } from '@/lib/event-utils';
+import { useEventFilter, useEventGrouper } from '@/lib/event';
 import { useShallow } from 'zustand/shallow';
 
 interface EventsListProps {
