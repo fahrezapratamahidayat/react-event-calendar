@@ -49,7 +49,7 @@ export function FilterContainer() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1.5">
+        <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
           <FilterIcon className="h-3.5 w-3.5" />
           <span>Filter</span>
           {activeFiltersCount > 0 && (
