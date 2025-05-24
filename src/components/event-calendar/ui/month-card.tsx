@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/tooltip';
 import { EventTypes } from '@/db/schema';
 import { isSameDay } from '@/lib/date';
-import { getColorClasses } from '@/lib/event-utils';
+import { getColorClasses } from '@/lib/event';
 import { cn } from '@/lib/utils';
 import {
   eachDayOfInterval,
