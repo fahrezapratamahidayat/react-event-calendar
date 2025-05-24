@@ -24,7 +24,7 @@ import {
 import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/calendar-constant';
 import { ColorOptionItem } from './ui/color-option-item';
 import { z } from 'zod';
-import { getColorClasses } from '@/lib/event-utils';
+import { getColorClasses } from '@/lib/event';
 
 type EventFormValues = z.infer<typeof eventFormSchema>;
 
