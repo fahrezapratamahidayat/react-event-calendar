@@ -18,7 +18,7 @@ import { useMemo } from 'react';
 import { TimeFormatType } from '@/types/event';
 import { cn } from '@/lib/utils';
 import { Badge } from '../ui/badge';
-import { getColorClasses } from '@/lib/event-utils';
+import { getColorClasses } from '@/lib/event';
 
 interface EventCardProps {
   event: EventTypes;
