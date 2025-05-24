@@ -19,8 +19,6 @@ import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { eventFormSchema } from '@/lib/validations';
 import { EventDetailsForm } from './event-detail-form';
 import { EventTypes } from '@/db/schema';
-import { getColorClasses } from '@/lib/event-utils';
-import { EVENT_DEFAULTS } from '@/constants/calendar-constant';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
