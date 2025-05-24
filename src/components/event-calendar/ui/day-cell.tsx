@@ -8,7 +8,7 @@ import { EventTypes } from '@/db/schema';
 import { format, isSameDay, isSameMonth, Locale } from 'date-fns';
 import { CalendarViewConfigs } from '@/hooks/use-event-calendar';
 import { TimeFormatType } from '@/types/event';
-import { getColorClasses } from '@/lib/event-utils';
+import { getColorClasses } from '@/lib/event';
 
 interface DayCellProps {
   date: Date;
@@ -43,7 +43,7 @@ export function DayCell({
   const isWithinMonth = isSameMonth(date, baseDate);
   const isEmpty = dayEvents.length === 0;
   const firstEvent = dayEvents[0];
-  const isFocused = focusedDate && isSameDay(date, focusedDate);
+  const _isFocused = focusedDate && isSameDay(date, focusedDate);
   const shouldRenderEvents = isWithinMonth && dayEvents.length > 0;
   const colorClasses = firstEvent ? getColorClasses(firstEvent.color) : null;
   return (
@@ -57,10 +57,11 @@ export function DayCell({
       className={cn(
         'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border transition-all sm:h-[130px] sm:p-2',
         'hover:border-primary focus:ring-primary hover:shadow-sm focus:ring-2 focus:outline-none',
-        !isWithinMonth &&
-          (viewSettings.month.hideOutsideDays
-            ? 'hidden'
-            : 'bg-muted/20 opacity-50'),
+        !isWithinMonth && viewSettings.month.hideOutsideDays
+          ? 'invisible'
+          : !isWithinMonth
+            ? 'bg-muted/20 opacity-50'
+            : '',
         // isFocused && 'ring-2 ring-blue-500',
       )}
       onClick={() => {
