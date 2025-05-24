@@ -16,7 +16,7 @@ import {
   useFilteredEvents,
   useMultiDayEventRows,
   useWeekDays,
-} from '@/lib/event-utils';
+} from '@/lib/event';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
@@ -133,6 +133,8 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
             locale={locale}
             firstDayOfWeek={firstDayOfWeek}
             showWeekNumber={true}
+            showDayNumber={true}
+            highlightToday={true}
           />
           {multiDayEventRows.length ? (
             <div className="relative w-full flex-1">
