@@ -14,7 +14,7 @@ import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
 import { DayCell } from './ui/day-cell';
 import { WeekDayHeaders } from './ui/week-days-header';
-import { useWeekDays } from '@/lib/event-utils';
+import { useWeekDays } from '@/lib/event';
 import { formatDate } from '@/lib/date';
 
 const DAYS_IN_WEEK = 7;
@@ -97,6 +97,8 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
         locale={locale}
         firstDayOfWeek={firstDayOfWeek}
         showWeekNumber={false}
+        showDayNumber={false}
+        highlightToday={false}
       />
       <div
         ref={daysContainerRef}
