@@ -18,7 +18,9 @@ import { ensureDate } from '@/lib/date';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { eventFormSchema } from '@/lib/validations';
 import { EventDetailsForm } from './event-detail-form';
-import { EventTypes } from '@/db/schema';
+import { toast } from 'sonner';
+import { deleteEvent, updateEvent } from '@/app/actions';
+import { useShallow } from 'zustand/shallow';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
@@ -52,12 +54,20 @@ function useIsMounted() {
 
 export default function EventDialog() {
   const {
+    locale,
     selectedEvent,
     isDialogOpen,
     closeEventDialog,
-    locale,
     isSubmitting,
-  } = useEventCalendarStore();
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      locale: state.locale,
+      selectedEvent: state.selectedEvent,
+      isDialogOpen: state.isDialogOpen,
+      closeEventDialog: state.closeEventDialog,
+      isSubmitting: state.isSubmitting,
+    })),
+  );
 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState<boolean>(false);
   const isMounted = useIsMounted();
@@ -92,30 +102,67 @@ export default function EventDialog() {
   }, [selectedEvent, form]);
 
   const handleSubmit = async (values: EventFormValues) => {
-    if (!selectedEvent) return;
+    if (!selectedEvent?.id) return;
 
-    const updatedEvent: EventTypes = {
-      ...selectedEvent,
-      title: values.title,
-      description: values.description || '',
-      startDate: values.startDate,
-      endDate: values.endDate,
-      startTime: values.startTime,
-      endTime: values.endTime,
-      location: values.location,
-      category: values.category,
-      color: values.color,
-    };
+    const toastId = toast.loading('Updating event...');
+
+    try {
+      const result = await updateEvent(selectedEvent.id, values);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update event');
+      }
+
+      toast.success('Event updated successfully!', { id: toastId });
+      closeEventDialog();
+    } catch (error) {
+      console.error('Error:', error);
+      let message = 'Ops! something went wrong';
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === 'string') {
+        message = error;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        message = String(error.message);
+      }
+
+      toast.error(message);
+    }
   };
 
   const handleDeleteEvent = async () => {
-    if (!selectedEvent) return;
+    if (!selectedEvent?.id) return;
+
+    const toastId = toast.loading('Deleting event...');
     setIsDeleteAlertOpen(false);
+
+    try {
+      const result = await deleteEvent(selectedEvent.id);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to delete event');
+      }
+
+      toast.success('Event deleted successfully!', { id: toastId });
+      closeEventDialog();
+    } catch (error) {
+      console.error('Error:', error);
+      let message = 'Ops! something went wrong';
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === 'string') {
+        message = error;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        message = String(error.message);
+      }
+
+      toast.error(message);
+    }
   };
 
-  if (!isMounted) {
-    return null;
-  }
+  if (!isMounted) return null;
 
   return (
     <Dialog
@@ -130,7 +177,7 @@ export default function EventDialog() {
             Event details {selectedEvent?.title}
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-[350px] w-full pr-4 sm:h-[500px] sm:pr-0">
+        <ScrollArea className="h-[350px] w-full sm:h-[500px]">
           <EventDetailsForm
             form={form}
             onSubmit={handleSubmit}
