@@ -20,11 +20,11 @@ export const FormFooter = ({
 }: FormFooterProps) => (
   <div className="flex flex-row gap-2">
     <Button variant="outline" onClick={onCancel} className="cursor-pointer">
-      <X className="mr-2 h-4 w-4" />
+      <X className="h-4 w-4" />
       {cancelText}
     </Button>
     <Button onClick={onSave} className="cursor-pointer" disabled={isSubmitting}>
-      <Save className="mr-2 h-4 w-4" />
+      <Save className="h-4 w-4" />
       {isSubmitting ? savingText : saveText}
     </Button>
   </div>
