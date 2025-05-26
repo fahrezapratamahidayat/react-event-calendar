@@ -7,7 +7,7 @@ import { addMinutesToTime } from '@/lib/date';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDays } from 'date-fns';
 import { Save } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import {
@@ -24,6 +24,8 @@ import { EventPreviewCalendar } from './event-preview-calendar';
 import { createEventSchema } from '@/lib/validations';
 import { EVENT_DEFAULTS } from '@/constants/calendar-constant';
 import { useShallow } from 'zustand/shallow';
+import { toast } from 'sonner';
+import { createEvent } from '@/app/actions';
 
 type EventFormValues = z.infer<typeof createEventSchema>;
 
@@ -44,19 +46,17 @@ export default function EventCreateDialog() {
   const {
     isQuickAddDialogOpen,
     closeQuickAddDialog,
-    currentView,
-    locale,
     timeFormat,
-    isSubmitting,
+    locale,
+    currentView,
     quickAddData,
   } = useEventCalendarStore(
     useShallow((state) => ({
       isQuickAddDialogOpen: state.isQuickAddDialogOpen,
       closeQuickAddDialog: state.closeQuickAddDialog,
-      currentView: state.currentView,
-      locale: state.locale,
       timeFormat: state.timeFormat,
-      isSubmitting: state.isSubmitting,
+      locale: state.locale,
+      currentView: state.currentView,
       quickAddData: state.quickAddData,
     })),
   );
@@ -67,19 +67,37 @@ export default function EventCreateDialog() {
     mode: 'onChange',
   });
 
-  const watchedValues = form.watch();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (
-    formValues: z.infer<typeof createEventSchema>,
-  ) => {
-    console.log(formValues);
+  const handleSubmit = async (formValues: EventFormValues) => {
+    setIsSubmitting(true);
+    const toastId = toast.loading('Membuat event...');
+
     try {
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.error('Validation error:', error.errors);
-        return { success: false, errors: error.errors };
+      const result = await createEvent(formValues);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Gagal membuat event');
       }
-      throw error;
+
+      toast.success('Event berhasil dibuat!', { id: toastId });
+      form.reset(DEFAULT_FORM_VALUES);
+      closeQuickAddDialog();
+    } catch (error) {
+      console.error('Error:', error);
+      let message = 'Ops! something went wrong';
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === 'string') {
+        message = error;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        message = String(error.message);
+      }
+
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -106,6 +124,8 @@ export default function EventCreateDialog() {
       });
     }
   }, [isQuickAddDialogOpen, quickAddData, form]);
+
+  const watchedValues = form.watch();
 
   return (
     <Dialog
