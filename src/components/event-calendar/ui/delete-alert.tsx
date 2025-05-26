@@ -34,7 +34,7 @@ export const DeleteAlert = ({
   <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
     <AlertDialogTrigger asChild>
       <Button variant="destructive" className="cursor-pointer">
-        <Trash2 className="mr-2 h-4 w-4" />
+        <Trash2 className="h-4 w-4" />
         {confirmText}
       </Button>
     </AlertDialogTrigger>
