@@ -55,7 +55,7 @@ export function DayCell({
         dayEvents.length === 0 ? 'add new event' : 'view events'
       }`}
       className={cn(
-        'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border transition-all sm:h-[130px] sm:p-2',
+        'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border transition-all sm:h-[140px] sm:p-2',
         'hover:border-primary focus:ring-primary hover:shadow-sm focus:ring-2 focus:outline-none',
         !isWithinMonth && viewSettings.month.hideOutsideDays
           ? 'invisible'
@@ -82,7 +82,7 @@ export function DayCell({
       <div className="mb-0 flex items-center justify-between sm:mb-1">
         <span
           className={cn(
-            'flex h-6 w-6 items-center justify-center rounded-full border text-xs font-medium',
+            'flex h-5 w-5 items-center justify-center rounded-full border text-xs font-medium sm:h-6 sm:w-6',
             isToday && 'bg-blue-500 text-white',
             !isWithinMonth && 'text-muted-foreground',
           )}
@@ -121,7 +121,7 @@ export function DayCell({
             <Button
               variant="ghost"
               size="sm"
-              className="h-1.5 w-full gap-1 truncate p-2 text-xs sm:mt-auto sm:h-5 sm:p-5 sm:px-1"
+              className="bg-muted hover:bg-muted/90 h-1.5 w-full gap-1 truncate rounded p-2 text-xs sm:mt-auto sm:h-5 sm:p-5 sm:px-1"
               onClick={() => onShowDayEvents(date)}
             >
               <Plus className="h-1.5 w-1.5" />
