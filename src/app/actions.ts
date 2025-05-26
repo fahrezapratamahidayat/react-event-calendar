@@ -15,7 +15,9 @@ import {
   endOfYear,
 } from 'date-fns';
 import { z } from 'zod';
-import { unstable_cache as cache } from 'next/cache';
+import { unstable_cache as cache, revalidatePath } from 'next/cache';
+import { combineDateAndTime } from '@/lib/date';
+import { createEventSchema } from '@/lib/validations';
 
 const REVALIDATE_TIME = 3600;
 
@@ -171,6 +173,145 @@ export async function getCategories() {
         error instanceof Error
           ? error.message
           : 'Terjadi kesalahan saat mengambil data kategori',
+    };
+  }
+}
+
+export async function createEvent(values: z.infer<typeof createEventSchema>) {
+  try {
+    const validatedFields = createEventSchema.safeParse(values);
+
+    if (!validatedFields.success) {
+      return {
+        error: 'Invalid fields',
+        details: validatedFields.error.flatten().fieldErrors,
+      };
+    }
+
+    const {
+      title,
+      description,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      location,
+      category,
+      color,
+      isRepeating,
+      repeatingType,
+    } = validatedFields.data;
+
+    const startDateTime = combineDateAndTime(startDate, startTime);
+    const endDateTime = combineDateAndTime(endDate, endTime);
+
+    await db.insert(events).values({
+      title,
+      description,
+      startDate: startDateTime,
+      endDate: endDateTime,
+      startTime,
+      endTime,
+      location,
+      category,
+      color,
+      isRepeating: isRepeating ?? false,
+      repeatingType: repeatingType ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    revalidatePath('/demo');
+    return { success: true };
+  } catch (error) {
+    console.error('Error creating event:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to create event',
+    };
+  }
+}
+
+export async function updateEvent(
+  id: string,
+  values: Partial<z.infer<typeof createEventSchema>>,
+) {
+  try {
+    const validatedFields = createEventSchema.partial().safeParse(values);
+
+    if (!validatedFields.success) {
+      return {
+        error: 'Invalid fields',
+        details: validatedFields.error.flatten().fieldErrors,
+      };
+    }
+
+    const existingEvent = await db
+      .select()
+      .from(events)
+      .where(and(eq(events.id, id)))
+      .limit(1);
+
+    if (!existingEvent.length) {
+      throw new Error('Event not found or unauthorized');
+    }
+
+    const updateData = validatedFields.data;
+
+    if (validatedFields.data.startDate && validatedFields.data.startTime) {
+      updateData.startDate = combineDateAndTime(
+        validatedFields.data.startDate,
+        validatedFields.data.startTime,
+      );
+    }
+
+    if (validatedFields.data.endDate && validatedFields.data.endTime) {
+      updateData.endDate = combineDateAndTime(
+        validatedFields.data.endDate,
+        validatedFields.data.endTime,
+      );
+    }
+
+    await db
+      .update(events)
+      .set({
+        ...updateData,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(events.id, id)));
+
+    revalidatePath('/demo');
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating event:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update event',
+    };
+  }
+}
+
+export async function deleteEvent(id: string) {
+  try {
+    const existingEvent = await db
+      .select()
+      .from(events)
+      .where(and(eq(events.id, id)))
+      .limit(1);
+
+    if (!existingEvent.length) {
+      throw new Error('Event not found or unauthorized');
+    }
+
+    await db.delete(events).where(and(eq(events.id, id)));
+
+    revalidatePath('/demo');
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to delete event',
     };
   }
 }
