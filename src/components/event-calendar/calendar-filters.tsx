@@ -1,16 +1,7 @@
-import { useState, useEffect } from 'react';
-import {
-  Search,
-  X,
-  Calendar,
-  MapPin,
-  Tag,
-  Repeat,
-  Clock,
-  Loader2,
-} from 'lucide-react';
+import { useState } from 'react';
+import { useQueryStates, parseAsArrayOf, parseAsString } from 'nuqs';
+import { Search, X, Calendar, MapPin, Tag, Repeat, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -22,217 +13,28 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Card, CardContent } from '@/components/ui/card';
 import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/calendar-constant';
 import { getColorClasses } from '@/lib/event';
+import { EventSearchDialog } from './event-search-dialog';
 
-// Definisi tipe untuk mockEvents
-interface MockEvent {
-  id: string;
-  title: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
-  startTime: string;
-  endTime: string;
-  isRepeating: boolean;
-  repeatingType: 'daily' | 'weekly' | 'monthly' | null;
-  location: string;
-  category: string;
-  color: string;
-}
-
-// Definisi tipe untuk filter
-interface EventFilters {
-  categories: string[];
-  locations: string[];
-  colors: string[];
-  isRepeating: string;
-  repeatingTypes: string[];
-  dateRange: { start: string; end: string };
-}
-
-const mockEvents: MockEvent[] = [
-  {
-    id: '1',
-    title: 'Team Meeting',
-    description: 'Weekly team sync',
-    startDate: new Date('2024-01-15'),
-    endDate: new Date('2024-01-15'),
-    startTime: '09:00',
-    endTime: '10:00',
-    isRepeating: true,
-    repeatingType: 'weekly',
-    location: 'Conference Room A',
-    category: 'Work',
-    color: '#3b82f6',
-  },
-  {
-    id: '2',
-    title: 'Project Deadline',
-    description: 'Final submission',
-    startDate: new Date('2024-01-20'),
-    endDate: new Date('2024-01-20'),
-    startTime: '17:00',
-    endTime: '18:00',
-    isRepeating: false,
-    repeatingType: null,
-    location: 'Office',
-    category: 'Important',
-    color: '#ef4444',
-  },
-  {
-    id: '3',
-    title: 'Doctor Appointment',
-    description: 'Regular checkup',
-    startDate: new Date('2024-01-18'),
-    endDate: new Date('2024-01-18'),
-    startTime: '14:00',
-    endTime: '15:00',
-    isRepeating: false,
-    repeatingType: null,
-    location: 'Medical Center',
-    category: 'Health',
-    color: '#10b981',
-  },
-];
-
-interface EventSearchDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-const EventSearchDialog = ({ open, onOpenChange }: EventSearchDialogProps) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<MockEvent[]>([]);
-
-  // Simulate search with loading
-  useEffect(() => {
-    if (searchQuery.trim()) {
-      setIsLoading(true);
-      const timer = setTimeout(() => {
-        const filtered = mockEvents.filter(
-          (event) =>
-            event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            event.description
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            event.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            event.category.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
-        setSearchResults(filtered);
-        setIsLoading(false);
-      }, 800); // Simulate network delay
-
-      return () => clearTimeout(timer);
-    } else {
-      setSearchResults([]);
-      setIsLoading(false);
-    }
-  }, [searchQuery]);
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Search Events</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-            <Input
-              placeholder="Search events by title, description, location, or category..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          <div className="max-h-96 overflow-y-auto">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="text-muted-foreground ml-2 text-sm">
-                  Searching events...
-                </span>
-              </div>
-            ) : searchResults.length > 0 ? (
-              <div className="space-y-2">
-                {searchResults.map((event) => (
-                  <Card
-                    key={event.id}
-                    className="hover:bg-muted/50 cursor-pointer transition-colors"
-                  >
-                    <CardContent className="p-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-medium">{event.title}</h4>
-                          <p className="text-muted-foreground text-sm">
-                            {event.description}
-                          </p>
-                          <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {event.startDate.toLocaleDateString()}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {event.startTime} - {event.endTime}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {event.location}
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          className="h-3 w-3 flex-shrink-0 rounded-full"
-                          style={{ backgroundColor: event.color }}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : searchQuery.trim() && !isLoading ? (
-              <div className="text-muted-foreground py-8 text-center">
-                <Search className="mx-auto mb-2 h-8 w-8 opacity-50" />
-                <p>No events found matching &quot;{searchQuery}&quot;</p>
-              </div>
-            ) : (
-              <div className="text-muted-foreground py-8 text-center">
-                <Search className="mx-auto mb-2 h-8 w-8 opacity-50" />
-                <p>Start typing to search events...</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const EventCalendarFilters = () => {
+export const EventCalendarFilters = () => {
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
-  const [filters, setFilters] = useState<EventFilters>({
-    categories: [],
-    locations: [],
-    colors: [],
-    isRepeating: '',
-    repeatingTypes: [],
-    dateRange: { start: '', end: '' },
+
+  const [filters, setFilters] = useQueryStates({
+    categories: parseAsArrayOf(parseAsString).withDefault([]),
+    locations: parseAsArrayOf(parseAsString).withDefault([]),
+    colors: parseAsArrayOf(parseAsString)
+      .withDefault([])
+      .withOptions({ shallow: false }),
+    isRepeating: parseAsString.withDefault(''),
+    repeatingTypes: parseAsArrayOf(parseAsString).withDefault([]),
+    dateStart: parseAsString.withDefault(''),
+    dateEnd: parseAsString.withDefault(''),
+    search: parseAsString.withDefault(''),
   });
 
   const getActiveFiltersCount = () => {
@@ -242,28 +44,34 @@ const EventCalendarFilters = () => {
     count += filters.colors.length;
     count += filters.repeatingTypes.length;
     if (filters.isRepeating) count += 1;
-    if (filters.dateRange.start || filters.dateRange.end) count += 1;
+    if (filters.dateStart || filters.dateEnd) count += 1;
+    if (filters.search) count += 1;
     return count;
   };
 
-  const toggleArrayFilter = (key: keyof EventFilters, value: string) => {
-    if (key === 'dateRange') return; // dateRange tidak bisa ditoggle dengan cara ini
+  const toggleArrayFilter = (key: keyof typeof filters, value: string) => {
+    if (
+      key === 'dateStart' ||
+      key === 'dateEnd' ||
+      key === 'search' ||
+      key === 'isRepeating'
+    )
+      return;
 
-    setFilters((prev) => ({
-      ...prev,
-      [key]: Array.isArray(prev[key])
-        ? (prev[key] as string[]).includes(value)
-          ? (prev[key] as string[]).filter((item) => item !== value)
-          : [...(prev[key] as string[]), value]
-        : prev[key],
-    }));
+    const currentArray = filters[key] as string[];
+    const newArray = currentArray.includes(value)
+      ? currentArray.filter((item) => item !== value)
+      : [...currentArray, value];
+
+    setFilters({ [key]: newArray });
   };
 
-  const updateFilter = (
-    key: keyof EventFilters,
-    value: string | { start: string; end: string },
-  ) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const updateSingleFilter = (key: keyof typeof filters, value: string) => {
+    setFilters({ [key]: value });
+  };
+
+  const updateDateRange = (start: string, end: string) => {
+    setFilters({ dateStart: start, dateEnd: end });
   };
 
   const clearAllFilters = () => {
@@ -273,14 +81,30 @@ const EventCalendarFilters = () => {
       colors: [],
       isRepeating: '',
       repeatingTypes: [],
-      dateRange: { start: '', end: '' },
+      dateStart: '',
+      dateEnd: '',
+      search: '',
     });
+  };
+
+  const clearSingleArrayFilter = (key: keyof typeof filters, value: string) => {
+    if (
+      key === 'dateStart' ||
+      key === 'dateEnd' ||
+      key === 'search' ||
+      key === 'isRepeating'
+    )
+      return;
+
+    const currentArray = filters[key] as string[];
+    const newArray = currentArray.filter((item) => item !== value);
+    setFilters({ [key]: newArray });
   };
 
   const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <div className="flex flex-col gap-4 border-b px-3 sm:px-4">
+    <div className="flex flex-col gap-4 border-b pt-0 pb-3 sm:px-4">
       <div className="flex flex-wrap items-center gap-2">
         <Button
           variant="outline"
@@ -289,7 +113,13 @@ const EventCalendarFilters = () => {
         >
           <Search className="h-4 w-4" />
           Search Events
+          {filters.search && (
+            <Badge variant="secondary" className="ml-1">
+              1
+            </Badge>
+          )}
         </Button>
+
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2 text-xs">
@@ -326,6 +156,7 @@ const EventCalendarFilters = () => {
             </div>
           </PopoverContent>
         </Popover>
+
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2 text-xs">
@@ -373,9 +204,10 @@ const EventCalendarFilters = () => {
             </div>
           </PopoverContent>
         </Popover>
+
         <Select
           value={filters.isRepeating}
-          onValueChange={(value) => updateFilter('isRepeating', value)}
+          onValueChange={(value) => updateSingleFilter('isRepeating', value)}
         >
           <SelectTrigger className="w-[150px]">
             <Repeat className="mr-2 h-4 w-4" />
@@ -393,6 +225,7 @@ const EventCalendarFilters = () => {
             </SelectItem>
           </SelectContent>
         </Select>
+
         {filters.isRepeating === 'repeating' && (
           <Popover>
             <PopoverTrigger asChild>
@@ -438,6 +271,22 @@ const EventCalendarFilters = () => {
             <span className="text-muted-foreground text-sm">
               Active filters:
             </span>
+
+            {/* Search Filter Badge */}
+            {filters.search && (
+              <Badge variant="secondary" className="gap-1">
+                <Search className="h-3 w-3" />
+                Search: {filters.search}
+                <button
+                  onClick={() => updateSingleFilter('search', '')}
+                  className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
+                >
+                  <X className="h-2 w-2" />
+                </button>
+              </Badge>
+            )}
+
+            {/* Category Filters */}
             {filters.categories.map((category) => (
               <Badge
                 key={`cat-${category}`}
@@ -448,13 +297,15 @@ const EventCalendarFilters = () => {
                 {CATEGORY_OPTIONS.find((c) => c.value === category)?.label ||
                   category}
                 <button
-                  onClick={() => toggleArrayFilter('categories', category)}
+                  onClick={() => clearSingleArrayFilter('categories', category)}
                   className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
                 >
                   <X className="h-2 w-2" />
                 </button>
               </Badge>
             ))}
+
+            {/* Location Filters */}
             {filters.locations.map((location) => (
               <Badge
                 key={`loc-${location}`}
@@ -464,13 +315,15 @@ const EventCalendarFilters = () => {
                 <MapPin className="h-3 w-3" />
                 {location}
                 <button
-                  onClick={() => toggleArrayFilter('locations', location)}
+                  onClick={() => clearSingleArrayFilter('locations', location)}
                   className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
                 >
                   <X className="h-2 w-2" />
                 </button>
               </Badge>
             ))}
+
+            {/* Color Filters */}
             {filters.colors.map((colorValue) => {
               const color = EVENT_COLORS.find((c) => c.value === colorValue);
               return (
@@ -484,7 +337,7 @@ const EventCalendarFilters = () => {
                   />
                   {color?.label || colorValue}
                   <button
-                    onClick={() => toggleArrayFilter('colors', colorValue)}
+                    onClick={() => clearSingleArrayFilter('colors', colorValue)}
                     className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
                   >
                     <X className="h-2 w-2" />
@@ -492,18 +345,22 @@ const EventCalendarFilters = () => {
                 </Badge>
               );
             })}
+
+            {/* Repeating Filter */}
             {filters.isRepeating && (
               <Badge variant="secondary" className="gap-1">
                 <Repeat className="h-3 w-3" />
                 {filters.isRepeating === 'repeating' ? 'Repeating' : 'Single'}
                 <button
-                  onClick={() => updateFilter('isRepeating', '')}
+                  onClick={() => updateSingleFilter('isRepeating', '')}
                   className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
                 >
                   <X className="h-2 w-2" />
                 </button>
               </Badge>
             )}
+
+            {/* Repeating Types */}
             {filters.repeatingTypes.map((type) => (
               <Badge
                 key={`repeat-${type}`}
@@ -513,21 +370,21 @@ const EventCalendarFilters = () => {
                 <Clock className="h-3 w-3" />
                 {type}
                 <button
-                  onClick={() => toggleArrayFilter('repeatingTypes', type)}
+                  onClick={() => clearSingleArrayFilter('repeatingTypes', type)}
                   className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
                 >
                   <X className="h-2 w-2" />
                 </button>
               </Badge>
             ))}
-            {(filters.dateRange.start || filters.dateRange.end) && (
+
+            {/* Date Range Filter */}
+            {(filters.dateStart || filters.dateEnd) && (
               <Badge variant="secondary" className="gap-1">
                 <Calendar className="h-3 w-3" />
                 Date Range
                 <button
-                  onClick={() =>
-                    updateFilter('dateRange', { start: '', end: '' })
-                  }
+                  onClick={() => updateDateRange('', '')}
                   className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
                 >
                   <X className="h-2 w-2" />
@@ -536,6 +393,8 @@ const EventCalendarFilters = () => {
             )}
           </div>
         )}
+
+        {/* Clear All Button */}
         {activeFiltersCount > 0 && (
           <Button
             variant="outline"
@@ -550,9 +409,9 @@ const EventCalendarFilters = () => {
       <EventSearchDialog
         open={searchDialogOpen}
         onOpenChange={setSearchDialogOpen}
+        searchQuery={filters.search}
+        onSearchQueryChange={(query) => updateSingleFilter('search', query)}
       />
     </div>
   );
 };
-
-export default EventCalendarFilters;
