@@ -28,7 +28,7 @@ export const DeleteAlert = ({
   onConfirm,
   title = 'Are you sure?',
   description = 'Are you sure you want to delete this event? This action cannot be undone.',
-  cancelText = 'Camce;',
+  cancelText = 'Cancel',
   confirmText = 'Delete',
 }: DeleteAlertProps) => (
   <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
