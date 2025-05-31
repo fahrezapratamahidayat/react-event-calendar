@@ -75,11 +75,9 @@ export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
       <EventDialog />
       <MonthDayEventsDialog />
       <EventCreateDialog />
-      <div className="mt-3 space-y-3 pb-8">
-        <div className="bg-background overflow-hidden rounded-xl border shadow-sm">
-          <CalendarToolbar />
-          <div className="overflow-hidden p-0">{renderCalendarView}</div>
-        </div>
+      <div className="bg-background overflow-hidden rounded-xl border shadow-sm">
+        <CalendarToolbar />
+        <div className="overflow-hidden p-0">{renderCalendarView}</div>
       </div>
     </>
   );
