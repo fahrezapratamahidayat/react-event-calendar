@@ -17,7 +17,7 @@ export default async function DemoPage(props: DemoPageProps) {
   const promises = await Promise.all([
     getEvents({
       ...search,
-      date: search.date.toISOString(),
+      date: search.date,
       view: search.view as CalendarViewType,
       daysCount: Number(search.daysCount),
     }),
