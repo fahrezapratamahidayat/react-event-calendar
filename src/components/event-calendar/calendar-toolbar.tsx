@@ -25,7 +25,7 @@ import {
 } from 'date-fns';
 import { useQueryState } from 'nuqs';
 import { parseAsIsoDate } from 'nuqs/server';
-import EventCalendarFilters from './calendar-filters';
+import { EventCalendarFilters } from './calendar-filters';
 
 export default function CalendarToolbar() {
   const [date, setDate] = useQueryState(
@@ -121,7 +121,7 @@ export default function CalendarToolbar() {
   );
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col space-y-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+      <div className="flex flex-col space-y-2 px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div className="flex items-center space-x-3">
           <div className="flex w-full flex-col items-center justify-between gap-5 space-x-2 sm:flex-row sm:gap-0">
             <div className="flex w-full items-center justify-between sm:hidden">
