@@ -22,10 +22,8 @@ import { createEventSchema } from '@/lib/validations';
 const REVALIDATE_TIME = 3600;
 
 const eventFilterSchema = z.object({
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
   title: z.string().optional(),
-  category: z.string().optional(),
+  categories: z.array(z.string()).default([]),
   daysCount: z.number().optional(),
   view: z
     .enum([
@@ -36,8 +34,14 @@ const eventFilterSchema = z.object({
       CalendarViewType.YEAR,
     ])
     .optional(),
-  date: z.string(),
+  date: z.date(),
+  search: z.string().optional(),
+  colors: z.array(z.string()).default([]),
+  locations: z.array(z.string()).default([]),
+  repeatingTypes: z.array(z.string()).default([]),
+  isRepeating: z.string().optional(),
 });
+
 export type EventFilter = z.infer<typeof eventFilterSchema>;
 
 export const getEvents = cache(
@@ -50,13 +54,7 @@ export const getEvents = cache(
         start: startOfMonth(currentDate),
         end: endOfMonth(currentDate),
       };
-
-      if (filter.startDate && filter.endDate) {
-        dateRange = {
-          start: new Date(filter.startDate),
-          end: new Date(filter.endDate),
-        };
-      } else if (filter.view) {
+      if (filter.view) {
         switch (filter.view) {
           case CalendarViewType.DAY:
             dateRange = {
@@ -119,8 +117,46 @@ export const getEvents = cache(
         conditions.push(ilike(events.title, `%${filter.title}%`));
       }
 
-      if (filter.category) {
-        conditions.push(eq(events.category, filter.category));
+      if (filter.search) {
+        conditions.push(
+          or(
+            ilike(events.title, `%${filter.search}%`),
+            ilike(events.description, `%${filter.search}%`),
+            ilike(events.location, `%${filter.search}%`),
+          ),
+        );
+      }
+
+      if (filter.categories.length > 0) {
+        const categoryConditions = filter.categories.map((category) =>
+          eq(events.category, category),
+        );
+        conditions.push(or(...categoryConditions));
+      }
+
+      if (filter.colors.length > 0) {
+        const colorConditions = filter.colors.map((color) =>
+          eq(events.color, color),
+        );
+        conditions.push(or(...colorConditions));
+      }
+
+      if (filter.locations.length > 0) {
+        const locationConditions = filter.locations.map((location) =>
+          ilike(events.location, `%${location}%`),
+        );
+        conditions.push(or(...locationConditions));
+      }
+
+      //   if (filter.repeatingTypes.length > 0) {
+      //     const typeConditions = filter.repeatingTypes.map((type) =>
+      //       eq(events.repeatingType, type),
+      //     );
+      //     conditions.push(or(...typeConditions));
+      //   }
+
+      if (filter.isRepeating) {
+        conditions.push(eq(events.isRepeating, filter.isRepeating === 'true'));
       }
 
       const result = await db
