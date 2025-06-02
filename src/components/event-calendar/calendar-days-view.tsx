@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { formatDate, generateTimeSlots, isSameDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
 import { WeekDayHeaders } from './ui/week-days-header';
@@ -16,6 +16,8 @@ import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
 import { MultiDayEventSection } from './ui/multi-day-event';
+import { TimeColumn } from './ui/time-column';
+import { HoverPositionType } from '@/types/event';
 
 const HOUR_HEIGHT = 64;
 const START_HOUR = 0;
@@ -33,15 +35,28 @@ export function CalendarDaysView({
   currentDate,
   daysCount = 16,
 }: CalendarDayViewProps) {
-  const { locale, firstDayOfWeek, openEventDialog } = useEventCalendarStore(
+  const {
+    timeFormat,
+    locale,
+    firstDayOfWeek,
+    viewSettings,
+    openEventDialog,
+    openQuickAddDialog,
+  } = useEventCalendarStore(
     useShallow((state) => ({
+      timeFormat: state.timeFormat,
       locale: state.locale,
+      viewSettings: state.viewSettings,
       firstDayOfWeek: state.firstDayOfWeek,
       openEventDialog: state.openEventDialog,
+      openQuickAddDialog: state.openQuickAddDialog,
     })),
   );
-
+  const [hoverPosition, setHoverPosition] = useState<
+    HoverPositionType | undefined
+  >(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
+  const timeColumnRef = useRef<HTMLDivElement>(null);
 
   const dayWidthPercent = 100 / daysCount;
 
@@ -59,11 +74,51 @@ export function CalendarDaysView({
   const multiDayEventRows = useMultiDayEventRows(multiDayEvents, weekDays);
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
 
+  const handleTimeHover = useCallback((hour: number) => {
+    setHoverPosition((prev) => ({ ...prev, hour, minute: 0, dayIndex: -1 }));
+  }, []);
+
+  const handlePreciseHover = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>, hour: number) => {
+      if (!timeColumnRef.current) return;
+
+      const slotRect = event.currentTarget.getBoundingClientRect();
+      const cursorY = event.clientY - slotRect.top;
+      const minutes = Math.floor((cursorY / slotRect.height) * 60);
+
+      setHoverPosition({
+        hour,
+        minute: Math.max(0, Math.min(59, minutes)),
+        dayIndex: -1,
+      });
+    },
+    [],
+  );
+
+  const handleTimeLeave = useCallback(() => {
+    setHoverPosition(undefined);
+  }, []);
+
+  const handleTimeSlotClick = useCallback(() => {
+    if (!viewSettings.day.enableTimeSlotClick || !hoverPosition) return;
+
+    openQuickAddDialog({
+      date: currentDate,
+      position: hoverPosition,
+    });
+  }, [
+    currentDate,
+    hoverPosition,
+    openQuickAddDialog,
+    viewSettings.day.enableTimeSlotClick,
+  ]);
+
   return (
     <div className="flex h-[760px] flex-col overflow-hidden border">
       <ScrollArea className="h-full w-full">
         <div className="bg-accent border-border sticky top-0 z-30 border-b">
           <div className="flex py-2">
+            <div className="w-[52px]" />
             <WeekDayHeaders
               daysInWeek={weekDays}
               currentDayIndex={todayIndex}
@@ -85,7 +140,17 @@ export function CalendarDaysView({
           )}
         </div>
         <div className="flex flex-1 overflow-hidden">
-          <div ref={containerRef} className="relative flex-1 overflow-y-auto">
+          <TimeColumn
+            ref={timeColumnRef}
+            timeSlots={timeSlots}
+            timeFormat={timeFormat}
+            onTimeHover={handleTimeHover}
+            onPreciseHover={handlePreciseHover}
+            onLeave={handleTimeLeave}
+            onTimeSlotClick={handleTimeSlotClick}
+            variant="week"
+          />
+          <div ref={containerRef} className="relative flex-1">
             <TimeGrid
               timeSlots={timeSlots}
               daysInWeek={weekDays}
