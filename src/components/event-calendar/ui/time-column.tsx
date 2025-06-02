@@ -7,7 +7,6 @@ const timeColumnVariants = cva('flex h-16 w-full cursor-pointer ', {
   variants: {
     variant: {
       day: 'text-muted-foreground pr-2 text-right justify-end text-xs sm:text-sm',
-      days: 'text-muted-foreground pr-2 text-right justify-end',
       week: 'text-muted-foreground justify-center  border-border px-2 text-xs sm:text-sm',
       single:
         'text-muted-foreground pr-2 text-right justify-end text-xs sm:text-sm',
