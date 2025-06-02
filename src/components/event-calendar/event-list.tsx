@@ -23,7 +23,7 @@ interface EventsListProps {
   currentDate: Date;
 }
 
-export const VIEW_CONFIG = {
+export const EVENT_VIEW_CONFIG = {
   [CalendarViewType.DAY]: {
     groupFormat: 'HH:mm',
     titleFormat: 'EEEE, d MMMM yyyy',
