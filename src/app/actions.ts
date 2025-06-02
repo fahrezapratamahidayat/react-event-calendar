@@ -35,14 +35,27 @@ const eventFilterSchema = z.object({
     ])
     .optional(),
   date: z.date(),
-  search: z.string().optional(),
   colors: z.array(z.string()).default([]),
   locations: z.array(z.string()).default([]),
   repeatingTypes: z.array(z.string()).default([]),
   isRepeating: z.string().optional(),
 });
 
+const searchEventFilterSchema = z.object({
+  search: z.string().min(1, 'Search query is required'),
+  categories: z.array(z.string()).default([]),
+  colors: z.array(z.string()).default([]),
+  locations: z.array(z.string()).default([]),
+  repeatingTypes: z.array(z.string()).default([]),
+  isRepeating: z.string().optional(),
+  dateFrom: z.date().optional(),
+  dateTo: z.date().optional(),
+  limit: z.number().default(50),
+  offset: z.number().default(0),
+});
+
 export type EventFilter = z.infer<typeof eventFilterSchema>;
+export type SearchEventFilter = z.infer<typeof searchEventFilterSchema>;
 
 export const getEvents = cache(
   async (filterParams: EventFilter) => {
@@ -117,16 +130,6 @@ export const getEvents = cache(
         conditions.push(ilike(events.title, `%${filter.title}%`));
       }
 
-      if (filter.search) {
-        conditions.push(
-          or(
-            ilike(events.title, `%${filter.search}%`),
-            ilike(events.description, `%${filter.search}%`),
-            ilike(events.location, `%${filter.search}%`),
-          ),
-        );
-      }
-
       if (filter.categories.length > 0) {
         const categoryConditions = filter.categories.map((category) =>
           eq(events.category, category),
@@ -186,6 +189,119 @@ export const getEvents = cache(
   {
     revalidate: REVALIDATE_TIME,
     tags: ['events'],
+  },
+);
+
+export const searchEvents = cache(
+  async (filterParams: SearchEventFilter) => {
+    try {
+      const filter = searchEventFilterSchema.parse(filterParams);
+
+      const conditions = [];
+
+      conditions.push(
+        or(
+          ilike(events.title, `%${filter.search}%`),
+          ilike(events.description, `%${filter.search}%`),
+          ilike(events.location, `%${filter.search}%`),
+        ),
+      );
+
+      if (filter.dateFrom && filter.dateTo) {
+        conditions.push(
+          or(
+            and(
+              between(events.startDate, filter.dateFrom, filter.dateTo),
+              between(events.endDate, filter.dateFrom, filter.dateTo),
+            ),
+            or(
+              between(events.startDate, filter.dateFrom, filter.dateTo),
+              between(events.endDate, filter.dateFrom, filter.dateTo),
+              and(
+                lte(events.startDate, filter.dateFrom),
+                gte(events.endDate, filter.dateTo),
+              ),
+            ),
+          ),
+        );
+      } else if (filter.dateFrom) {
+        conditions.push(gte(events.startDate, filter.dateFrom));
+      } else if (filter.dateTo) {
+        conditions.push(lte(events.endDate, filter.dateTo));
+      }
+
+      if (filter.categories.length > 0) {
+        const categoryConditions = filter.categories.map((category) =>
+          eq(events.category, category),
+        );
+        conditions.push(or(...categoryConditions));
+      }
+
+      if (filter.colors.length > 0) {
+        const colorConditions = filter.colors.map((color) =>
+          eq(events.color, color),
+        );
+        conditions.push(or(...colorConditions));
+      }
+
+      if (filter.locations.length > 0) {
+        const locationConditions = filter.locations.map((location) =>
+          ilike(events.location, `%${location}%`),
+        );
+        conditions.push(or(...locationConditions));
+      }
+
+      // Filter berdasarkan repeating types (jika uncommented)
+      // if (filter.repeatingTypes.length > 0) {
+      //   const typeConditions = filter.repeatingTypes.map((type) =>
+      //     eq(events.repeatingType, type),
+      //   );
+      //   conditions.push(or(...typeConditions));
+      // }
+
+      if (filter.isRepeating) {
+        conditions.push(eq(events.isRepeating, filter.isRepeating === 'true'));
+      }
+
+      const result = await db
+        .select()
+        .from(events)
+        .where(and(...conditions))
+        .orderBy(events.startDate)
+        .limit(filter.limit)
+        .offset(filter.offset)
+        .execute();
+
+      const totalCountResult = await db
+        .select({ count: events.id })
+        .from(events)
+        .where(and(...conditions));
+
+      return {
+        events: result,
+        totalCount: totalCountResult.length,
+        hasMore: result.length === filter.limit,
+        success: true,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error('Error searching events:', error);
+      return {
+        events: [],
+        totalCount: 0,
+        hasMore: false,
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Terjadi kesalahan saat mencari events',
+      };
+    }
+  },
+  ['search-events'],
+  {
+    revalidate: REVALIDATE_TIME / 2,
+    tags: ['events', 'search'],
   },
 );
 
