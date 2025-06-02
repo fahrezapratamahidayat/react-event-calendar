@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQueryStates, parseAsArrayOf, parseAsString } from 'nuqs';
-import { Search, X, Calendar, MapPin, Tag, Repeat, Clock } from 'lucide-react';
+import { Search, X, Calendar, Tag, Repeat, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -20,10 +20,17 @@ import {
 import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/calendar-constant';
 import { getColorClasses } from '@/lib/event';
 import { EventSearchDialog } from './event-search-dialog';
+import { useShallow } from 'zustand/shallow';
+import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 
 export const EventCalendarFilters = () => {
+  const { timeFormat, openEventDialog } = useEventCalendarStore(
+    useShallow((state) => ({
+      timeFormat: state.timeFormat,
+      openEventDialog: state.openEventDialog,
+    })),
+  );
   const [searchDialogOpen, setSearchDialogOpen] = useState(false);
-
   const [filters, setFilters] = useQueryStates({
     categories: parseAsArrayOf(parseAsString).withDefault([]),
     locations: parseAsArrayOf(parseAsString).withDefault([]),
@@ -104,8 +111,8 @@ export const EventCalendarFilters = () => {
   const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <div className="flex flex-col gap-4 border-b pt-0 pb-3 sm:px-4">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-4 border-b px-4 pt-0 pb-3">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
         <Button
           variant="outline"
           onClick={() => setSearchDialogOpen(true)}
@@ -271,8 +278,6 @@ export const EventCalendarFilters = () => {
             <span className="text-muted-foreground text-sm">
               Active filters:
             </span>
-
-            {/* Search Filter Badge */}
             {filters.search && (
               <Badge variant="secondary" className="gap-1">
                 <Search className="h-3 w-3" />
@@ -285,8 +290,6 @@ export const EventCalendarFilters = () => {
                 </button>
               </Badge>
             )}
-
-            {/* Category Filters */}
             {filters.categories.map((category) => (
               <Badge
                 key={`cat-${category}`}
@@ -304,26 +307,6 @@ export const EventCalendarFilters = () => {
                 </button>
               </Badge>
             ))}
-
-            {/* Location Filters */}
-            {filters.locations.map((location) => (
-              <Badge
-                key={`loc-${location}`}
-                variant="secondary"
-                className="gap-1 text-xs"
-              >
-                <MapPin className="h-3 w-3" />
-                {location}
-                <button
-                  onClick={() => clearSingleArrayFilter('locations', location)}
-                  className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
-                >
-                  <X className="h-2 w-2" />
-                </button>
-              </Badge>
-            ))}
-
-            {/* Color Filters */}
             {filters.colors.map((colorValue) => {
               const color = EVENT_COLORS.find((c) => c.value === colorValue);
               return (
@@ -345,8 +328,6 @@ export const EventCalendarFilters = () => {
                 </Badge>
               );
             })}
-
-            {/* Repeating Filter */}
             {filters.isRepeating && (
               <Badge variant="secondary" className="gap-1">
                 <Repeat className="h-3 w-3" />
@@ -359,8 +340,6 @@ export const EventCalendarFilters = () => {
                 </button>
               </Badge>
             )}
-
-            {/* Repeating Types */}
             {filters.repeatingTypes.map((type) => (
               <Badge
                 key={`repeat-${type}`}
@@ -377,8 +356,6 @@ export const EventCalendarFilters = () => {
                 </button>
               </Badge>
             ))}
-
-            {/* Date Range Filter */}
             {(filters.dateStart || filters.dateEnd) && (
               <Badge variant="secondary" className="gap-1">
                 <Calendar className="h-3 w-3" />
@@ -393,8 +370,6 @@ export const EventCalendarFilters = () => {
             )}
           </div>
         )}
-
-        {/* Clear All Button */}
         {activeFiltersCount > 0 && (
           <Button
             variant="outline"
@@ -411,6 +386,8 @@ export const EventCalendarFilters = () => {
         onOpenChange={setSearchDialogOpen}
         searchQuery={filters.search}
         onSearchQueryChange={(query) => updateSingleFilter('search', query)}
+        onEventSelect={openEventDialog}
+        timeFormat={timeFormat}
       />
     </div>
   );
