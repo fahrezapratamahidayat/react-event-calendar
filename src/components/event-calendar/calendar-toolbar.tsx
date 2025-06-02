@@ -124,22 +124,22 @@ export default function CalendarToolbar() {
       <div className="flex flex-col space-y-2 px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div className="flex items-center space-x-3">
           <div className="flex w-full flex-col items-center justify-between gap-5 space-x-2 sm:flex-row sm:gap-0">
-            <div className="flex w-full items-center justify-between sm:hidden">
+            <div className="flex w-full items-center justify-around sm:hidden">
               <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-muted h-8 w-8 rounded-full"
+                variant="outline"
+                className="hover:bg-muted rounded-full"
                 onClick={handleNavigatePrevious}
               >
                 <ChevronLeft className="h-4 w-4" />
+                Previous
               </Button>
               <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-muted h-8 w-8 rounded-full"
+                variant={'outline'}
+                className="hover:bg-muted rounded-full"
                 onClick={handleNavigateNext}
               >
                 <ChevronRight className="h-4 w-4" />
+                Next
               </Button>
             </div>
             <Button
