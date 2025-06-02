@@ -6,7 +6,7 @@ import { CalendarWeek } from './calendar-week';
 import EventDialog from './event-dialog';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { CalendarMonth } from './calendar-month';
-import { MonthDayEventsDialog } from './month-day-events-dialog';
+import { MonthDayEventsDialog } from './day-events-dialog';
 import EventCreateDialog from './event-create-dialog';
 import { useShallow } from 'zustand/shallow';
 import { getCategories, getEvents } from '@/app/actions';
