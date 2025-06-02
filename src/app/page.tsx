@@ -10,7 +10,6 @@ import {
   Layout,
   Paintbrush,
   Puzzle,
-  Star,
   Server,
   Database,
   Clock,
@@ -20,13 +19,13 @@ import {
 import { ModeToggle } from '@/components/mode-toggel';
 import { FeatureCard } from '@/components/feature-card';
 import dynamic from 'next/dynamic';
-import { EventTypes } from '@/db/schema';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { demoEvents } from '@/constants/calendar-constant';
 
 const CalendarDay = dynamic(
   () =>
@@ -44,41 +43,6 @@ const CalendarDay = dynamic(
 );
 
 export default function IndexPage() {
-  const demoEvents = [
-    {
-      id: '1',
-      title: 'Team Meeting',
-      description: 'Weekly team sync',
-      startDate: new Date(new Date().setHours(10, 0, 0, 0)),
-      endDate: new Date(new Date().setHours(11, 30, 0, 0)),
-      startTime: '10:00',
-      endTime: '11:30',
-      isRepeating: true,
-      repeatingType: 'weekly',
-      location: 'Zoom',
-      category: 'Work',
-      color: 'blue',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      id: '2',
-      title: 'Product Review',
-      description: 'New feature walkthrough',
-      startDate: new Date(new Date().setHours(14, 0, 0, 0)),
-      endDate: new Date(new Date().setHours(15, 0, 0, 0)),
-      startTime: '14:00',
-      endTime: '15:00',
-      isRepeating: false,
-      repeatingType: null,
-      location: 'Meeting Room A',
-      category: 'Product',
-      color: 'green',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ] as EventTypes[];
-
   return (
     <div className="flex min-h-screen flex-col">
       <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
@@ -118,7 +82,7 @@ export default function IndexPage() {
           <div className="flex items-center gap-4">
             <Button variant="outline" size="sm" asChild>
               <a
-                href="https://github.com/yourusername/react-event-calendar"
+                href="https://github.com/fahrezapratamahidayat/react-event-calendar"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2"
@@ -378,38 +342,7 @@ export default function IndexPage() {
             </div>
           </div>
         </section>
-
-        <section className="border-t py-20">
-          <div className="container text-center">
-            <div className="mx-auto max-w-md">
-              <h2 className="font-clash-display text-3xl font-bold">
-                Ready to get started?
-              </h2>
-              <p className="text-muted-foreground mt-4">
-                Check out our live demo or read our documentation to learn more
-                about our Event Calendar component.
-              </p>
-              <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <Button size="lg" asChild>
-                  <Link href="/demo">Try the Demo</Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <a
-                    href="https://github.com/yourusername/react-event-calendar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    <Star size={16} />
-                    Star on GitHub
-                  </a>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
-
       <footer className="border-t py-10">
         <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex items-center gap-2">
@@ -420,28 +353,12 @@ export default function IndexPage() {
           </div>
           <div className="flex items-center gap-6">
             <a
-              href="https://github.com/yourusername/react-event-calendar"
+              href="https://github.com/fahrezapratamahidayat/react-event-calendar"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground text-sm"
             >
               GitHub
-            </a>
-            <a
-              href="https://twitter.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground text-sm"
-            >
-              Twitter
-            </a>
-            <a
-              href="https://discord.gg/yourinvite"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground text-sm"
-            >
-              Discord
             </a>
           </div>
         </div>
