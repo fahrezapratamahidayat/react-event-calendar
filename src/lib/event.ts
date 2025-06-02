@@ -15,7 +15,7 @@ import {
 } from '@/types/event';
 import { CATEGORY_OPTIONS } from '@/constants/calendar-constant';
 import { EventTypes } from '@/db/schema';
-import { VIEW_CONFIG } from '@/components/event-calendar/event-list';
+import { EVENT_VIEW_CONFIG } from '@/components/event-calendar/event-list';
 import { convertTimeToMinutes, formatTimeDisplay, isSameDay } from './date';
 
 /**
@@ -374,7 +374,7 @@ export function useEventFilter(
 ) {
   return useMemo(() => {
     try {
-      const { filterFn } = VIEW_CONFIG[viewType];
+      const { filterFn } = EVENT_VIEW_CONFIG[viewType];
       return events.filter((event) => {
         const eventDate = new Date(event.startDate);
         return filterFn(eventDate, currentDate);
@@ -405,7 +405,7 @@ export function useEventGrouper(
   locale?: Locale,
 ) {
   return useMemo(() => {
-    const { groupFormat, titleFormat } = VIEW_CONFIG[viewType];
+    const { groupFormat, titleFormat } = EVENT_VIEW_CONFIG[viewType];
     const isDayView = viewType === CalendarViewType.DAY;
 
     const groupMap = events.reduce(
