@@ -1,53 +1,19 @@
 import { create } from 'zustand';
 import {
+  CalendarViewConfigs,
   CalendarViewType,
+  DayViewConfig,
+  EventCalendarConfig,
   EventPosition,
+  MonthViewConfig,
   QuickAddDialogData,
   TimeFormatType,
   ViewModeType,
+  WeekViewConfig,
+  YearViewConfig,
 } from '@/types/event';
 import { Locale, enUS } from 'date-fns/locale';
 import { EventTypes } from '@/db/schema';
-
-export interface DayViewConfig {
-  showCurrentTimeIndicator: boolean;
-  showHoverTimeIndicator: boolean;
-  enableTimeSlotClick: boolean;
-}
-
-export interface daysViewConfig {
-  showCurrentTimeIndicator: boolean;
-  showHoverTimeIndicator: boolean;
-  enableTimeSlotClick: boolean;
-}
-
-export interface WeekViewConfig {
-  showCurrentTimeIndicator: boolean;
-  showHoverTimeIndicator: boolean;
-  enableTimeSlotClick: boolean;
-}
-
-export interface MonthViewConfig {
-  eventLimit: number;
-  showMoreEventsIndicator: boolean;
-  cellHeight: number;
-  compactMode: boolean;
-  hideOutsideDays: boolean;
-}
-
-export interface YearViewConfig {
-  showMonthLabels: boolean;
-  quarterView: boolean;
-  highlightCurrentMonth: boolean;
-}
-
-export interface CalendarViewConfigs {
-  day: DayViewConfig;
-  days: daysViewConfig;
-  week: WeekViewConfig;
-  month: MonthViewConfig;
-  year: YearViewConfig;
-}
 
 const DEFAULT_VIEW_CONFIGS: CalendarViewConfigs = {
   day: {
@@ -79,16 +45,6 @@ const DEFAULT_VIEW_CONFIGS: CalendarViewConfigs = {
   },
 };
 
-export interface EventCalendarConfig {
-  defaultView?: CalendarViewType;
-  defaultTimeFormat?: TimeFormatType;
-  defaultViewMode?: ViewModeType;
-  locale?: Locale;
-  firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  daysCount: number;
-  viewSettings?: Partial<CalendarViewConfigs>;
-}
-
 interface EventCalendarState {
   selectedEvent: EventTypes | null;
   currentView: CalendarViewType;
@@ -102,8 +58,6 @@ interface EventCalendarState {
   globalConfig: EventCalendarConfig;
   viewSettings: CalendarViewConfigs;
   defaultConfig: EventCalendarConfig;
-
-  // Dialog states
   isDialogOpen: boolean;
   eventDialogPosition: EventPosition | null;
   isSubmitting: boolean;
@@ -114,8 +68,6 @@ interface EventCalendarState {
   };
   quickAddData: QuickAddDialogData;
   isQuickAddDialogOpen: boolean;
-
-  // Core actions
   init: (
     globalConfig?: EventCalendarConfig,
     initialEvents?: EventTypes[],
@@ -128,8 +80,6 @@ interface EventCalendarState {
   setLocale: (locale: Locale) => void;
   setFirstDayOfWeek: (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) => void;
   setDaysCount: (count: number) => void;
-
-  // View globalConfig setters
   updateDayViewConfig: (globalConfig: Partial<DayViewConfig>) => void;
   updateWeekViewConfig: (globalConfig: Partial<WeekViewConfig>) => void;
   updateMonthViewConfig: (globalConfig: Partial<MonthViewConfig>) => void;
@@ -139,8 +89,6 @@ interface EventCalendarState {
     | WeekViewConfig
     | MonthViewConfig
     | YearViewConfig;
-
-  // Dialog actions
   openEventDialog: (
     event: EventTypes,
     position?: EventPosition,
@@ -176,8 +124,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
     error: null,
     globalConfig: defaultConfig,
     viewSettings: DEFAULT_VIEW_CONFIGS,
-
-    // Dialog states
     isDialogOpen: false,
     eventDialogPosition: null,
     isSubmitting: false,
@@ -218,8 +164,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
       });
     },
     setLoading: (loading) => set({ loading }),
-
-    // View configuration management
     updateDayViewConfig: (globalConfig) =>
       set((state) => ({
         viewSettings: {
@@ -268,8 +212,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
       const { currentView, viewSettings } = get();
       return viewSettings[currentView];
     },
-
-    // Dialog actions
     openEventDialog: (event, position) => {
       set({
         selectedEvent: event,
@@ -277,7 +219,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         eventDialogPosition: position,
       });
     },
-
     closeEventDialog: () => {
       set({
         isDialogOpen: false,
@@ -285,19 +226,16 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         eventDialogPosition: null,
       });
     },
-
     openDayEventsDialog: (date, events) => {
       set({
         dayEventsDialog: { open: true, date, events },
       });
     },
-
     closeDayEventsDialog: () => {
       set({
         dayEventsDialog: { open: false, date: null, events: [] },
       });
     },
-
     openQuickAddDialog: (data) => {
       const timeStr = data.position
         ? `${String(data.position.hour).padStart(2, '0')}:${String(data.position.minute).padStart(2, '0')}`
@@ -311,7 +249,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         isQuickAddDialogOpen: true,
       });
     },
-
     closeQuickAddDialog: () => {
       set({
         quickAddData: {
@@ -322,8 +259,6 @@ export const useEventCalendarStore = create<EventCalendarState>((set, get) => {
         isQuickAddDialogOpen: false,
       });
     },
-
-    // Basic setters
     setView: (view) => set({ currentView: view }),
     setMode: (mode) => set({ viewMode: mode }),
     setTimeFormat: (format) => set({ timeFormat: format }),
