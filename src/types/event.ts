@@ -1,3 +1,5 @@
+import { Locale } from 'date-fns';
+
 export interface HoverPositionType {
   hour: number;
   minute: number;
@@ -41,4 +43,55 @@ export enum TimeFormatType {
 export enum ViewModeType {
   CALENDAR = 'calendar',
   LIST = 'list',
+}
+
+export interface DayViewConfig {
+  showCurrentTimeIndicator: boolean;
+  showHoverTimeIndicator: boolean;
+  enableTimeSlotClick: boolean;
+}
+
+export interface daysViewConfig {
+  showCurrentTimeIndicator: boolean;
+  showHoverTimeIndicator: boolean;
+  enableTimeSlotClick: boolean;
+}
+
+export interface WeekViewConfig {
+  showCurrentTimeIndicator: boolean;
+  showHoverTimeIndicator: boolean;
+  enableTimeSlotClick: boolean;
+  expandMultiDayEvents: boolean;
+}
+
+export interface MonthViewConfig {
+  eventLimit: number;
+  showMoreEventsIndicator: boolean;
+  cellHeight: number;
+  compactMode: boolean;
+  hideOutsideDays: boolean;
+}
+
+export interface YearViewConfig {
+  showMonthLabels: boolean;
+  quarterView: boolean;
+  highlightCurrentMonth: boolean;
+}
+
+export interface CalendarViewConfigs {
+  day: DayViewConfig;
+  days: daysViewConfig;
+  week: WeekViewConfig;
+  month: MonthViewConfig;
+  year: YearViewConfig;
+}
+
+export interface EventCalendarConfig {
+  defaultView?: CalendarViewType;
+  defaultTimeFormat?: TimeFormatType;
+  defaultViewMode?: ViewModeType;
+  locale?: Locale;
+  firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  daysCount: number;
+  viewSettings?: Partial<CalendarViewConfigs>;
 }
