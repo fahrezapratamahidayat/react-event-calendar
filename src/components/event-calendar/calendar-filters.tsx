@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQueryStates, parseAsArrayOf, parseAsString } from 'nuqs';
-import { Search, X, Calendar, Tag, Repeat, Clock } from 'lucide-react';
+import { Search, X, Tag, Repeat, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -77,10 +77,6 @@ export const EventCalendarFilters = () => {
     setFilters({ [key]: value });
   };
 
-  const updateDateRange = (start: string, end: string) => {
-    setFilters({ dateStart: start, dateEnd: end });
-  };
-
   const clearAllFilters = () => {
     setFilters({
       categories: [],
@@ -126,7 +122,6 @@ export const EventCalendarFilters = () => {
             </Badge>
           )}
         </Button>
-
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2 text-xs">
@@ -356,18 +351,6 @@ export const EventCalendarFilters = () => {
                 </button>
               </Badge>
             ))}
-            {(filters.dateStart || filters.dateEnd) && (
-              <Badge variant="secondary" className="gap-1">
-                <Calendar className="h-3 w-3" />
-                Date Range
-                <button
-                  onClick={() => updateDateRange('', '')}
-                  className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
-                >
-                  <X className="h-2 w-2" />
-                </button>
-              </Badge>
-            )}
           </div>
         )}
         {activeFiltersCount > 0 && (
