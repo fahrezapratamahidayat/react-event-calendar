@@ -30,6 +30,7 @@ const DEFAULT_VIEW_CONFIGS: CalendarViewConfigs = {
     showCurrentTimeIndicator: true,
     showHoverTimeIndicator: true,
     enableTimeSlotClick: true,
+    expandMultiDayEvents: true,
   },
   month: {
     eventLimit: 3,
