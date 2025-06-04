@@ -131,6 +131,7 @@ export default function EventCreateDialog() {
     <Dialog
       open={isQuickAddDialogOpen}
       onOpenChange={(open) => !open && closeQuickAddDialog()}
+      modal={false}
     >
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
@@ -139,7 +140,7 @@ export default function EventCreateDialog() {
             Fill in the event details to add it to the calendar
           </DialogDescription>
         </DialogHeader>
-        <Tabs className="w-full">
+        <Tabs className="w-full" defaultValue="edit">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="edit">Edit</TabsTrigger>
             <TabsTrigger value="preview">Preview</TabsTrigger>
