@@ -6,8 +6,7 @@ import { formatTimeDisplay } from '@/lib/date';
 import { Button } from '@/components/ui/button';
 import { EventTypes } from '@/db/schema';
 import { format, isSameDay, isSameMonth, Locale } from 'date-fns';
-import { CalendarViewConfigs } from '@/hooks/use-event-calendar';
-import { TimeFormatType } from '@/types/event';
+import { CalendarViewConfigs, TimeFormatType } from '@/types/event';
 import { getColorClasses } from '@/lib/event';
 
 interface DayCellProps {
