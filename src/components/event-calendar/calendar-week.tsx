@@ -8,7 +8,6 @@ import { WeekDayHeaders } from './ui/week-days-header';
 import { TimeColumn } from './ui/time-column';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
-import { MultiDayEventSection } from './ui/multi-day-event';
 import { TimeGrid } from './ui/time-grid';
 import { EventDialogTrigger } from './event-dialog-trigger';
 import {
@@ -20,13 +19,17 @@ import {
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
+import { Button } from '../ui/button';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { MultiDayEventSection } from './ui/multi-day-event';
+import { cn } from '@/lib/utils';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
 const END_HOUR = 23; // 23:00
 const DAYS_IN_WEEK = 7;
 const DAY_WIDTH_PERCENT = 100 / DAYS_IN_WEEK;
-const MULTI_DAY_ROW_HEIGHT = 50;
+const MULTI_DAY_ROW_HEIGHT = 64;
 
 interface CalendarWeekProps {
   events: EventTypes[];
@@ -55,6 +58,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
   const [hoverPosition, setHoverPosition] = useState<
     HoverPositionType | undefined
   >(undefined);
+  const [isMultiDayExpanded, setIsMultiDayExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const timeColumnRef = useRef<HTMLDivElement>(null);
 
@@ -79,6 +83,11 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
 
   const multiDayEventRows = useMultiDayEventRows(multiDayEvents, weekDays);
   const timeSlots = useMemo(() => generateTimeSlots(START_HOUR, END_HOUR), []);
+
+  const totalMultiDayRows =
+    multiDayEventRows.length > 0
+      ? Math.max(...multiDayEventRows.map((r) => r.row)) + 1
+      : 1;
 
   const handleTimeHover = useCallback((hour: number) => {
     setHoverPosition((prev) => ({ ...prev, hour, minute: 0, dayIndex: -1 }));
@@ -119,43 +128,93 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
     viewSettings.day.enableTimeSlotClick,
   ]);
 
-  const showEventDetail = useCallback((_event: EventTypes) => {}, []);
+  const showEventDetail = useCallback(
+    (_event: EventTypes) => {
+      openEventDialog(_event);
+    },
+    [openEventDialog],
+  );
+
+  const toggleMultiDayExpand = useCallback(() => {
+    setIsMultiDayExpanded((prev) => !prev);
+  }, []);
 
   return (
     <div className="flex h-[760px] flex-col border">
-      <ScrollArea className="h-full w-full">
-        <div className="bg-accent border-border sticky top-0 z-30 flex flex-col items-center justify-center border-b pr-4">
-          <WeekDayHeaders
-            weekNumber={weekNumber}
-            daysInWeek={weekDays}
-            currentDayIndex={todayIndex}
-            formatDate={formatDate}
-            locale={locale}
-            firstDayOfWeek={firstDayOfWeek}
-            showWeekNumber={true}
-            showDayNumber={true}
-            highlightToday={true}
-          />
-          {multiDayEventRows.length ? (
-            <div className="relative w-full flex-1">
-              <div className="flex items-center justify-between">
-                <div className="flex w-14 flex-shrink-0 flex-col items-center justify-center gap-2 p-2 text-center font-medium sm:w-32">
-                  <span className="w-full truncate text-xs font-medium">
-                    Multi Day Events
-                  </span>
-                </div>
-                <div className="relative flex-1">
-                  <MultiDayEventSection
-                    rows={multiDayEventRows}
-                    daysInWeek={weekDays}
-                    showEventDetail={showEventDetail}
-                    multiDayRowHeight={MULTI_DAY_ROW_HEIGHT}
-                  />
-                </div>
+      <div className="bg-background border-border sticky top-0 z-30 flex flex-col items-center justify-center border-b pr-4">
+        <WeekDayHeaders
+          weekNumber={weekNumber}
+          daysInWeek={weekDays}
+          currentDayIndex={todayIndex}
+          formatDate={formatDate}
+          locale={locale}
+          firstDayOfWeek={firstDayOfWeek}
+          showWeekNumber={true}
+          showDayNumber={true}
+          highlightToday={true}
+        />
+      </div>
+      {multiDayEventRows.length > 1 && (
+        <div className="bg-background border-border sticky top-[64px] z-20 flex pr-4">
+          <div className="flex h-[64px] w-14 items-center justify-center sm:w-32">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-primary h-10 w-10"
+              onClick={toggleMultiDayExpand}
+            >
+              <span className="sr-only">
+                {isMultiDayExpanded
+                  ? 'Collapse Multi Day Events'
+                  : 'Expand Multi Day Events'}
+              </span>
+              {isMultiDayExpanded ? <ChevronUp /> : <ChevronDown />}
+            </Button>
+          </div>
+          <div
+            className="relative flex-1"
+            style={{
+              height: isMultiDayExpanded
+                ? `${totalMultiDayRows * MULTI_DAY_ROW_HEIGHT}px`
+                : `${MULTI_DAY_ROW_HEIGHT}px`,
+              transition: 'height 0.3s ease',
+            }}
+          >
+            <div className="absolute inset-0">
+              <div className="relative">
+                {Array.from({
+                  length: isMultiDayExpanded ? totalMultiDayRows : 1,
+                }).map((_, rowIndex) => (
+                  <div
+                    key={`multi-day-row-${rowIndex}`}
+                    className="border-border flex h-16 border-t"
+                  >
+                    {weekDays.map((day, dayIndex) => (
+                      <div
+                        key={`multi-day-cell-${rowIndex}-${dayIndex}`}
+                        data-testid={`multi-day-cell-${rowIndex}-${dayIndex}`}
+                        className={cn(
+                          'relative flex items-center justify-center border-r last:border-r-0',
+                          todayIndex === dayIndex && 'bg-primary/10',
+                          'flex-1',
+                        )}
+                      ></div>
+                    ))}
+                  </div>
+                ))}
               </div>
             </div>
-          ) : null}
+            <MultiDayEventSection
+              rows={multiDayEventRows}
+              daysInWeek={weekDays}
+              multiDayRowHeight={MULTI_DAY_ROW_HEIGHT}
+              showEventDetail={showEventDetail}
+              isExpanded={isMultiDayExpanded}
+            />
+          </div>
         </div>
+      )}
+      <ScrollArea className="h-full w-full">
         <div className="flex flex-1 overflow-hidden pr-4">
           <TimeColumn
             ref={timeColumnRef}
@@ -166,7 +225,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
             onLeave={handleTimeLeave}
             onTimeSlotClick={handleTimeSlotClick}
             variant="week"
-            className="w-14 sm:w-32"
+            className="p w-14 sm:w-32"
           />
           <div ref={containerRef} className="relative flex-1 overflow-y-auto">
             {viewSettings.week.showCurrentTimeIndicator && (
