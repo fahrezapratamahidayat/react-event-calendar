@@ -165,11 +165,7 @@ export default function EventDialog() {
   if (!isMounted) return null;
 
   return (
-    <Dialog
-      open={isDialogOpen}
-      onOpenChange={closeEventDialog}
-      data-testid="event-dialog"
-    >
+    <Dialog open={isDialogOpen} onOpenChange={closeEventDialog} modal={false}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>Event Details</DialogTitle>
