@@ -65,7 +65,7 @@ export const EventDialogTrigger = ({
           </div>
           {position?.height && position.height > 40 && (
             <div className="mt-1 text-xs sm:truncate">
-              {calculateDuration?.(event.startTime, event.endTime)} Hour
+              {calculateDuration?.(event.startTime, event.endTime, 'auto')} Hour
             </div>
           )}
         </Button>
