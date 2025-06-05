@@ -1,12 +1,11 @@
 import { cn } from '@/lib/utils';
-import { FormatOptions, Locale } from 'date-fns';
+import { FormatOptions, isSameDay, Locale } from 'date-fns';
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 interface WeekDayHeadersProps {
   weekNumber?: number;
   daysInWeek: Date[];
-  currentDayIndex: number;
   formatDate: (
     date: Date,
     formatStr: string,
@@ -24,7 +23,6 @@ interface WeekDayHeadersProps {
 export function WeekDayHeaders({
   weekNumber,
   daysInWeek,
-  currentDayIndex,
   formatDate,
   locale,
   firstDayOfWeek,
@@ -34,6 +32,7 @@ export function WeekDayHeaders({
   dayNumberClassName,
   highlightToday = true,
 }: WeekDayHeadersProps) {
+  const today = new Date();
   const reorderedDays = useMemo(() => {
     const ordered = [...daysInWeek];
     return ordered
@@ -57,8 +56,7 @@ export function WeekDayHeaders({
         </motion.div>
       )}
       {reorderedDays.map((day, dayIndex) => {
-        const originalIndex = (dayIndex + firstDayOfWeek) % 7;
-        const isToday = highlightToday && currentDayIndex === originalIndex;
+        const isToday = highlightToday && isSameDay(day, today);
 
         return (
           <motion.div
@@ -70,16 +68,15 @@ export function WeekDayHeaders({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: dayIndex * 0.05 }}
           >
-            <div className="text-muted-foreground mb-1 text-xs sm:text-sm">
+            <span className="text-muted-foreground mb-1 text-xs sm:text-sm">
               {formatDate(day, 'EEE', { locale })}
-            </div>
+            </span>
             {showDayNumber && (
-              <div className="flex items-center justify-center">
+              <div className="">
                 <span
                   className={cn(
-                    'flex h-8 w-8 items-center justify-center text-xs sm:text-sm',
-                    isToday &&
-                      'text-primary bg-primary/10 rounded-full font-bold',
+                    'flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium sm:h-6 sm:w-6',
+                    isToday && 'bg-blue-500 text-white',
                     dayNumberClassName,
                   )}
                 >
