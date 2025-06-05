@@ -35,8 +35,6 @@ const DEFAULT_VIEW_CONFIGS: CalendarViewConfigs = {
   month: {
     eventLimit: 3,
     showMoreEventsIndicator: true,
-    cellHeight: 120,
-    compactMode: false,
     hideOutsideDays: true,
   },
   year: {
