@@ -67,8 +67,6 @@ export interface WeekViewConfig {
 export interface MonthViewConfig {
   eventLimit: number;
   showMoreEventsIndicator: boolean;
-  cellHeight: number;
-  compactMode: boolean;
   hideOutsideDays: boolean;
 }
 
