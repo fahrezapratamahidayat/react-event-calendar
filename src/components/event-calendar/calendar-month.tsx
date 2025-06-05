@@ -48,11 +48,7 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
   const daysContainerRef = useRef<HTMLDivElement>(null);
   const [focusedDate, setFocusedDate] = useState<Date | null>(null);
 
-  const { weekNumber, weekDays, todayIndex } = useWeekDays(
-    baseDate,
-    DAYS_IN_WEEK,
-    locale,
-  );
+  const { weekNumber, weekDays } = useWeekDays(baseDate, DAYS_IN_WEEK, locale);
 
   // Calculate visible days in month
   const visibleDays = useMemo(() => {
@@ -64,7 +60,7 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
     return eachDayOfInterval({ start: gridStart, end: gridEnd });
   }, [baseDate, weekStartDay]);
 
-  /** Groups events by their start date  */
+  // Groups events by their start date
   const eventsGroupedByDate = useMemo(() => {
     const groupedEvents: Record<string, EventTypes[]> = {};
 
@@ -92,13 +88,9 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
       <WeekDayHeaders
         weekNumber={weekNumber}
         daysInWeek={weekDays}
-        currentDayIndex={todayIndex}
         formatDate={formatDate}
         locale={locale}
         firstDayOfWeek={firstDayOfWeek}
-        showWeekNumber={false}
-        showDayNumber={false}
-        highlightToday={false}
       />
       <div
         ref={daysContainerRef}
