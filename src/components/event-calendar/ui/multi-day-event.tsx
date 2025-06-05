@@ -31,9 +31,6 @@ interface MultiDayEventSectionProps {
   isExpanded?: boolean;
 }
 
-/**
- * Section for multi-day events display
- */
 export const MultiDayEvent = ({
   event,
   startIndex,
@@ -56,10 +53,10 @@ export const MultiDayEvent = ({
       transition={{ duration: 0.2 }}
       className="absolute"
       style={{
-        left: `calc(${eventLeftPercent}% + 4px)`,
-        width: `calc(${eventWidthPercent}% - 8px)`,
+        left: `calc(${eventLeftPercent}% + 1px)`,
+        width: `calc(${eventWidthPercent}% - 2px)`,
         top: `${row * multiDayRowHeight}px`,
-        height: `${multiDayRowHeight - 4}px`,
+        height: `${multiDayRowHeight - 1}px`,
       }}
     >
       <Button
@@ -77,7 +74,7 @@ export const MultiDayEvent = ({
           {formatTimeDisplay(event.endTime, '12')}
         </div>
         <div className="mt-1 text-xs sm:truncate">
-          {calculateDuration?.(event.startTime, event.endTime)} Hour
+          {calculateDuration(event.startTime, event.endTime, 'auto')}
         </div>
       </Button>
     </motion.div>
@@ -86,9 +83,6 @@ export const MultiDayEvent = ({
 
 MultiDayEvent.displayName = 'MultiDayEvent';
 
-/**
- * Section for multi-day events display
- */
 export const MultiDayEventSection = memo(
   ({
     rows,
