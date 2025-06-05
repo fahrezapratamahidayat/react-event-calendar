@@ -23,6 +23,7 @@ import { Button } from '../ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { MultiDayEventSection } from './ui/multi-day-event';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -141,80 +142,84 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
 
   return (
     <div className="flex h-[760px] flex-col border">
-      <div className="bg-background border-border sticky top-0 z-30 flex flex-col items-center justify-center border-b pr-4">
-        <WeekDayHeaders
-          weekNumber={weekNumber}
-          daysInWeek={weekDays}
-          currentDayIndex={todayIndex}
-          formatDate={formatDate}
-          locale={locale}
-          firstDayOfWeek={firstDayOfWeek}
-          showWeekNumber={true}
-          showDayNumber={true}
-          highlightToday={true}
-        />
-      </div>
-      {multiDayEventRows.length > 1 && (
-        <div className="bg-background border-border sticky top-[64px] z-20 flex pr-4">
-          <div className="flex h-[64px] w-14 items-center justify-center sm:w-32">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-primary h-10 w-10"
-              onClick={toggleMultiDayExpand}
-            >
-              <span className="sr-only">
-                {isMultiDayExpanded
-                  ? 'Collapse Multi Day Events'
-                  : 'Expand Multi Day Events'}
-              </span>
-              {isMultiDayExpanded ? <ChevronUp /> : <ChevronDown />}
-            </Button>
-          </div>
-          <div
-            className="relative flex-1"
-            style={{
-              height: isMultiDayExpanded
-                ? `${totalMultiDayRows * MULTI_DAY_ROW_HEIGHT}px`
-                : `${MULTI_DAY_ROW_HEIGHT}px`,
-              transition: 'height 0.3s ease',
-            }}
-          >
-            <div className="absolute inset-0">
-              <div className="relative">
-                {Array.from({
-                  length: isMultiDayExpanded ? totalMultiDayRows : 1,
-                }).map((_, rowIndex) => (
-                  <div
-                    key={`multi-day-row-${rowIndex}`}
-                    className="border-border flex h-16 border-t"
-                  >
-                    {weekDays.map((day, dayIndex) => (
-                      <div
-                        key={`multi-day-cell-${rowIndex}-${dayIndex}`}
-                        data-testid={`multi-day-cell-${rowIndex}-${dayIndex}`}
-                        className={cn(
-                          'relative flex items-center justify-center border-r last:border-r-0',
-                          todayIndex === dayIndex && 'bg-primary/10',
-                          'flex-1',
-                        )}
-                      ></div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <MultiDayEventSection
-              rows={multiDayEventRows}
-              daysInWeek={weekDays}
-              multiDayRowHeight={MULTI_DAY_ROW_HEIGHT}
-              showEventDetail={showEventDetail}
-              isExpanded={isMultiDayExpanded}
-            />
-          </div>
-        </div>
-      )}
       <ScrollArea className="h-full w-full">
+        <div className="bg-background border-border sticky top-0 z-30 flex flex-col items-center justify-center pr-4">
+          <WeekDayHeaders
+            weekNumber={weekNumber}
+            daysInWeek={weekDays}
+            formatDate={formatDate}
+            locale={locale}
+            firstDayOfWeek={firstDayOfWeek}
+            showWeekNumber={true}
+            showDayNumber={true}
+            highlightToday={true}
+          />
+        </div>
+        {multiDayEventRows.length > 1 && (
+          <div className="bg-background border-border sticky top-18 z-50 flex pr-4">
+            <div className="flex h-[64px] w-14 items-center justify-center sm:w-32">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-primary h-10 w-10"
+                    onClick={toggleMultiDayExpand}
+                  >
+                    <span className="sr-only">
+                      {isMultiDayExpanded ? 'Collapse' : 'Expand'} multi-day
+                    </span>
+                    {isMultiDayExpanded ? <ChevronUp /> : <ChevronDown />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {isMultiDayExpanded ? 'Collapse' : 'Expand'} multi-day
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <div
+              className="relative flex-1"
+              style={{
+                height: isMultiDayExpanded
+                  ? `${totalMultiDayRows * MULTI_DAY_ROW_HEIGHT}px`
+                  : `${MULTI_DAY_ROW_HEIGHT}px`,
+                transition: 'height 0.3s ease',
+              }}
+            >
+              <div className="absolute inset-0">
+                <div className="relative">
+                  {Array.from({
+                    length: isMultiDayExpanded ? totalMultiDayRows : 1,
+                  }).map((_, rowIndex) => (
+                    <div
+                      key={`multi-day-row-${rowIndex}`}
+                      className="border-border flex h-16 border-t"
+                    >
+                      {weekDays.map((day, dayIndex) => (
+                        <div
+                          key={`multi-day-cell-${rowIndex}-${dayIndex}`}
+                          data-testid={`multi-day-cell-${rowIndex}-${dayIndex}`}
+                          className={cn(
+                            'relative flex items-center justify-center border-r last:border-r-0',
+                            todayIndex === dayIndex && 'bg-primary/10',
+                            'flex-1',
+                          )}
+                        ></div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <MultiDayEventSection
+                rows={multiDayEventRows}
+                daysInWeek={weekDays}
+                multiDayRowHeight={MULTI_DAY_ROW_HEIGHT}
+                showEventDetail={showEventDetail}
+                isExpanded={isMultiDayExpanded}
+              />
+            </div>
+          </div>
+        )}
         <div className="flex flex-1 overflow-hidden pr-4">
           <TimeColumn
             ref={timeColumnRef}
