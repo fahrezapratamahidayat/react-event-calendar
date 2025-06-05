@@ -57,17 +57,15 @@ export function DayCell({
         'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border transition-all sm:h-[140px] sm:p-2',
         'hover:border-primary focus:ring-primary hover:shadow-sm focus:ring-2 focus:outline-none',
         !isWithinMonth && viewSettings.month.hideOutsideDays
-          ? 'invisible'
+          ? 'hidden'
           : !isWithinMonth
             ? 'bg-muted/20 opacity-50'
             : '',
-        // isFocused && 'ring-2 ring-blue-500',
+        // _isFocused && 'ring-2 ring-blue-500',
       )}
       onClick={() => {
-        if (dayEvents.length === 0) {
-          onQuickAdd(date);
-          onFocusDate(date);
-        }
+        onQuickAdd(date);
+        onFocusDate(date);
       }}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -88,9 +86,11 @@ export function DayCell({
         >
           {format(date, 'd', { locale })}
         </span>
-        <span className="text-muted-foreground hidden text-xs md:block">
-          {format(date, 'E', { locale })}
-        </span>
+        {!viewSettings.month.hideOutsideDays && (
+          <span className="text-muted-foreground hidden text-xs md:block">
+            {format(date, 'E', { locale })}
+          </span>
+        )}
       </div>
       {isWithinMonth && (
         <div className="item flex flex-1 flex-col justify-center gap-1 overflow-hidden">
@@ -102,7 +102,10 @@ export function DayCell({
                 'transition-colors hover:opacity-90',
                 colorClasses?.bg ?? 'bg-primary',
               )}
-              onClick={() => onOpenEvent(firstEvent)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenEvent(firstEvent);
+              }}
             >
               <span className="truncate font-medium text-white">
                 {firstEvent.title}
