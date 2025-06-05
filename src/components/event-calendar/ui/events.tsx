@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { EventTypes } from '@/db/schema';
 import { formatTimeDisplay } from '@/lib/date';
 import { getColorClasses } from '@/lib/event';
@@ -67,53 +67,44 @@ export const EventCard = ({
   timeFormat: TimeFormatType;
   onClick: (event: EventTypes) => void;
 }) => {
-  const validColor = getColorClasses(event.color);
-  const { bg, border, badge } = validColor;
+  const { bg, badge } = getColorClasses(event.color);
   return (
-    <Card
+    <Button
       key={event.id}
+      data-testid={`event-item-${event.id}`}
       className={cn(
-        'group relative cursor-pointer overflow-hidden rounded-lg transition-all duration-300 hover:shadow-md',
-        'border-l-2',
+        'group/event relative z-0 flex h-auto w-full flex-col items-start justify-start gap-3 px-4 py-3 text-left text-white hover:cursor-pointer',
+        'transition-all duration-200',
+        'focus-visible:ring-ring last:border-b-0 focus-visible:ring-1 focus-visible:ring-offset-0',
         bg,
-        border,
       )}
       onClick={() => onClick(event)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onClick(event)}
-      aria-label={`Event: ${event.title}. Press enter to view details`}
     >
-      <div className="px-3 py-2">
-        <div className="mb-3 flex items-start justify-between">
-          <div className="space-y-1">
-            <h3 className="text-base leading-tight font-medium">
-              {event.title}
-            </h3>
-            <Badge variant="default" className={`${badge.bg}`}>
-              {event.category}
-            </Badge>
-          </div>
-          <div className="flex items-center">
-            <Clock className="mr-1 h-3.5 w-3.5" />
-            <span>
-              {formatTimeDisplay(event.startTime, timeFormat)}
-              {event.endTime &&
-                ` - ${formatTimeDisplay(event.endTime, timeFormat)}`}
-            </span>
-          </div>
+      <div className="flex w-full items-start justify-between gap-2 group-hover/event:opacity-50">
+        <span className="line-clamp-1 text-base font-medium">
+          {event.title}
+        </span>
+        <Badge variant="default" className={`${badge.bg}`}>
+          {event.category}
+        </Badge>
+      </div>
+      <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white group-hover/event:opacity-50">
+        <div className="flex items-center gap-1.5">
+          <Clock className="h-3 w-3" />
+          <span>
+            {formatTimeDisplay(event.startTime, timeFormat)} -{' '}
+            {formatTimeDisplay(event.endTime, timeFormat)}
+          </span>
         </div>
+
         {event.location && (
-          <div className="mt-2 flex items-center">
-            <MapPin className="mr-1.5 h-3.5 w-3.5" />
-            <span className="truncate text-xs">{event.location}</span>
+          <div className="flex items-center gap-1.5">
+            <MapPin className="h-3 w-3" />
+            <span className="line-clamp-1">{event.location}</span>
           </div>
-        )}
-        {event.description && (
-          <p className="mt-3 line-clamp-2 text-xs">{event.description}</p>
         )}
       </div>
-    </Card>
+    </Button>
   );
 };
 
@@ -129,24 +120,22 @@ export const EventGroup = memo(
     timeFormat: TimeFormatType;
     onClick: (event: EventTypes) => void;
   }) => (
-    <Card
+    <div
       key={timeKey}
       className="gap-0 overflow-hidden rounded-md py-0"
       data-testid={`event-group-${timeKey}`}
     >
-      <CardContent className="p-0">
-        <div className="divide-3 gap-1.3 flex flex-col gap-2">
-          {events.map((event) => (
-            <EventCard
-              key={event.id}
-              event={event}
-              timeFormat={timeFormat}
-              onClick={onClick}
-            />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+      <div className="gap-1.3 flex flex-col gap-2">
+        {events.map((event) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            timeFormat={timeFormat}
+            onClick={onClick}
+          />
+        ))}
+      </div>
+    </div>
   ),
 );
 
