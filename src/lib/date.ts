@@ -171,22 +171,45 @@ export const generateTimeSlots = (
  */
 
 /**
- * Calculates duration between two times in hours
- * @memberof DateTimeCalculations
+ * Calculates duration between two times with smart formatting
  * @param {string} startTime - Start time in "HH:MM" format
  * @param {string} endTime - End time in "HH:MM" format
- * @returns {number} Duration in hours (rounded to nearest 0.5)
+ * @param {'hours' | 'auto'} format - Return format ('hours' for decimal hours, 'auto' for smart string)
+ * @returns {number | string} Duration in hours (if format='hours') or smart string (e.g. "30m" or "1h 30m")
  *
  * @example
- * calculateDuration('09:00', '12:30'); // 3.5
+ * calculateDuration('09:00', '09:45', 'auto'); // "45m"
+ * calculateDuration('09:00', '10:30', 'auto'); // "1h 30m"
+ * calculateDuration('09:00', '12:30'); // 3.5 (default format='hours')
  */
 export const calculateDuration = (
   startTime: string,
   endTime: string,
-): number => {
+  format: 'hours' | 'auto' = 'auto',
+): number | string => {
   const startMinutes = convertTimeToMinutes(startTime);
   const endMinutes = convertTimeToMinutes(endTime);
-  return (endMinutes - startMinutes) / 60;
+
+  if (endMinutes < startMinutes) {
+    throw new Error('End time cannot be earlier than start time');
+  }
+
+  const totalMinutes = endMinutes - startMinutes;
+
+  if (format === 'hours') {
+    return totalMinutes / 60;
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours === 0) {
+    return `${minutes}m`; // e.g. "45m"
+  } else if (minutes === 0) {
+    return `${hours}h`; // e.g. "2h" (exact hours)
+  } else {
+    return `${hours}h ${minutes}m`; // e.g. "1h 30m"
+  }
 };
 
 /**
