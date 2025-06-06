@@ -156,7 +156,7 @@ export function CalendarDaysView({
       </div>
 
       {multiDayEventRows.length > 0 && (
-        <div className="bg-background border-border sticky top-[48px] z-20 flex">
+        <div className="bg-background border-border sticky top-[48px] z-20 flex border-b">
           <div className="flex h-[64px] w-[51px] items-center justify-center">
             {multiDayEventRows.length > 1 && (
               <Tooltip>
