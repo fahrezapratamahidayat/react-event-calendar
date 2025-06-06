@@ -26,6 +26,7 @@ import {
 import { useQueryState } from 'nuqs';
 import { parseAsIsoDate } from 'nuqs/server';
 import { EventCalendarFilters } from './calendar-filters';
+import CalendarSettingsDialog from './calendar-setting-dialog';
 
 export default function CalendarToolbar() {
   const [date, setDate] = useQueryState(
@@ -193,6 +194,7 @@ export default function CalendarToolbar() {
             onChange={handleTimeFormatChange}
           />
           <ViewModeToggle mode={viewMode} onChange={handleViewModeChange} />
+          <CalendarSettingsDialog />
         </div>
       </div>
     </div>
