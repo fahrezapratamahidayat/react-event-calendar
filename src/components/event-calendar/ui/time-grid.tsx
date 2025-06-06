@@ -21,7 +21,10 @@ export const TimeGrid = memo((props: TimeGridProps) => {
   return (
     <div className="relative" data-testid="time-grid">
       {timeSlots.map((time, timeIndex) => (
-        <div key={timeIndex} className="border-border flex h-16 border-t">
+        <div
+          key={timeIndex}
+          className="border-border flex h-16 border-t first:border-t-0"
+        >
           {daysInWeek.map((day, dayIndex) => (
             <div
               key={`${timeIndex}-${dayIndex}`}
