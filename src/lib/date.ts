@@ -390,3 +390,61 @@ export const isSameDay = (date1: Date, date2: Date): boolean => {
 export const isDifferentDay = (date1: Date, date2: Date): boolean => {
   return !isSameDay(date1, date2);
 };
+
+import type { Locale } from 'date-fns';
+
+const dayOfWeekCache = new Map<
+  string,
+  Array<{ value: number; label: string }>
+>();
+
+/**
+ * Generates an array of day of week objects localized for a given locale.
+ * Each day object contains the day value (0-6, where 0 is Sunday) and its localized name.
+ *
+ * @param {Locale} localeObj - The date-fns locale object used for localization
+ * @returns {Array<{value: number, label: string}>} An array of day objects with:
+ *          - value: number (0-6, Sunday-Saturday)
+ *          - label: string (localized full day name)
+ *
+ * @example
+ * // For English (US) locale
+ * const days = getLocalizedDaysOfWeek(enUS);
+ * // Returns:
+ * // [
+ * //   { value: 0, label: 'Sunday' },
+ * //   { value: 1, label: 'Monday' },
+ * //   ...
+ * // ]
+ *
+ * @example
+ * // For Japanese locale
+ * const days = getLocalizedDaysOfWeek(ja);
+ * // Returns:
+ * // [
+ * //   { value: 0, label: '日曜日' },
+ * //   { value: 1, label: '月曜日' },
+ * //   ...
+ * // ]
+ */
+export const getLocalizedDaysOfWeek = (locale: Locale) => {
+  const cacheKey = locale.code || 'en-US';
+
+  if (dayOfWeekCache.has(cacheKey)) {
+    return dayOfWeekCache.get(cacheKey)!;
+  }
+
+  const baseDate = new Date(2023, 0, 1);
+  const days = [0, 1, 2, 3, 4, 5, 6].map((dayValue) => {
+    const date = new Date(baseDate);
+    date.setDate(baseDate.getDate() + dayValue);
+
+    return {
+      value: dayValue as 0 | 1 | 2 | 3 | 4 | 5 | 6,
+      label: format(date, 'EEEE', { locale }),
+    };
+  });
+
+  dayOfWeekCache.set(cacheKey, days);
+  return days;
+};
