@@ -15,7 +15,11 @@ import { CalendarViewType, TimeFormatType } from '@/types/event';
 import { EventGroup, NoEvents } from './ui/events';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { EventTypes } from '@/db/schema';
-import { useEventFilter, useEventGrouper } from '@/lib/event';
+import {
+  getLocaleFromCode,
+  useEventFilter,
+  useEventGrouper,
+} from '@/lib/event';
 import { useShallow } from 'zustand/shallow';
 
 interface EventsListProps {
@@ -93,6 +97,7 @@ export function EventsList({ events, currentDate }: EventsListProps) {
         openEventDialog: state.openEventDialog,
       })),
     );
+  const localeObj = getLocaleFromCode(locale);
 
   const filteredEvents = useEventFilter(events, currentDate, currentView);
 
@@ -100,7 +105,7 @@ export function EventsList({ events, currentDate }: EventsListProps) {
     filteredEvents,
     currentView,
     timeFormat,
-    locale,
+    localeObj,
   );
 
   const handleEventClick = useCallback(
@@ -111,7 +116,7 @@ export function EventsList({ events, currentDate }: EventsListProps) {
   );
 
   if (groupedEvents.length === 0) {
-    return <NoEvents {...{ currentDate, currentView, locale }} />;
+    return <NoEvents {...{ currentDate, currentView, locale: localeObj }} />;
   }
 
   return (
