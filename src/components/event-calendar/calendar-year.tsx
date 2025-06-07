@@ -21,17 +21,21 @@ interface CalendarYearProps {
 }
 
 export function CalendarYear({ events, currentDate }: CalendarYearProps) {
-  const { openQuickAddDialog, openEventDialog, openDayEventsDialog, setView } =
-    useEventCalendarStore(
-      useShallow((state) => ({
-        locale: state.locale,
-        viewSettings: state.viewSettings,
-        openQuickAddDialog: state.openQuickAddDialog,
-        openEventDialog: state.openEventDialog,
-        openDayEventsDialog: state.openDayEventsDialog,
-        setView: state.setView,
-      })),
-    );
+  const {
+    openQuickAddDialog,
+    openEventDialog,
+    openDayEventsDialog,
+    setView,
+    viewSettings,
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      openQuickAddDialog: state.openQuickAddDialog,
+      openEventDialog: state.openEventDialog,
+      openDayEventsDialog: state.openDayEventsDialog,
+      setView: state.setView,
+      viewSettings: state.viewSettings.year,
+    })),
+  );
 
   const monthsInYear = useMemo(() => {
     const yearStart = startOfYear(currentDate);
@@ -90,6 +94,7 @@ export function CalendarYear({ events, currentDate }: CalendarYearProps) {
           month={month}
           eventsByDate={eventsByDate}
           eventCount={eventCountByMonth[getMonth(month)]}
+          yearViewConfig={viewSettings}
           onMonthClick={handleMonthClick}
           onEventClick={openEventDialog}
           onDateClick={handleDateClick}
