@@ -15,6 +15,8 @@ import { EventTypes } from '@/db/schema';
 import { useMemo } from 'react';
 import { TimeFormatType } from '@/types/event';
 import { EventCard } from './ui/events';
+import { getLocaleFromCode } from '@/lib/event';
+import { useShallow } from 'zustand/shallow';
 
 const EmptyState = () => (
   <div className="text-muted-foreground py-12 text-center">
@@ -56,13 +58,24 @@ export function MonthDayEventsDialog() {
     timeFormat,
     dayEventsDialog,
     locale,
-  } = useEventCalendarStore();
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      openEventDialog: state.openEventDialog,
+      closeDayEventsDialog: state.closeDayEventsDialog,
+      timeFormat: state.timeFormat,
+      dayEventsDialog: state.dayEventsDialog,
+      locale: state.locale,
+    })),
+  );
+  const localeObj = getLocaleFromCode(locale);
 
   const formattedDate = useMemo(
     () =>
       dayEventsDialog.date &&
-      formatDate(dayEventsDialog.date, 'EEEE, d MMMM yyyy', { locale }),
-    [dayEventsDialog, locale],
+      formatDate(dayEventsDialog.date, 'EEEE, d MMMM yyyy', {
+        locale: localeObj,
+      }),
+    [dayEventsDialog.date, localeObj],
   );
 
   return (

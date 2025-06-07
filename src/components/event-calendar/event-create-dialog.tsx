@@ -26,6 +26,7 @@ import { EVENT_DEFAULTS } from '@/constants/calendar-constant';
 import { useShallow } from 'zustand/shallow';
 import { toast } from 'sonner';
 import { createEvent } from '@/app/actions';
+import { getLocaleFromCode } from '@/lib/event';
 
 type EventFormValues = z.infer<typeof createEventSchema>;
 
@@ -60,6 +61,8 @@ export default function EventCreateDialog() {
       quickAddData: state.quickAddData,
     })),
   );
+
+  const localeObj = getLocaleFromCode(locale);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(createEventSchema),
@@ -150,7 +153,7 @@ export default function EventCreateDialog() {
               <EventDetailsForm
                 form={form}
                 onSubmit={handleSubmit}
-                locale={locale}
+                locale={localeObj}
               />
             </ScrollArea>
           </TabsContent>
@@ -158,7 +161,7 @@ export default function EventCreateDialog() {
             <ScrollArea className="h-[500px] w-full">
               <EventPreviewCalendar
                 watchedValues={watchedValues}
-                locale={locale}
+                locale={localeObj}
                 timeFormat={timeFormat}
               />
             </ScrollArea>

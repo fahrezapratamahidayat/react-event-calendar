@@ -21,6 +21,7 @@ import { EventDetailsForm } from './event-detail-form';
 import { toast } from 'sonner';
 import { deleteEvent, updateEvent } from '@/app/actions';
 import { useShallow } from 'zustand/shallow';
+import { getLocaleFromCode } from '@/lib/event';
 
 const DEFAULT_START_TIME = '09:00';
 const DEFAULT_END_TIME = '10:00';
@@ -68,6 +69,7 @@ export default function EventDialog() {
       isSubmitting: state.isSubmitting,
     })),
   );
+  const localeObj = getLocaleFromCode(locale);
 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState<boolean>(false);
   const isMounted = useIsMounted();
@@ -177,7 +179,7 @@ export default function EventDialog() {
           <EventDetailsForm
             form={form}
             onSubmit={handleSubmit}
-            locale={locale}
+            locale={localeObj}
           />
         </ScrollArea>
         <DialogFooter className="mt-2 flex flex-row">
