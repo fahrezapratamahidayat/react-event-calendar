@@ -1,12 +1,6 @@
 'use client';
 
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useTransition,
-  useMemo,
-} from 'react';
+import React, { useState, useRef, useTransition, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { CalendarViewType } from '@/types/event';
@@ -78,21 +72,24 @@ export function CalendarTabs({
   className = '',
   disabledViews = [],
 }: CalendarTabsProps) {
-  const [isMounted, setIsMounted] = useState(false);
-  const desktopButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const mobileButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const desktopButtonRefs = useRef<(HTMLButtonElement | null)[]>(
+    new Array(tabsConfig.length).fill(null),
+  );
+  const mobileButtonRefs = useRef<(HTMLButtonElement | null)[]>(
+    new Array(tabsConfig.length).fill(null),
+  );
+  const navRef = useRef<HTMLDivElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
+  const dropdownButtonRef = useRef<HTMLButtonElement>(null);
+
   const [hoveredTabIndex, setHoveredTabIndex] = useState<number | null>(null);
   const [hoveredMobileTabIndex, setHoveredMobileTabIndex] = useState<
     number | null
   >(null);
-  const navRef = useRef<HTMLDivElement>(null);
-  const mobileNavRef = useRef<HTMLDivElement>(null);
-  const dropdownButtonRef = useRef<HTMLButtonElement | null>(null);
   const [, startTransition] = useTransition();
 
   const { daysCount: storeDaysCount, setDaysCount: setStoreDaysCount } =
     useEventCalendarStore();
-
   const [, setQueryDaysCount] = useQueryState(
     'daysCount',
     parseAsInteger.withDefault(7).withOptions({
@@ -101,7 +98,6 @@ export function CalendarTabs({
       startTransition,
     }),
   );
-
   const [, setView] = useQueryState(
     'view',
     parseAsString.withOptions({
@@ -111,28 +107,12 @@ export function CalendarTabs({
     }),
   );
 
-  useEffect(() => {
-    setIsMounted(true);
-    desktopButtonRefs.current = new Array(tabsConfig.length).fill(null);
-    mobileButtonRefs.current = new Array(tabsConfig.length).fill(null);
-  }, []);
-
-  const visibleTabs = useMemo(
-    () => tabsConfig.filter((tab) => !disabledViews.includes(tab.value)),
-    [disabledViews],
+  const visibleTabs = tabsConfig.filter(
+    (tab) => !disabledViews.includes(tab.value),
   );
-
-  const selectedTabIndex = useMemo(
-    () => visibleTabs.findIndex((tab) => tab.value === viewType),
-    [visibleTabs, viewType],
+  const selectedTabIndex = visibleTabs.findIndex(
+    (tab) => tab.value === viewType,
   );
-
-  const navRect = navRef.current?.getBoundingClientRect();
-  const mobileNavRect = mobileNavRef.current?.getBoundingClientRect();
-
-  const selectedDesktopRect =
-    desktopButtonRefs.current[selectedTabIndex]?.getBoundingClientRect();
-
   const [primaryTabs, secondaryTabs] = useMemo(() => {
     const primary = visibleTabs.slice(0, 2);
     const secondary = visibleTabs.slice(2);
@@ -140,69 +120,59 @@ export function CalendarTabs({
   }, [visibleTabs]);
 
   const hasSecondaryTabs = secondaryTabs.length > 0;
-
-  const primarySelectedTabIndex = useMemo(
-    () => primaryTabs.findIndex((tab) => tab.value === viewType),
-    [primaryTabs, viewType],
+  const primarySelectedTabIndex = primaryTabs.findIndex(
+    (tab) => tab.value === viewType,
+  );
+  const isSecondaryTabActive = secondaryTabs.some(
+    (tab) => tab.value === viewType,
   );
 
+  const navRect = navRef.current?.getBoundingClientRect();
+  const mobileNavRect = mobileNavRef.current?.getBoundingClientRect();
+  const selectedDesktopRect =
+    desktopButtonRefs.current[selectedTabIndex]?.getBoundingClientRect();
   const selectedMobileRect =
-    primarySelectedTabIndex !== -1
-      ? mobileButtonRefs.current[
-          primarySelectedTabIndex
-        ]?.getBoundingClientRect()
-      : null;
-
+    mobileButtonRefs.current[primarySelectedTabIndex]?.getBoundingClientRect();
   const hoveredDesktopRect =
     hoveredTabIndex !== null
       ? desktopButtonRefs.current[hoveredTabIndex]?.getBoundingClientRect()
       : null;
-
   const hoveredMobileRect =
     hoveredMobileTabIndex !== null
       ? mobileButtonRefs.current[hoveredMobileTabIndex]?.getBoundingClientRect()
       : null;
-
-  const isSecondaryTabActive = useMemo(
-    () => secondaryTabs.some((tab) => tab.value === viewType),
-    [secondaryTabs, viewType],
-  );
-
   const dropdownRect = dropdownButtonRef.current?.getBoundingClientRect();
+
+  const updateView = (tabValue: CalendarViewType) => {
+    if (!disabledViews.includes(tabValue)) {
+      onChange(tabValue);
+      setView(tabValue);
+    }
+  };
 
   const handleTabClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const tabValue = e.currentTarget.dataset.value as CalendarViewType;
-    const hasDropdown = e.currentTarget.dataset.dropdown === 'true';
-
-    if (tabValue && !disabledViews.includes(tabValue) && !hasDropdown) {
-      onChange(tabValue);
-      setView(tabValue);
+    if (e.currentTarget.dataset.dropdown !== 'true') {
+      updateView(tabValue);
     }
   };
 
   const handleDropdownClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     const tabValue = e.currentTarget.dataset.value as CalendarViewType;
-
-    if (tabValue && !disabledViews.includes(tabValue)) {
-      onChange(tabValue);
-      setView(tabValue);
-    }
+    updateView(tabValue);
   };
 
   const handleDaysOptionClick = async (days: number) => {
     setStoreDaysCount(days);
     try {
       await setQueryDaysCount(days);
-      onChange(CalendarViewType.DAYS);
-      setView(CalendarViewType.DAYS);
+      updateView(CalendarViewType.DAYS);
     } catch (error) {
       console.error('Failed to update URL state:', error);
     }
   };
-
-  if (!isMounted) return null;
 
   return (
     <div className={cn('border-border relative border-b', className)}>
