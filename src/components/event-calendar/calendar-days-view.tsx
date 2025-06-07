@@ -7,6 +7,7 @@ import { WeekDayHeaders } from './ui/week-days-header';
 import { TimeGrid } from './ui/time-grid';
 import { EventDialogTrigger } from './event-dialog-trigger';
 import {
+  getLocaleFromCode,
   useEventPositions,
   useFilteredEvents,
   useMultiDayEventRows,
@@ -69,8 +70,14 @@ export function CalendarDaysView({
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
 
+  const localeObj = getLocaleFromCode(locale);
+
   const dayWidthPercent = 100 / daysCount;
-  const { weekDays, todayIndex } = useWeekDays(currentDate, daysCount, locale);
+  const { weekDays, todayIndex } = useWeekDays(
+    currentDate,
+    daysCount,
+    localeObj,
+  );
 
   const { singleDayEvents, multiDayEvents } = useFilteredEvents(
     events,
@@ -147,7 +154,7 @@ export function CalendarDaysView({
           <WeekDayHeaders
             daysInWeek={weekDays}
             formatDate={formatDate}
-            locale={locale}
+            locale={localeObj}
             firstDayOfWeek={firstDayOfWeek}
             highlightToday
             showDayNumber
