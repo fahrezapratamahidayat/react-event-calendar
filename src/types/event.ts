@@ -74,6 +74,9 @@ export interface YearViewConfig {
   showMonthLabels: boolean;
   quarterView: boolean;
   highlightCurrentMonth: boolean;
+  showMoreEventsIndicator: boolean;
+  enableEventPreview: boolean;
+  previewEventsPerMonth: number;
 }
 
 export interface CalendarViewConfigs {
