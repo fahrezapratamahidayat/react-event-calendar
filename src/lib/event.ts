@@ -13,10 +13,11 @@ import {
   MultiDayEventRowType,
   TimeFormatType,
 } from '@/types/event';
-import { CATEGORY_OPTIONS } from '@/constants/calendar-constant';
+import { CATEGORY_OPTIONS, LOCALES } from '@/constants/calendar-constant';
 import { EventTypes } from '@/db/schema';
 import { EVENT_VIEW_CONFIG } from '@/components/event-calendar/event-list';
 import { convertTimeToMinutes, formatTimeDisplay, isSameDay } from './date';
+import { enUS } from 'date-fns/locale';
 
 /**
  * @namespace CalendarHooks
@@ -604,3 +605,7 @@ export type ColorName = keyof typeof COLOR_CLASSES;
  */
 export const getColorClasses = (color: string) =>
   COLOR_CLASSES[color as ColorName] || COLOR_CLASSES.blue;
+
+export const getLocaleFromCode = (code: string) => {
+  return LOCALES.find((l) => l.value === code)?.locale || enUS;
+};
