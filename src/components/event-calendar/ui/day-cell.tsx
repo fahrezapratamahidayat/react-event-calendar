@@ -6,7 +6,7 @@ import { formatTimeDisplay } from '@/lib/date';
 import { Button } from '@/components/ui/button';
 import { EventTypes } from '@/db/schema';
 import { format, isSameDay, isSameMonth, Locale } from 'date-fns';
-import { CalendarViewConfigs, TimeFormatType } from '@/types/event';
+import { MonthViewConfig, TimeFormatType } from '@/types/event';
 import { getColorClasses } from '@/lib/event';
 
 interface DayCellProps {
@@ -15,7 +15,7 @@ interface DayCellProps {
   eventsByDate: Record<string, EventTypes[]>;
   locale: Locale;
   timeFormat: TimeFormatType;
-  viewSettings: CalendarViewConfigs;
+  monthViewConfig: MonthViewConfig;
   focusedDate: Date | null;
   onQuickAdd: (date: Date) => void;
   onFocusDate: (date: Date) => void;
@@ -29,7 +29,7 @@ export function DayCell({
   eventsByDate,
   locale,
   timeFormat,
-  viewSettings,
+  monthViewConfig,
   focusedDate,
   onQuickAdd,
   onFocusDate,
@@ -56,7 +56,7 @@ export function DayCell({
       className={cn(
         'group relative z-20 flex h-[80px] cursor-pointer flex-col rounded border transition-all sm:h-[140px] sm:p-2',
         'hover:border-primary focus:ring-primary hover:shadow-sm focus:ring-2 focus:outline-none',
-        !isWithinMonth && viewSettings.month.hideOutsideDays
+        !isWithinMonth && monthViewConfig.hideOutsideDays
           ? 'hidden'
           : !isWithinMonth
             ? 'bg-muted/20 opacity-50'
@@ -86,7 +86,7 @@ export function DayCell({
         >
           {format(date, 'd', { locale })}
         </span>
-        {!viewSettings.month.hideOutsideDays && (
+        {!monthViewConfig.hideOutsideDays && (
           <span className="text-muted-foreground hidden text-xs md:block">
             {format(date, 'E', { locale })}
           </span>
