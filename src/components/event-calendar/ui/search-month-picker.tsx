@@ -22,16 +22,16 @@ import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryState } from 'nuqs';
 import { parseAsIsoDate } from 'nuqs/server';
-
+import { enUS } from 'date-fns/locale';
 interface SearchableMonthPickerProps {
-  locale?: Locale;
+  locale: Locale;
   className?: string;
   monthFormat?: string;
   placeholder?: string;
 }
 
 export function SearchMonthPicker({
-  locale,
+  locale = enUS,
   className = '',
   monthFormat = 'MMMM',
   placeholder = 'Select month',
@@ -102,7 +102,7 @@ export function SearchMonthPicker({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              'w-[150px] justify-between text-xs font-normal',
+              'w-[150px] justify-between text-sm font-normal',
               !selectedMonth && 'text-muted-foreground',
               className,
             )}
@@ -160,7 +160,7 @@ export function SearchMonthPicker({
                       )}
                     />
                     <span className="flex-1">{m.label}</span>
-                    <span className="text-muted-foreground mr-2 text-xs">
+                    <span className="text-muted-foreground mr-2 text-sm">
                       {m.shortLabel}
                     </span>
                   </CommandItem>

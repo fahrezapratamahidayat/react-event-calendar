@@ -9,7 +9,7 @@ import {
   getYear,
   Locale,
 } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -40,7 +40,7 @@ interface SearchDayPickerProps {
 }
 
 export function SearchDayPicker({
-  locale = id,
+  locale = enUS,
   className = '',
   placeholder = 'Choose Day',
   weekStartsOn = 1, // Monday as default first day of week
@@ -157,7 +157,7 @@ export function SearchDayPicker({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              'w-[130px] justify-between text-xs font-normal',
+              'w-[130px] justify-between text-sm font-normal',
               !selectedDay && 'text-muted-foreground',
               className,
             )}
