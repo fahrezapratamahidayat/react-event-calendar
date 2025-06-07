@@ -11,6 +11,7 @@ import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { TimeGrid } from './ui/time-grid';
 import { EventDialogTrigger } from './event-dialog-trigger';
 import {
+  getLocaleFromCode,
   useEventPositions,
   useFilteredEvents,
   useMultiDayEventRows,
@@ -66,11 +67,12 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
+  const localeObj = getLocaleFromCode(locale);
 
   const { weekNumber, weekDays, todayIndex } = useWeekDays(
     currentDate,
     DAYS_IN_WEEK,
-    locale,
+    localeObj,
   );
   const { singleDayEvents, multiDayEvents } = useFilteredEvents(
     events,
@@ -147,7 +149,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
           weekNumber={weekNumber}
           daysInWeek={weekDays}
           formatDate={formatDate}
-          locale={locale}
+          locale={localeObj}
           firstDayOfWeek={firstDayOfWeek}
           showWeekNumber={true}
           showDayNumber={true}

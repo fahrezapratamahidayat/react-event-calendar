@@ -27,6 +27,7 @@ import { useQueryState } from 'nuqs';
 import { parseAsIsoDate } from 'nuqs/server';
 import { EventCalendarFilters } from './calendar-filters';
 import CalendarSettingsDialog from './calendar-setting-dialog';
+import { getLocaleFromCode } from '@/lib/event';
 
 export default function CalendarToolbar() {
   const [date, setDate] = useQueryState(
@@ -120,9 +121,11 @@ export default function CalendarToolbar() {
     },
     [setView],
   );
+
+  const localeObj = getLocaleFromCode(locale);
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col space-y-2 px-4 py-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+      <div className="flex flex-col space-y-2 px-4 pt-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div className="flex items-center space-x-3">
           <div className="flex w-full flex-col items-center justify-between gap-5 space-x-2 sm:flex-row sm:gap-0">
             <div className="flex w-full items-center justify-around sm:hidden">
@@ -154,13 +157,13 @@ export default function CalendarToolbar() {
             <div className="flex items-center space-x-2">
               {currentView === 'day' && (
                 <SearchDayPicker
-                  locale={locale}
+                  locale={localeObj}
                   weekStartsOn={0}
                   placeholder="Select day"
                 />
               )}
               {currentView !== 'year' && (
-                <SearchMonthPicker locale={locale} monthFormat="LLLL" />
+                <SearchMonthPicker locale={localeObj} monthFormat="LLLL" />
               )}
               <SearchYearPicker yearRange={20} minYear={2000} maxYear={2030} />
             </div>
@@ -181,7 +184,7 @@ export default function CalendarToolbar() {
             className="h-9 gap-1.5 px-3"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span className="text-xs">Add Event</span>
+            Add Event
           </Button>
         </div>
       </div>
