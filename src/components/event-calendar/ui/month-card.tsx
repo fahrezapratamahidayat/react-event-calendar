@@ -18,14 +18,16 @@ import {
   isSameYear,
   startOfMonth,
 } from 'date-fns';
-import { ArrowRight, ChevronRight, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { memo, useMemo, useState } from 'react';
+import { ChevronRight, Plus } from 'lucide-react';
+import { memo, useMemo } from 'react';
+import { YearViewConfig } from '@/types/event';
+import { parseAsIsoDate, useQueryState } from 'nuqs';
 
 interface MonthCardProps {
   month: Date;
   eventsByDate: Record<string, EventTypes[]>;
   eventCount: number;
+  yearViewConfig: YearViewConfig;
   onMonthClick: (month: Date) => void;
   onEventClick: (event: EventTypes) => void;
   onDateClick: (date: Date) => void;
@@ -125,6 +127,7 @@ const MonthCard = memo(
     month,
     eventsByDate,
     eventCount,
+    yearViewConfig,
     onMonthClick,
     onEventClick,
     onDateClick,
@@ -135,16 +138,21 @@ const MonthCard = memo(
     const isCurrentMonth =
       isSameMonth(month, today) && isSameYear(month, today);
     const hasEvents = eventCount > 0;
-    const [hovered, setHovered] = useState(false);
+    const [, setDate] = useQueryState(
+      'date',
+      parseAsIsoDate.withOptions({
+        shallow: false,
+      }),
+    );
 
     return (
       <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         className={cn(
           'group flex flex-col rounded-lg border p-3 shadow-sm transition-all',
           'hover:border-primary hover:shadow-md',
-          isCurrentMonth && 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/10',
+          isCurrentMonth &&
+            yearViewConfig.highlightCurrentMonth &&
+            'border-blue-500 bg-blue-50/50 dark:bg-blue-950/10',
         )}
       >
         <div className="mb-3 flex items-center justify-between">
@@ -153,22 +161,19 @@ const MonthCard = memo(
               <Button
                 variant="ghost"
                 className={cn(
-                  'text-md flex h-auto items-center gap-1 p-0 font-medium',
+                  'text-md flex h-auto items-center gap-1 p-0 font-medium hover:cursor-pointer',
                   isCurrentMonth && 'text-blue-600 dark:text-blue-400',
                   'transition-all hover:translate-x-0.5',
                 )}
-                onClick={() => onMonthClick(month)}
+                onClick={() => {
+                  const dateForQuery = new Date(month);
+                  dateForQuery.setHours(12, 0, 0, 0);
+                  setDate(dateForQuery);
+                  onMonthClick(month);
+                }}
               >
-                <span>{format(month, 'MMMM')}</span>
-                {hovered && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -5 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </motion.span>
+                {yearViewConfig.showMonthLabels && (
+                  <span>{format(month, 'MMMM')}</span>
                 )}
               </Button>
             </TooltipTrigger>
@@ -199,11 +204,11 @@ const MonthCard = memo(
           onDateClick={onDateClick}
         />
 
-        {hasEvents ? (
+        {hasEvents && yearViewConfig.enableEventPreview ? (
           <div className="space-y-1 pt-1">
             {Object.entries(eventsByDate)
               .filter(([key]) => key.startsWith(format(month, 'yyyy-MM')))
-              .slice(0, 2)
+              .slice(0, yearViewConfig.previewEventsPerMonth)
               .flatMap(([dateKey, events]) =>
                 events.slice(0, 1).map((event) => {
                   const colorClasses = getColorClasses(event.color);
@@ -226,7 +231,7 @@ const MonthCard = memo(
                   );
                 }),
               )}
-            {eventCount > 3 && (
+            {eventCount > 3 && yearViewConfig.showMoreEventsIndicator && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -238,11 +243,7 @@ const MonthCard = memo(
               </Button>
             )}
           </div>
-        ) : (
-          <div className="text-muted-foreground mt-auto flex h-10 flex-col items-center justify-center">
-            <p className="text-xs">No events this month</p>
-          </div>
-        )}
+        ) : null}
       </div>
     );
   },
