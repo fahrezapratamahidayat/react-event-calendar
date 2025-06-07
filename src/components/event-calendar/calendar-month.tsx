@@ -14,7 +14,7 @@ import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
 import { DayCell } from './ui/day-cell';
 import { WeekDayHeaders } from './ui/week-days-header';
-import { useWeekDays } from '@/lib/event';
+import { getLocaleFromCode, useWeekDays } from '@/lib/event';
 import { formatDate } from '@/lib/date';
 
 const DAYS_IN_WEEK = 7;
@@ -37,7 +37,7 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
     useShallow((state) => ({
       timeFormat: state.timeFormat,
       firstDayOfWeek: state.firstDayOfWeek,
-      viewSettings: state.viewSettings,
+      viewSettings: state.viewSettings.month,
       locale: state.locale,
       weekStartDay: state.firstDayOfWeek,
       openDayEventsDialog: state.openDayEventsDialog,
@@ -47,8 +47,13 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
   );
   const daysContainerRef = useRef<HTMLDivElement>(null);
   const [focusedDate, setFocusedDate] = useState<Date | null>(null);
+  const localeObj = getLocaleFromCode(locale);
 
-  const { weekNumber, weekDays } = useWeekDays(baseDate, DAYS_IN_WEEK, locale);
+  const { weekNumber, weekDays } = useWeekDays(
+    baseDate,
+    DAYS_IN_WEEK,
+    localeObj,
+  );
 
   // Calculate visible days in month
   const visibleDays = useMemo(() => {
@@ -89,7 +94,7 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
         weekNumber={weekNumber}
         daysInWeek={weekDays}
         formatDate={formatDate}
-        locale={locale}
+        locale={localeObj}
         firstDayOfWeek={firstDayOfWeek}
       />
       <div
@@ -104,9 +109,9 @@ export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
             date={date}
             baseDate={baseDate}
             eventsByDate={eventsGroupedByDate}
-            locale={locale}
+            locale={localeObj}
             timeFormat={timeFormat}
-            viewSettings={viewSettings}
+            monthViewConfig={viewSettings}
             focusedDate={focusedDate}
             onQuickAdd={(date) => openQuickAddDialog({ date })}
             onFocusDate={setFocusedDate}
