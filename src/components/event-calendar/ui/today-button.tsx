@@ -77,7 +77,7 @@ export function TodayButton({
           aria-label={getButtonLabel()}
         >
           <motion.div
-            className="flex items-center"
+            className="flex items-center text-sm"
             animate={
               isAnimating ? { rotate: [0, 15, -15, 10, -10, 5, -5, 0] } : {}
             }

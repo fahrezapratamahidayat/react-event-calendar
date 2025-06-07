@@ -49,7 +49,9 @@ export function ViewModeToggle({
                 whileTap={{ scale: 0.9 }}
                 transition={{ duration: 0.2 }}
               >
-                <CalendarDays className="h-4 w-4" />
+                <CalendarDays
+                  className={`h-4 w-4 ${mode === ViewModeType.CALENDAR ? 'z-10 text-white' : ''}`}
+                />
                 <AnimatePresence mode="wait">
                   {mode === ViewModeType.CALENDAR && (
                     <motion.span
@@ -57,7 +59,7 @@ export function ViewModeToggle({
                       animate={{ opacity: 1, width: 'auto', x: 0 }}
                       exit={{ opacity: 0, width: 0, x: -5 }}
                       transition={{ duration: 0.3 }}
-                      className="ml-2 overflow-hidden text-xs whitespace-nowrap"
+                      className="z-10 ml-2 overflow-hidden text-sm whitespace-nowrap text-white"
                     >
                       Calendar
                     </motion.span>
@@ -97,7 +99,9 @@ export function ViewModeToggle({
                 whileTap={{ scale: 0.9 }}
                 transition={{ duration: 0.2 }}
               >
-                <List className="h-4 w-4" />
+                <List
+                  className={`h-4 w-4 ${mode === ViewModeType.LIST ? 'z-10 text-white' : ''}`}
+                />
                 <AnimatePresence mode="wait">
                   {mode === ViewModeType.LIST && (
                     <motion.span
@@ -105,7 +109,7 @@ export function ViewModeToggle({
                       animate={{ opacity: 1, width: 'auto', x: 0 }}
                       exit={{ opacity: 0, width: 0, x: -5 }}
                       transition={{ duration: 0.3 }}
-                      className="ml-2 overflow-hidden text-xs whitespace-nowrap"
+                      className="z-10 ml-2 overflow-hidden text-sm whitespace-nowrap text-white"
                     >
                       List
                     </motion.span>
