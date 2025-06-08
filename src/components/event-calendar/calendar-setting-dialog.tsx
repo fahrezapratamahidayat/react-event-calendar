@@ -33,6 +33,7 @@ import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import {
   CalendarViewConfigs,
   CalendarViewType,
+  daysViewConfig,
   DayViewConfig,
   MonthViewConfig,
   TimeFormatType,
@@ -131,6 +132,7 @@ export default function CalendarSettingsDialog() {
     setLocale,
     setFirstDayOfWeek,
     updateDayViewConfig,
+    updateDaysViewConfig,
     updateWeekViewConfig,
     updateMonthViewConfig,
     updateYearViewConfig,
@@ -150,6 +152,7 @@ export default function CalendarSettingsDialog() {
       setFirstDayOfWeek: state.setFirstDayOfWeek,
       setDaysCount: state.setDaysCount,
       updateDayViewConfig: state.updateDayViewConfig,
+      updateDaysViewConfig: state.updateDaysViewConfig,
       updateWeekViewConfig: state.updateWeekViewConfig,
       updateMonthViewConfig: state.updateMonthViewConfig,
       updateYearViewConfig: state.updateYearViewConfig,
@@ -235,6 +238,7 @@ export default function CalendarSettingsDialog() {
                   <CalendarSettings
                     viewSettings={viewSettings}
                     updateDayViewConfig={updateDayViewConfig}
+                    updateDaysViewConfig={updateDaysViewConfig}
                     updateWeekViewConfig={updateWeekViewConfig}
                     updateMonthViewConfig={updateMonthViewConfig}
                     updateYearViewConfig={updateYearViewConfig}
@@ -371,96 +375,188 @@ const GeneralSettings = ({
 const CalendarSettings = ({
   viewSettings,
   updateDayViewConfig,
+  updateDaysViewConfig, // Tambah handler untuk days view
   updateWeekViewConfig,
   updateMonthViewConfig,
   updateYearViewConfig,
 }: {
   viewSettings: CalendarViewConfigs;
   updateDayViewConfig: (config: Partial<DayViewConfig>) => void;
+  updateDaysViewConfig: (config: Partial<daysViewConfig>) => void;
   updateWeekViewConfig: (config: Partial<WeekViewConfig>) => void;
   updateMonthViewConfig: (config: Partial<MonthViewConfig>) => void;
   updateYearViewConfig: (config: Partial<YearViewConfig>) => void;
 }) => (
   <div className="space-y-8">
-    <ConfigSection title="Time-based Views" icon={Clock}>
+    <ConfigSection title="Day View" icon={Clock}>
       <ConfigRow
         label="Current time indicator"
-        description="Show red line at current time in day/week views"
+        description="Show red line at current time"
       >
-        <div className="flex gap-3">
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={viewSettings.day.showCurrentTimeIndicator}
-              onCheckedChange={(checked) =>
-                updateDayViewConfig({ showCurrentTimeIndicator: checked })
-              }
-            />
-            <span className="text-muted-foreground text-xs">Day</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={viewSettings.week.showCurrentTimeIndicator}
-              onCheckedChange={(checked) =>
-                updateWeekViewConfig({ showCurrentTimeIndicator: checked })
-              }
-            />
-            <span className="text-muted-foreground text-xs">Week</span>
-          </div>
-        </div>
+        <Switch
+          checked={viewSettings.day.showCurrentTimeIndicator}
+          onCheckedChange={(checked) =>
+            updateDayViewConfig({ showCurrentTimeIndicator: checked })
+          }
+        />
       </ConfigRow>
       <ConfigRow
         label="Hover time indicator"
         description="Show time when hovering over time slots"
       >
-        <div className="flex gap-3">
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={viewSettings.day.showHoverTimeIndicator}
-              onCheckedChange={(checked) =>
-                updateDayViewConfig({ showHoverTimeIndicator: checked })
-              }
-            />
-            <span className="text-muted-foreground text-xs">Day</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={viewSettings.week.showHoverTimeIndicator}
-              onCheckedChange={(checked) =>
-                updateWeekViewConfig({ showHoverTimeIndicator: checked })
-              }
-            />
-            <span className="text-muted-foreground text-xs">Week</span>
-          </div>
-        </div>
+        <Switch
+          checked={viewSettings.day.showHoverTimeIndicator}
+          onCheckedChange={(checked) =>
+            updateDayViewConfig({ showHoverTimeIndicator: checked })
+          }
+        />
       </ConfigRow>
       <ConfigRow
         label="Click to create events"
         description="Allow clicking time slots to create new events"
       >
-        <div className="flex gap-3">
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={viewSettings.day.enableTimeSlotClick}
-              onCheckedChange={(checked) =>
-                updateDayViewConfig({ enableTimeSlotClick: checked })
-              }
-            />
-            <span className="text-muted-foreground text-xs">Day</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={viewSettings.week.enableTimeSlotClick}
-              onCheckedChange={(checked) =>
-                updateWeekViewConfig({ enableTimeSlotClick: checked })
-              }
-            />
-            <span className="text-muted-foreground text-xs">Week</span>
-          </div>
-        </div>
+        <Switch
+          checked={viewSettings.day.enableTimeSlotClick}
+          onCheckedChange={(checked) =>
+            updateDayViewConfig({ enableTimeSlotClick: checked })
+          }
+        />
+      </ConfigRow>
+    </ConfigSection>
+
+    <Separator />
+
+    {/* Tambah Days View Section */}
+    <ConfigSection title="Days View" icon={CalendarDays}>
+      <ConfigRow
+        label="Highlight today"
+        description="Highlight the current day column"
+      >
+        <Switch
+          checked={viewSettings.days.highlightToday}
+          onCheckedChange={(checked) =>
+            updateDaysViewConfig({ highlightToday: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Current time indicator"
+        description="Show red line at current time"
+      >
+        <Switch
+          checked={viewSettings.days.showCurrentTimeIndicator}
+          onCheckedChange={(checked) =>
+            updateDaysViewConfig({ showCurrentTimeIndicator: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Hover time indicator"
+        description="Show time when hovering over time slots"
+      >
+        <Switch
+          checked={viewSettings.days.showHoverTimeIndicator}
+          onCheckedChange={(checked) =>
+            updateDaysViewConfig({ showHoverTimeIndicator: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Click time slots to create events"
+        description="Allow clicking time slots to create new events"
+      >
+        <Switch
+          checked={viewSettings.days.enableTimeSlotClick}
+          onCheckedChange={(checked) =>
+            updateDaysViewConfig({ enableTimeSlotClick: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Click time blocks to create events"
+        description="Allow clicking time blocks to create new events"
+      >
+        <Switch
+          checked={viewSettings.days.enableTimeBlockClick}
+          onCheckedChange={(checked) =>
+            updateDaysViewConfig({ enableTimeBlockClick: checked })
+          }
+        />
       </ConfigRow>
       <ConfigRow
         label="Expand multi-day events"
-        description="Show multi-day events across multiple columns in week view"
+        description="Show multi-day events across multiple columns"
+      >
+        <Switch
+          checked={viewSettings.days.expandMultiDayEvents}
+          onCheckedChange={(checked) =>
+            updateDaysViewConfig({ expandMultiDayEvents: checked })
+          }
+        />
+      </ConfigRow>
+    </ConfigSection>
+
+    <Separator />
+
+    <ConfigSection title="Week View" icon={CalendarDays}>
+      <ConfigRow
+        label="Highlight today"
+        description="Highlight the current day column"
+      >
+        <Switch
+          checked={viewSettings.week.highlightToday}
+          onCheckedChange={(checked) =>
+            updateWeekViewConfig({ highlightToday: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Current time indicator"
+        description="Show red line at current time"
+      >
+        <Switch
+          checked={viewSettings.week.showCurrentTimeIndicator}
+          onCheckedChange={(checked) =>
+            updateWeekViewConfig({ showCurrentTimeIndicator: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Hover time indicator"
+        description="Show time when hovering over time slots"
+      >
+        <Switch
+          checked={viewSettings.week.showHoverTimeIndicator}
+          onCheckedChange={(checked) =>
+            updateWeekViewConfig({ showHoverTimeIndicator: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Click time slots to create events"
+        description="Allow clicking time slots to create new events"
+      >
+        <Switch
+          checked={viewSettings.week.enableTimeSlotClick}
+          onCheckedChange={(checked) =>
+            updateWeekViewConfig({ enableTimeSlotClick: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Click time blocks to create events"
+        description="Allow clicking time blocks to create new events"
+      >
+        <Switch
+          checked={viewSettings.week.enableTimeBlockClick}
+          onCheckedChange={(checked) =>
+            updateWeekViewConfig({ enableTimeBlockClick: checked })
+          }
+        />
+      </ConfigRow>
+      <ConfigRow
+        label="Expand multi-day events"
+        description="Show multi-day events across multiple columns"
       >
         <Switch
           checked={viewSettings.week.expandMultiDayEvents}
@@ -470,7 +566,9 @@ const CalendarSettings = ({
         />
       </ConfigRow>
     </ConfigSection>
+
     <Separator />
+
     <ConfigSection title="Month View" icon={CalendarDays}>
       <ConfigRow
         label="Events per day limit"
@@ -510,7 +608,9 @@ const CalendarSettings = ({
         />
       </ConfigRow>
     </ConfigSection>
+
     <Separator />
+
     <ConfigSection title="Year View" icon={Sun}>
       <ConfigRow
         label="Show month labels"
@@ -524,30 +624,6 @@ const CalendarSettings = ({
         />
       </ConfigRow>
       <ConfigRow
-        label="Show Preview Events Per Month"
-        description="Toggle to show or hide event previews in year view"
-      >
-        <Switch
-          checked={viewSettings.year.enableEventPreview}
-          onCheckedChange={(checked) =>
-            updateYearViewConfig({ enableEventPreview: checked })
-          }
-        />
-      </ConfigRow>
-      {viewSettings.year.enableEventPreview && (
-        <ConfigRow
-          label="Show more events indicator"
-          description="Display +X more when events exceed limit"
-        >
-          <Switch
-            checked={viewSettings.year.showMoreEventsIndicator}
-            onCheckedChange={(checked) =>
-              updateYearViewConfig({ showMoreEventsIndicator: checked })
-            }
-          />
-        </ConfigRow>
-      )}
-      <ConfigRow
         label="Quarter view mode"
         description="Group months by quarters instead of 12-month grid"
       >
@@ -558,25 +634,6 @@ const CalendarSettings = ({
           }
         />
       </ConfigRow>
-      {viewSettings.year.enableEventPreview && (
-        <ConfigRow
-          label="Events per month preview"
-          description="Max events shown per month in year view"
-        >
-          <Input
-            type="number"
-            value={viewSettings.year.previewEventsPerMonth}
-            onChange={(e) =>
-              updateYearViewConfig({
-                previewEventsPerMonth: parseInt(e.target.value),
-              })
-            }
-            className="w-20 text-center"
-            min={1}
-            max={10}
-          />
-        </ConfigRow>
-      )}
       <ConfigRow
         label="Highlight current month"
         description="Emphasize the current month in year view"
@@ -588,6 +645,49 @@ const CalendarSettings = ({
           }
         />
       </ConfigRow>
+      <ConfigRow
+        label="Enable event preview"
+        description="Show event indicators in year view"
+      >
+        <Switch
+          checked={viewSettings.year.enableEventPreview}
+          onCheckedChange={(checked) =>
+            updateYearViewConfig({ enableEventPreview: checked })
+          }
+        />
+      </ConfigRow>
+      {viewSettings.year.enableEventPreview && (
+        <>
+          <ConfigRow
+            label="Preview events per month"
+            description="Max events shown per month in year view"
+          >
+            <Input
+              type="number"
+              value={viewSettings.year.previewEventsPerMonth}
+              onChange={(e) =>
+                updateYearViewConfig({
+                  previewEventsPerMonth: parseInt(e.target.value),
+                })
+              }
+              className="w-20 text-center"
+              min={1}
+              max={10}
+            />
+          </ConfigRow>
+          <ConfigRow
+            label="Show more events indicator"
+            description="Display +X more when events exceed limit"
+          >
+            <Switch
+              checked={viewSettings.year.showMoreEventsIndicator}
+              onCheckedChange={(checked) =>
+                updateYearViewConfig({ showMoreEventsIndicator: checked })
+              }
+            />
+          </ConfigRow>
+        </>
+      )}
     </ConfigSection>
   </div>
 );
