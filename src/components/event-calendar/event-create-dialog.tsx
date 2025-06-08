@@ -3,9 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
-import { addMinutesToTime } from '@/lib/date';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { addDays } from 'date-fns';
 import { Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -49,7 +47,6 @@ export default function EventCreateDialog() {
     closeQuickAddDialog,
     timeFormat,
     locale,
-    currentView,
     quickAddData,
   } = useEventCalendarStore(
     useShallow((state) => ({
@@ -57,7 +54,6 @@ export default function EventCreateDialog() {
       closeQuickAddDialog: state.closeQuickAddDialog,
       timeFormat: state.timeFormat,
       locale: state.locale,
-      currentView: state.currentView,
       quickAddData: state.quickAddData,
     })),
   );
@@ -104,26 +100,14 @@ export default function EventCreateDialog() {
     }
   };
 
-  const startDate = form.watch('startDate');
-
-  useEffect(() => {
-    const newEndDate =
-      currentView === 'week' ? addDays(startDate, 7) : startDate;
-    form.setValue('endDate', newEndDate);
-  }, [currentView, startDate, form]);
-
   useEffect(() => {
     if (isQuickAddDialogOpen && quickAddData.date) {
-      const defaultTime = quickAddData.position
-        ? `${String(quickAddData.position.hour).padStart(2, '0')}:${String(quickAddData.position.minute).padStart(2, '0')}`
-        : '12:00';
-
       form.reset({
         ...DEFAULT_FORM_VALUES,
         startDate: quickAddData.date,
         endDate: quickAddData.date,
-        startTime: defaultTime,
-        endTime: addMinutesToTime(defaultTime),
+        startTime: quickAddData.startTime,
+        endTime: quickAddData.endTime,
       });
     }
   }, [isQuickAddDialogOpen, quickAddData, form]);
