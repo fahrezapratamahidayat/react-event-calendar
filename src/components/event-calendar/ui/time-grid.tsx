@@ -1,10 +1,17 @@
 import { cn } from '@/lib/utils';
 import { memo } from 'react';
+import { format } from 'date-fns';
 
 interface BaseTimeGridProps {
+  highlightToday: boolean;
   timeSlots: Date[];
   daysInWeek: Date[];
   todayIndex: number;
+  onTimeBlockClick: (data: {
+    date: Date;
+    startTime: string;
+    endTime: string;
+  }) => void;
 }
 
 interface DynamicWidthTimeGridProps extends BaseTimeGridProps {
@@ -15,29 +22,43 @@ interface DynamicWidthTimeGridProps extends BaseTimeGridProps {
 type TimeGridProps = BaseTimeGridProps | DynamicWidthTimeGridProps;
 
 export const TimeGrid = memo((props: TimeGridProps) => {
-  const { timeSlots, daysInWeek, todayIndex } = props;
+  const {
+    highlightToday,
+    timeSlots,
+    daysInWeek,
+    todayIndex,
+    onTimeBlockClick,
+  } = props;
   const isDynamic = 'dynamicWidth' in props && props.dynamicWidth;
 
   return (
-    <div className="relative" data-testid="time-grid">
+    <div className="relative">
       {timeSlots.map((time, timeIndex) => (
-        <div
-          key={timeIndex}
-          className="border-border flex h-16 border-t first:border-t-0"
-        >
+        <div key={timeIndex} className="border-border flex h-16 border-t">
           {daysInWeek.map((day, dayIndex) => (
-            <div
+            <button
               key={`${timeIndex}-${dayIndex}`}
-              data-testid={`time-cell-${timeIndex}-${dayIndex}`}
               className={cn(
-                'relative flex items-center justify-center border-r last:border-r-0',
-                todayIndex === dayIndex && 'bg-primary/10',
+                'hover:bg-primary/10 relative flex items-center justify-center border-r last:border-r-0 hover:cursor-pointer',
+                todayIndex === dayIndex && highlightToday && 'bg-muted',
                 isDynamic ? 'flex-none' : 'flex-1',
               )}
               style={
                 isDynamic ? { width: `${props.dayWidthPercent}%` } : undefined
               }
-            ></div>
+              onClick={() => {
+                const startTime = format(time, 'HH:mm');
+                const endTime = format(
+                  new Date(time.getTime() + 60 * 60 * 1000),
+                  'HH:mm',
+                );
+                onTimeBlockClick({
+                  date: day,
+                  startTime,
+                  endTime,
+                });
+              }}
+            />
           ))}
         </div>
       ))}
