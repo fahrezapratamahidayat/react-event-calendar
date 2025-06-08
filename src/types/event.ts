@@ -23,7 +23,8 @@ export interface EventPosition {
 
 export interface QuickAddDialogData {
   date: Date | null;
-  time?: string;
+  startTime?: string;
+  endTime?: string;
   position?: HoverPositionType;
 }
 
@@ -52,15 +53,20 @@ export interface DayViewConfig {
 }
 
 export interface daysViewConfig {
+  highlightToday: boolean;
   showCurrentTimeIndicator: boolean;
   showHoverTimeIndicator: boolean;
+  enableTimeBlockClick: boolean;
   enableTimeSlotClick: boolean;
+  expandMultiDayEvents: boolean;
 }
 
 export interface WeekViewConfig {
+  highlightToday: boolean;
   showCurrentTimeIndicator: boolean;
   showHoverTimeIndicator: boolean;
   enableTimeSlotClick: boolean;
+  enableTimeBlockClick: boolean;
   expandMultiDayEvents: boolean;
 }
 
