@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   CalendarViewConfigs,
   CalendarViewType,
+  daysViewConfig,
   DayViewConfig,
   EventPosition,
   MonthViewConfig,
@@ -21,14 +22,19 @@ const DEFAULT_VIEW_CONFIGS: CalendarViewConfigs = {
     enableTimeSlotClick: true,
   },
   days: {
+    highlightToday: true,
     showCurrentTimeIndicator: true,
     showHoverTimeIndicator: true,
     enableTimeSlotClick: true,
+    enableTimeBlockClick: false,
+    expandMultiDayEvents: true,
   },
   week: {
+    highlightToday: true,
     showCurrentTimeIndicator: true,
     showHoverTimeIndicator: true,
     enableTimeSlotClick: true,
+    enableTimeBlockClick: false,
     expandMultiDayEvents: true,
   },
   month: {
@@ -75,6 +81,7 @@ interface EventCalendarState {
   setFirstDayOfWeek: (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) => void;
   setDaysCount: (count: number) => void;
   updateDayViewConfig: (config: Partial<DayViewConfig>) => void;
+  updateDaysViewConfig: (config: Partial<daysViewConfig>) => void;
   updateWeekViewConfig: (config: Partial<WeekViewConfig>) => void;
   updateMonthViewConfig: (config: Partial<MonthViewConfig>) => void;
   updateYearViewConfig: (config: Partial<YearViewConfig>) => void;
@@ -135,7 +142,16 @@ export const useEventCalendarStore = create<EventCalendarState>()(
             },
           },
         })),
-
+      updateDaysViewConfig: (config) =>
+        set((state) => ({
+          viewSettings: {
+            ...state.viewSettings,
+            days: {
+              ...state.viewSettings.days,
+              ...config,
+            },
+          },
+        })),
       updateWeekViewConfig: (config) =>
         set((state) => ({
           viewSettings: {
@@ -197,14 +213,12 @@ export const useEventCalendarStore = create<EventCalendarState>()(
           dayEventsDialog: { open: false, date: null, events: [] },
         });
       },
-      openQuickAddDialog: (data) => {
-        const timeStr = data.position
-          ? `${String(data.position.hour).padStart(2, '0')}:${String(data.position.minute).padStart(2, '0')}`
-          : data.time;
+      openQuickAddDialog: (data: QuickAddDialogData) => {
         set({
           quickAddData: {
-            date: data.date,
-            time: timeStr,
+            date: data.date || new Date(),
+            startTime: data.startTime || '12:00',
+            endTime: data.endTime || '13:00',
             position: data.position,
           },
           isQuickAddDialogOpen: true,
@@ -214,7 +228,8 @@ export const useEventCalendarStore = create<EventCalendarState>()(
         set({
           quickAddData: {
             date: null,
-            time: undefined,
+            startTime: undefined,
+            endTime: undefined,
             position: undefined,
           },
           isQuickAddDialogOpen: false,
