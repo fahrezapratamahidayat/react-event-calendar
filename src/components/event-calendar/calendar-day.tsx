@@ -114,13 +114,14 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
               variant="day"
             />
           </div>
-          <div className="relative ml-16">
+          <div className="relative ml-14">
             {viewSettings.day.showCurrentTimeIndicator && (
               <CurrentTimeIndicator
                 currentHour={currentHour}
                 currentMinute={currentMinute}
                 timeFormat={timeFormat}
                 hourHeight={HOUR_HEIGHT}
+                className="left-0"
               />
             )}
             {hoverPosition && viewSettings.day.showHoverTimeIndicator && (
@@ -129,6 +130,7 @@ export function CalendarDay({ events, currentDate }: CalendarDayProps) {
                 minute={hoverPosition.minute}
                 timeFormat={timeFormat}
                 hourHeight={HOUR_HEIGHT}
+                className="left-0"
               />
             )}
             {timeSlots.map((time, index) => (
