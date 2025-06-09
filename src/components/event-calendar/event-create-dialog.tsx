@@ -57,47 +57,42 @@ export default function EventCreateDialog() {
       quickAddData: state.quickAddData,
     })),
   );
-
-  const localeObj = getLocaleFromCode(locale);
-
   const form = useForm<EventFormValues>({
     resolver: zodResolver(createEventSchema),
     defaultValues: DEFAULT_FORM_VALUES,
     mode: 'onChange',
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const localeObj = getLocaleFromCode(locale);
+
+  const watchedValues = form.watch();
 
   const handleSubmit = async (formValues: EventFormValues) => {
     setIsSubmitting(true);
-    const toastId = toast.loading('Membuat event...');
 
-    try {
-      const result = await createEvent(formValues);
-
-      if (!result.success) {
-        throw new Error(result.error || 'Gagal membuat event');
-      }
-
-      toast.success('Event berhasil dibuat!', { id: toastId });
-      form.reset(DEFAULT_FORM_VALUES);
-      closeQuickAddDialog();
-    } catch (error) {
-      console.error('Error:', error);
-      let message = 'Ops! something went wrong';
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else if (typeof error === 'string') {
-        message = error;
-      } else if (error && typeof error === 'object' && 'message' in error) {
-        message = String(error.message);
-      }
-
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    toast.promise(createEvent(formValues), {
+      loading: 'Creating Event...',
+      success: (result) => {
+        if (!result.success) {
+          throw new Error(result.error || 'Error Creating Event');
+        }
+        form.reset(DEFAULT_FORM_VALUES);
+        setIsSubmitting(false);
+        closeQuickAddDialog();
+        return 'Event Succesfully created';
+      },
+      error: (error) => {
+        console.error('Error:', error);
+        if (error instanceof Error) {
+          return error.message;
+        } else if (typeof error === 'string') {
+          return error;
+        } else if (error && typeof error === 'object' && 'message' in error) {
+          return String(error.message);
+        }
+        return 'Ops! something went wrong';
+      },
+    });
   };
 
   useEffect(() => {
@@ -111,8 +106,6 @@ export default function EventCreateDialog() {
       });
     }
   }, [isQuickAddDialogOpen, quickAddData, form]);
-
-  const watchedValues = form.watch();
 
   return (
     <Dialog
