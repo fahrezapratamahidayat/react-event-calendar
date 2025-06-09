@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { validateTimeOrder } from './date';
 
-const timeRegex = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/; // HH:MM or HH:MM:SS
+const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
 
 const baseEventSchema = z.object({
   id: z.string().uuid(),
@@ -35,14 +35,8 @@ export const createEventSchema = z.object({
 export const eventFormSchema = baseEventSchema
   .omit({ id: true, createdAt: true, updatedAt: true })
   .extend({
-    startTime: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
-      .transform((time) => `${time}:00`), // HH:MM
-    endTime: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
-      .transform((time) => `${time}:00`),
+    startTime: z.string().regex(timeRegex),
+    endTime: z.string().regex(timeRegex),
     isRepeating: z.boolean().default(false).optional(),
     repeatingType: z.enum(['daily', 'weekly', 'monthly']).optional(),
   })
