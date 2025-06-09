@@ -408,26 +408,10 @@ export async function updateEvent(
       throw new Error('Event not found or unauthorized');
     }
 
-    const updateData = validatedFields.data;
-
-    if (validatedFields.data.startDate && validatedFields.data.startTime) {
-      updateData.startDate = combineDateAndTime(
-        validatedFields.data.startDate,
-        validatedFields.data.startTime,
-      );
-    }
-
-    if (validatedFields.data.endDate && validatedFields.data.endTime) {
-      updateData.endDate = combineDateAndTime(
-        validatedFields.data.endDate,
-        validatedFields.data.endTime,
-      );
-    }
-
     await db
       .update(events)
       .set({
-        ...updateData,
+        ...validatedFields.data,
         updatedAt: new Date(),
       })
       .where(and(eq(events.id, id)));
