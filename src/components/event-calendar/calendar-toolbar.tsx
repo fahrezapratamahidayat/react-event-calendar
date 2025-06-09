@@ -12,7 +12,7 @@ import { CalendarViewType, TimeFormatType, ViewModeType } from '@/types/event';
 import { useEventCalendarStore } from '@/hooks/use-event-calendar';
 import { CalendarTabs } from './calendar-tabs';
 import { useShallow } from 'zustand/shallow';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   addDays,
   addMonths,
@@ -58,6 +58,7 @@ export default function CalendarToolbar() {
       openQuickAddDialog: state.openQuickAddDialog,
     })),
   );
+  const localeObj = getLocaleFromCode(locale);
 
   const handleNavigateNext = useCallback(() => {
     let newDate = new Date(date);
@@ -122,7 +123,16 @@ export default function CalendarToolbar() {
     [setView],
   );
 
-  const localeObj = getLocaleFromCode(locale);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') handleNavigatePrevious();
+      if (e.key === 'ArrowRight') handleNavigateNext();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleNavigatePrevious, handleNavigateNext]);
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-col space-y-2 px-4 pt-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
