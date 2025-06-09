@@ -13,8 +13,8 @@ export const events = pgTable('events', {
   description: text('description').notNull(),
   startDate: timestamp('start_date', { withTimezone: true }).notNull(),
   endDate: timestamp('end_date', { withTimezone: true }).notNull(),
-  startTime: varchar('start_time', { length: 10 }).notNull(),
-  endTime: varchar('end_time', { length: 10 }).notNull(),
+  startTime: varchar('start_time', { length: 5 }).notNull(),
+  endTime: varchar('end_time', { length: 5 }).notNull(),
   isRepeating: boolean('is_repeating').notNull(),
   repeatingType: varchar('repeating_type', {
     length: 10,
