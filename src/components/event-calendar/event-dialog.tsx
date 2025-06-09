@@ -103,65 +103,47 @@ export default function EventDialog() {
     }
   }, [selectedEvent, form]);
 
-  const handleSubmit = async (values: EventFormValues) => {
+  const handleUpdate = async (values: EventFormValues) => {
     if (!selectedEvent?.id) return;
 
-    const toastId = toast.loading('Updating event...');
-
-    try {
-      const result = await updateEvent(selectedEvent.id, values);
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to update event');
-      }
-
-      toast.success('Event updated successfully!', { id: toastId });
-      closeEventDialog();
-    } catch (error) {
-      console.error('Error:', error);
-      let message = 'Ops! something went wrong';
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else if (typeof error === 'string') {
-        message = error;
-      } else if (error && typeof error === 'object' && 'message' in error) {
-        message = String(error.message);
-      }
-
-      toast.error(message);
-    }
+    toast.promise(updateEvent(selectedEvent.id, values), {
+      loading: 'Updating event...',
+      success: (result) => {
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to update event');
+        }
+        closeEventDialog();
+        return 'Event updated successfully!';
+      },
+      error: (error) => {
+        console.error('Error:', error);
+        return error instanceof Error
+          ? error.message
+          : 'Ops! Something went wrong';
+      },
+    });
   };
 
   const handleDeleteEvent = async () => {
     if (!selectedEvent?.id) return;
-
-    const toastId = toast.loading('Deleting event...');
     setIsDeleteAlertOpen(false);
 
-    try {
-      const result = await deleteEvent(selectedEvent.id);
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to delete event');
-      }
-
-      toast.success('Event deleted successfully!', { id: toastId });
-      closeEventDialog();
-    } catch (error) {
-      console.error('Error:', error);
-      let message = 'Ops! something went wrong';
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else if (typeof error === 'string') {
-        message = error;
-      } else if (error && typeof error === 'object' && 'message' in error) {
-        message = String(error.message);
-      }
-
-      toast.error(message);
-    }
+    toast.promise(deleteEvent(selectedEvent.id), {
+      loading: 'Deleting event...',
+      success: (result) => {
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to delete event');
+        }
+        closeEventDialog();
+        return 'Event deleted successfully!';
+      },
+      error: (error) => {
+        console.error('Error:', error);
+        return error instanceof Error
+          ? error.message
+          : 'Ops! Something went wrong';
+      },
+    });
   };
 
   if (!isMounted) return null;
@@ -178,7 +160,7 @@ export default function EventDialog() {
         <ScrollArea className="h-[350px] w-full sm:h-[500px]">
           <EventDetailsForm
             form={form}
-            onSubmit={handleSubmit}
+            onSubmit={handleUpdate}
             locale={localeObj}
           />
         </ScrollArea>
@@ -190,7 +172,7 @@ export default function EventDialog() {
           />
           <FormFooter
             onCancel={closeEventDialog}
-            onSave={form.handleSubmit(handleSubmit)}
+            onSave={form.handleSubmit(handleUpdate)}
             isSubmitting={isSubmitting}
           />
         </DialogFooter>
