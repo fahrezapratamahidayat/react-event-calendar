@@ -6,7 +6,6 @@ import {
   CheckCircle,
   Code,
   Feather,
-  Github,
   Layout,
   Paintbrush,
   Puzzle,
@@ -16,7 +15,6 @@ import {
   Layers,
   Box,
 } from 'lucide-react';
-import { ModeToggle } from '@/components/mode-toggel';
 import { FeatureCard } from '@/components/feature-card';
 import dynamic from 'next/dynamic';
 import {
@@ -26,6 +24,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { demoEvents } from '@/constants/calendar-constant';
+import Navbar from '@/components/navbar';
 
 const CalendarDay = dynamic(
   () =>
@@ -45,56 +44,7 @@ const CalendarDay = dynamic(
 export default function IndexPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Calendar className="text-primary h-5 w-5" />
-            <span className="font-inter text-xl font-semibold tracking-tight">
-              React Event Calendar
-            </span>
-          </div>
-          <nav className="hidden md:flex md:items-center md:gap-6">
-            <Link
-              href="/"
-              className="hover:text-primary text-sm font-medium transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              href="/demo"
-              className="hover:text-primary text-sm font-medium transition-colors"
-            >
-              Demo
-            </Link>
-            <Link
-              href="/docs"
-              className="hover:text-primary text-sm font-medium transition-colors"
-            >
-              Documentation
-            </Link>
-            <Link
-              href="/examples"
-              className="hover:text-primary text-sm font-medium transition-colors"
-            >
-              Examples
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" asChild>
-              <a
-                href="https://github.com/fahrezapratamahidayat/react-event-calendar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2"
-              >
-                <Github size={16} />
-                <span className="hidden sm:inline">Star on GitHub</span>
-              </a>
-            </Button>
-            <ModeToggle />
-          </div>
-        </div>
-      </header>
+      <Navbar />
       <main className="flex-1">
         <section className="py-20 sm:py-32">
           <div className="container">
