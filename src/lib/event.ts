@@ -606,6 +606,12 @@ export type ColorName = keyof typeof COLOR_CLASSES;
 export const getColorClasses = (color: string) =>
   COLOR_CLASSES[color as ColorName] || COLOR_CLASSES.blue;
 
+/**
+ * Retrieves a localization object based on the provided language code.
+ *
+ * @param code - A language code in BCP 47 format (e.g., 'id-ID').
+ * @returns The corresponding Day.js locale object, or falls back to English (US) if not found.
+ */
 export const getLocaleFromCode = (code: string) => {
   return LOCALES.find((l) => l.value === code)?.locale || enUS;
 };
