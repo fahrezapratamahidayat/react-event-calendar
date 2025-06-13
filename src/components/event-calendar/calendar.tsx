@@ -9,21 +9,18 @@ import { CalendarMonth } from './calendar-month';
 import { MonthDayEventsDialog } from './day-events-dialog';
 import EventCreateDialog from './event-create-dialog';
 import { useShallow } from 'zustand/shallow';
-import { getCategories, getEvents } from '@/app/actions';
 import { useMemo } from 'react';
 import { CalendarYear } from './calendar-year';
 import { CalendarDaysView } from './calendar-days-view';
 import CalendarToolbar from './calendar-toolbar';
+import { EventTypes } from '@/db/schema';
 
 interface EventCalendarProps {
+  events: EventTypes[];
   initialDate: Date;
-  promises: [
-    Awaited<ReturnType<typeof getEvents>>,
-    Awaited<ReturnType<typeof getCategories>>,
-  ];
 }
-export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
-  const [eventsData] = promises;
+
+export function EventCalendar({ initialDate, events }: EventCalendarProps) {
   const { viewMode, currentView, daysCount } = useEventCalendarStore(
     useShallow((state) => ({
       viewMode: state.viewMode,
@@ -34,41 +31,29 @@ export function EventCalendar({ initialDate, promises }: EventCalendarProps) {
 
   const renderCalendarView = useMemo(() => {
     if (viewMode === 'list') {
-      return (
-        <EventsList events={eventsData.events} currentDate={initialDate} />
-      );
+      return <EventsList events={events} currentDate={initialDate} />;
     }
     switch (currentView) {
       case 'day':
-        return (
-          <CalendarDay events={eventsData.events} currentDate={initialDate} />
-        );
+        return <CalendarDay events={events} currentDate={initialDate} />;
       case 'days':
         return (
           <CalendarDaysView
-            events={eventsData.events}
+            events={events}
             daysCount={daysCount}
             currentDate={initialDate}
           />
         );
       case 'week':
-        return (
-          <CalendarWeek events={eventsData.events} currentDate={initialDate} />
-        );
+        return <CalendarWeek events={events} currentDate={initialDate} />;
       case 'month':
-        return (
-          <CalendarMonth events={eventsData.events} baseDate={initialDate} />
-        );
+        return <CalendarMonth events={events} baseDate={initialDate} />;
       case 'year':
-        return (
-          <CalendarYear events={eventsData.events} currentDate={initialDate} />
-        );
+        return <CalendarYear events={events} currentDate={initialDate} />;
       default:
-        return (
-          <CalendarDay events={eventsData.events} currentDate={initialDate} />
-        );
+        return <CalendarDay events={events} currentDate={initialDate} />;
     }
-  }, [currentView, daysCount, eventsData.events, initialDate, viewMode]);
+  }, [currentView, daysCount, events, initialDate, viewMode]);
 
   return (
     <>
