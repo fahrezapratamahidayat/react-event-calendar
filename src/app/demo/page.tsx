@@ -1,5 +1,5 @@
 import { EventCalendar } from '@/components/event-calendar/calendar';
-import { getCategories, getEvents } from '../actions';
+import { getEvents } from '../actions';
 import { SearchParams } from 'nuqs';
 import { searchParamsCache } from '@/lib/searchParams';
 import { CalendarViewType } from '@/types/event';
@@ -14,15 +14,17 @@ interface DemoPageProps {
 export default async function DemoPage(props: DemoPageProps) {
   const searchParams = await props.searchParams;
   const search = searchParamsCache.parse(searchParams);
-  const promises = await Promise.all([
-    getEvents({
-      ...search,
-      date: search.date,
-      view: search.view as CalendarViewType,
-      daysCount: Number(search.daysCount),
-    }),
-    getCategories(),
-  ]);
+  const eventsResponse = await getEvents({
+    date: search.date,
+    view: search.view as CalendarViewType,
+    daysCount: Number(search.daysCount),
+    categories: search.categories,
+    title: search.title,
+    colors: search.colors,
+    locations: search.locations,
+    isRepeating: search.isRepeating,
+    repeatingTypes: search.repeatingTypes,
+  });
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -58,7 +60,10 @@ export default async function DemoPage(props: DemoPageProps) {
                 </div>
               }
             >
-              <EventCalendar promises={promises} initialDate={search.date} />
+              <EventCalendar
+                events={eventsResponse.events}
+                initialDate={search.date}
+              />
             </Suspense>
           </div>
         </div>
