@@ -556,7 +556,7 @@ export default async function CalendarPage({ searchParams }) {
 }`}
           />
 
-          <Callout type="info">
+          <Callout variant="info">
             <p className="font-medium">Server-Side Rendering and Caching</p>
             <p className="mt-2">
               The calendar uses Next.js Server Components and Server Actions to
