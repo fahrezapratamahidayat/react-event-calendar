@@ -4,19 +4,19 @@ import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
 import FileTree from '@/components/docs/file-tree';
+import { DocsHeader } from '@/components/docs/docs-header';
+import { docsConfig } from '@/configs/docs';
 
 export default function ArchitecturePage() {
   return (
     <div className="space-y-16">
-      <div className="space-y-6">
-        <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">
-          Architecture
-        </h1>
-        <p className="text-muted-foreground mb-6 text-xl leading-7">
-          Understanding the architecture and design patterns of React Event
-          Calendar.
-        </p>
-      </div>
+      <DocsHeader
+        title="Architecture"
+        description="Understanding the architecture and design patterns of React Event
+          Calendar."
+        currentPath="/docs/architecture"
+        config={docsConfig}
+      />
 
       <div className="space-y-12">
         <section className="space-y-6">
@@ -678,22 +678,6 @@ export default async function CalendarPage({ searchParams }) {
             </li>
           </ul>
         </section>
-      </div>
-
-      <div className="mt-10 space-y-6 border-t pt-10">
-        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-          Next Steps
-        </h2>
-        <p className="text-muted-foreground leading-7">
-          Now that you understand the architecture of React Event Calendar, you
-          can:
-        </p>
-        <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
-          <li>Customize the calendar appearance and behavior</li>
-          <li>Implement additional features like event reminders or sharing</li>
-          <li>Integrate with other systems through the API</li>
-          <li>Extend the schema to support additional event properties</li>
-        </ul>
       </div>
     </div>
   );

@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
 import dynamic from 'next/dynamic';
 import { Calendar } from 'lucide-react';
 import { demoEvents } from '@/constants/calendar-constant';
+import { DocsHeader } from '@/components/docs/docs-header';
+import { docsConfig } from '@/configs/docs';
 
 export default function CalendarViewsDocPage() {
   const CalendarDay = dynamic(
@@ -55,15 +56,13 @@ export default function CalendarViewsDocPage() {
 
   return (
     <div className="space-y-16">
-      <div className="space-y-6">
-        <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">
-          Calendar Views
-        </h1>
-        <p className="text-muted-foreground mb-6 text-xl leading-7">
-          React Event Calendar offers multiple view options to display and
-          interact with events.
-        </p>
-      </div>
+      <DocsHeader
+        title="Calendar Views"
+        description="React Event Calendar offers multiple view options to display and
+          interact with events."
+        currentPath="/docs/features/calendar-views"
+        config={docsConfig}
+      />
 
       <div className="space-y-12">
         <section className="space-y-6">
@@ -430,44 +429,6 @@ useEventCalendarStore.getState().updateMonthViewConfig({
             your specific needs and user preferences.
           </p>
         </section>
-      </div>
-
-      <div className="mt-10 space-y-6 border-t pt-10">
-        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-          Next Steps
-        </h2>
-        <p className="text-muted-foreground leading-7">
-          Now that you understand the different calendar views, learn about:
-        </p>
-        <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
-          <li>
-            <a
-              href="/docs/features/event-management"
-              className="text-primary font-medium hover:underline"
-            >
-              Event Management
-            </a>{' '}
-            - Creating, editing, and deleting events
-          </li>
-          <li>
-            <a
-              href="/docs/features/recurring-events"
-              className="text-primary font-medium hover:underline"
-            >
-              Recurring Events
-            </a>{' '}
-            - Setting up daily, weekly, and monthly recurring events
-          </li>
-          <li>
-            <a
-              href="/docs/features/theming"
-              className="text-primary font-medium hover:underline"
-            >
-              Theming
-            </a>{' '}
-            - Customizing the appearance of your calendar
-          </li>
-        </ul>
       </div>
     </div>
   );

@@ -3,19 +3,19 @@
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
+import { DocsHeader } from '@/components/docs/docs-header';
+import { docsConfig } from '@/configs/docs';
 
 export default function EventManagementDocPage() {
   return (
     <div className="space-y-16">
-      <div className="space-y-6">
-        <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">
-          Event Management
-        </h1>
-        <p className="text-muted-foreground mb-6 text-xl leading-7">
-          Create, edit, delete, and manage calendar events with React Event
-          Calendar.
-        </p>
-      </div>
+      <DocsHeader
+        title="Event Management"
+        description="Create, edit, delete, and manage calendar events with React Event
+          Calendar."
+        currentPath="/docs/features/event-management"
+        config={docsConfig}
+      />
 
       <div className="space-y-12">
         <section className="space-y-6">
@@ -573,44 +573,6 @@ export function EventItem({ event, view }: EventItemProps) {
 }`}
           />
         </section>
-      </div>
-
-      <div className="mt-10 space-y-6 border-t pt-10">
-        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-          Next Steps
-        </h2>
-        <p className="text-muted-foreground leading-7">
-          Now that you understand event management, learn about:
-        </p>
-        <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
-          <li>
-            <a
-              href="/docs/features/recurring-events"
-              className="text-primary font-medium hover:underline"
-            >
-              Recurring Events
-            </a>{' '}
-            - Setting up daily, weekly, and monthly recurring events
-          </li>
-          <li>
-            <a
-              href="/docs/features/filtering"
-              className="text-primary font-medium hover:underline"
-            >
-              Event Filtering
-            </a>{' '}
-            - Filtering events by category, color, or custom criteria
-          </li>
-          <li>
-            <a
-              href="/docs/features/drag-and-drop"
-              className="text-primary font-medium hover:underline"
-            >
-              Drag and Drop
-            </a>{' '}
-            - Advanced event interaction capabilities
-          </li>
-        </ul>
       </div>
     </div>
   );

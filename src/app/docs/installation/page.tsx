@@ -2,18 +2,20 @@ import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import FileTree from '@/components/docs/file-tree';
 import { PackageManager } from '@/components/docs/package-manager';
+import { DocsHeader } from '@/components/docs/docs-header';
+import { docsConfig } from '@/configs/docs';
 
 export default function InstallationPage() {
   return (
     <div className="space-y-16">
-      <div className="space-y-6">
-        <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">
-          Installation
-        </h1>
-        <p className="text-muted-foreground mb-6 text-xl leading-7">
-          Step-by-step guide to install React Event Calendar in your project.
-        </p>
-      </div>
+      <DocsHeader
+        title={'Installation'}
+        description={
+          '     Step-by-step guide to install React Event Calendar in your project.'
+        }
+        currentPath="/docs/installation"
+        config={docsConfig}
+      />
 
       <div className="space-y-12">
         <section className="space-y-6">
@@ -419,21 +421,6 @@ export default async function EventCalendarPage(props: DemoPageProps) {
             </div>
           </div>
         </section>
-      </div>
-
-      <div className="mt-10 space-y-6 border-t pt-10">
-        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-          Next Steps
-        </h2>
-        <p className="text-muted-foreground leading-7">
-          After successfully installing React Event Calendar, you can:
-        </p>
-        <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
-          <li>Customize the calendar appearance and behavior</li>
-          <li>Configure database storage for events</li>
-          <li>Implement authentication if needed</li>
-          <li>Deploy your application to your preferred hosting platform</li>
-        </ul>
       </div>
     </div>
   );

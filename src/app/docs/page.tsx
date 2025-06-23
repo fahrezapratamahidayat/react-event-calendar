@@ -1,5 +1,6 @@
 'use client';
 
+import { DocsHeader } from '@/components/docs/docs-header';
 import { docsConfig } from '@/configs/docs';
 
 export default function DocsPage() {
@@ -7,17 +8,12 @@ export default function DocsPage() {
 
   return (
     <div className="space-y-10">
-      <div className="space-y-4">
-        <h2
-          id="overview"
-          className="scroll-m-20 text-4xl font-bold tracking-tight"
-        >
-          {projectInfo.name}
-        </h2>
-        <p className="text-muted-foreground text-xl leading-7">
-          {projectInfo.description}
-        </p>
-      </div>
+      <DocsHeader
+        title={docsConfig.projectInfo.name}
+        description={docsConfig.projectInfo.description}
+        currentPath="/docs"
+        config={docsConfig}
+      />
 
       <div className="space-y-4">
         <h2
@@ -111,42 +107,6 @@ export default function DocsPage() {
           <li className="leading-7">Date range and view options</li>
           <li className="leading-7">Time formats and localization</li>
         </ul>
-      </div>
-
-      <div className="space-y-4">
-        <h2
-          id="examples"
-          className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
-        >
-          Examples
-        </h2>
-        <p className="mt-4 leading-7">
-          Check out these examples to see React Event Calendar in action:
-        </p>
-        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <a
-            href="/examples/basic"
-            className="group hover:bg-accent rounded-lg border p-6"
-          >
-            <h3 className="group-hover:text-accent-foreground mb-2 text-lg font-medium">
-              Basic Calendar
-            </h3>
-            <p className="text-muted-foreground group-hover:text-accent-foreground text-sm">
-              Simple implementation with basic features
-            </p>
-          </a>
-          <a
-            href="/examples/advanced"
-            className="group hover:bg-accent rounded-lg border p-6"
-          >
-            <h3 className="group-hover:text-accent-foreground mb-2 text-lg font-medium">
-              Advanced Calendar
-            </h3>
-            <p className="text-muted-foreground group-hover:text-accent-foreground text-sm">
-              Full-featured implementation with all customizations
-            </p>
-          </a>
-        </div>
       </div>
     </div>
   );
