@@ -14,12 +14,9 @@ export function useToc() {
   const [activeId, setActiveId] = React.useState<string>('');
   const pathname = usePathname();
 
-  // Function to build TOC from DOM
   const buildToc = React.useCallback(() => {
     const headings = Array.from(
-      document.querySelectorAll(
-        'h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]',
-      ),
+      document.querySelectorAll('h2[id], h3[id], h4[id], h5[id], h6[id]'),
     ) as HTMLElement[];
 
     const headingsData: TocItem[] = headings.map((heading) => ({
@@ -31,9 +28,7 @@ export function useToc() {
     setToc(headingsData);
   }, []);
 
-  // Build TOC on mount and pathname change
   React.useEffect(() => {
-    // Small delay to ensure DOM is ready after route change
     const timer = setTimeout(() => {
       buildToc();
     }, 100);
@@ -41,17 +36,14 @@ export function useToc() {
     return () => clearTimeout(timer);
   }, [pathname, buildToc]);
 
-  // Intersection Observer for active section detection
   React.useEffect(() => {
     if (toc.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Find the entry that's most in view
         const visibleEntries = entries.filter((entry) => entry.isIntersecting);
 
         if (visibleEntries.length > 0) {
-          // Sort by intersection ratio and choose the most visible one
           const mostVisible = visibleEntries.reduce((prev, current) =>
             current.intersectionRatio > prev.intersectionRatio ? current : prev,
           );
@@ -93,7 +85,6 @@ export function useToc() {
     };
   }, [toc]);
 
-  // Listen for content changes (useful for dynamic content)
   React.useEffect(() => {
     const observer = new MutationObserver(() => {
       buildToc();

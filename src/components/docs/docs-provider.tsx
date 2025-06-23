@@ -1,11 +1,9 @@
 'use client';
 
-import {
-  TableOfContents,
-  TableOfContentsMinimal,
-} from '@/components/docs/table-of-contents';
+import { TableOfContentsMinimal } from '@/components/docs/table-of-contents';
 import { DocSidebar } from '@/components/docs/doc-sidebar';
 import Navbar from '../navbar';
+import { DocsFooter } from './docs-footer';
 
 export function DocsProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -24,6 +22,7 @@ export function DocsProvider({ children }: { children: React.ReactNode }) {
                 <div className="min-w-0">
                   <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 py-6 text-neutral-800 dark:text-neutral-300">
                     {children}
+                    <DocsFooter />
                   </div>
                 </div>
                 <div className="hidden lg:block">

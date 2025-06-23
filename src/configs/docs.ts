@@ -72,11 +72,6 @@ export const docsConfig: DocsConfig = {
           title: 'Event Management',
           description: 'Create, edit and delete events easily',
         },
-        {
-          href: '/docs/features/drag-and-drop',
-          title: 'Drag and Drop',
-          description: 'Intuitive interactions with Framer Motion',
-        },
       ],
     },
     {
@@ -187,19 +182,16 @@ export const docsConfig: DocsConfig = {
     version: '1.0.0',
     features: [
       'Responsive calendar views (day, week, month, agenda)',
-      'Drag-and-drop event management using Framer Motion',
       'Customizable themes with shadcn/ui and Tailwind CSS v4',
       'Efficient state management with nuqs',
       'Reliable date manipulation with date-fns',
       'High performance with Next.js App Router',
-      'Localization and timezone support',
-      'Integration with popular calendar services',
       'Comprehensive API for custom integrations',
       'Complete documentation and implementation examples',
     ],
     techStack: [
       'React 18+',
-      'Next.js 14+',
+      'Next.js 15+',
       'Tailwind CSS v4',
       'shadcn/ui',
       'Framer Motion',
@@ -207,6 +199,6 @@ export const docsConfig: DocsConfig = {
       'nuqs',
       'TypeScript',
     ],
-    github: 'https://github.com/username/react-event-calendar',
+    github: 'https://github.com/fahrezapratamahidayat/react-event-calendar',
   },
 };

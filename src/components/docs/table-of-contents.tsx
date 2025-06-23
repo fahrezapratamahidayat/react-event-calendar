@@ -9,8 +9,8 @@ import { ChevronRight } from 'lucide-react';
 interface TableOfContentsProps {
   className?: string;
   title?: string;
-  showLevels?: number[]; // Which heading levels to show (e.g., [2, 3])
-  maxItems?: number; // Maximum number of items to show
+  showLevels?: number[];
+  maxItems?: number;
 }
 
 export function TableOfContents({
@@ -21,7 +21,6 @@ export function TableOfContents({
 }: TableOfContentsProps) {
   const { toc, activeId, scrollToHeading } = useToc();
 
-  // Filter TOC based on showLevels
   const filteredToc = React.useMemo(() => {
     let filtered = toc.filter((item) => showLevels.includes(item.level));
 
@@ -40,7 +39,6 @@ export function TableOfContents({
     e.preventDefault();
     scrollToHeading(id);
 
-    // Update URL hash without triggering scroll
     history.replaceState(null, '', `#${id}`);
   };
 
@@ -70,13 +68,12 @@ export function TableOfContents({
       </div>
 
       <div className="space-y-1">
-        {filteredToc.map((item, index) => {
+        {filteredToc.map((item) => {
           const isActive = activeId === item.id;
           const indentClass = getIndentationClass(item.level);
 
           return (
             <div key={item.id} className="relative">
-              {/* Active indicator line */}
               {isActive && (
                 <div className="bg-primary absolute top-0 bottom-0 left-0 w-0.5 rounded-full" />
               )}
@@ -93,7 +90,6 @@ export function TableOfContents({
                 )}
                 aria-current={isActive ? 'location' : undefined}
               >
-                {/* Chevron icon for active item */}
                 <ChevronRight
                   className={cn(
                     'mt-0.5 h-3 w-3 flex-shrink-0 transition-transform duration-200',
@@ -110,7 +106,6 @@ export function TableOfContents({
         })}
       </div>
 
-      {/* Progress indicator */}
       <div className="border-border/50 border-t pt-2">
         <div className="text-muted-foreground flex items-center justify-between text-xs">
           <span>Progress</span>
@@ -136,7 +131,6 @@ export function TableOfContents({
   );
 }
 
-// Alternative minimal version
 export function TableOfContentsMinimal() {
   const { toc, activeId, scrollToHeading } = useToc();
 
