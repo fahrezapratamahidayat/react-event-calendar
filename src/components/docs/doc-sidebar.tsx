@@ -51,7 +51,7 @@ export function DocSidebar() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      'flex w-full items-center rounded-md p-2 hover:underline',
+                      'flex w-full items-center rounded-[6px] p-2 hover:underline',
                       pathname === item.href
                         ? 'bg-accent text-accent-foreground font-medium'
                         : 'text-muted-foreground',
