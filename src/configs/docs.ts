@@ -82,16 +82,6 @@ export const docsConfig: DocsConfig = {
           title: 'useEvents',
           description: 'Hook for managing event data',
         },
-        {
-          href: '/docs/hooks/use-calendar',
-          title: 'useCalendar',
-          description: 'Hook for calendar logic and date navigation',
-        },
-        {
-          href: '/docs/hooks/use-date-utils',
-          title: 'useDateUtils',
-          description: 'Date utilities with date-fns',
-        },
       ],
     },
     {
@@ -115,26 +105,6 @@ export const docsConfig: DocsConfig = {
       ],
     },
     {
-      title: 'API',
-      items: [
-        {
-          href: '/docs/api/events',
-          title: 'Events API',
-          description: 'Endpoints for event management',
-        },
-        {
-          href: '/docs/api/categories',
-          title: 'Categories API',
-          description: 'Endpoints for category management',
-        },
-        {
-          href: '/docs/api/filters',
-          title: 'Filters API',
-          description: 'Endpoints for filtering and searching',
-        },
-      ],
-    },
-    {
       title: 'Customization',
       items: [
         {
@@ -146,31 +116,6 @@ export const docsConfig: DocsConfig = {
           href: '/docs/customization/localization',
           title: 'Localization',
           description: 'Multi-language support and local date formats',
-        },
-        {
-          href: '/docs/customization/layouts',
-          title: 'Custom Layouts',
-          description: 'Create tailored calendar views',
-        },
-      ],
-    },
-    {
-      title: 'Integrations',
-      items: [
-        {
-          href: '/docs/integrations/google-calendar',
-          title: 'Google Calendar',
-          description: 'Synchronization with Google Calendar',
-        },
-        {
-          href: '/docs/integrations/outlook',
-          title: 'Outlook',
-          description: 'Synchronization with Microsoft Outlook',
-        },
-        {
-          href: '/docs/integrations/ical',
-          title: 'iCal',
-          description: 'Import and export iCalendar format',
         },
       ],
     },

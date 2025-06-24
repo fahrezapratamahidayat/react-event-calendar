@@ -11,7 +11,7 @@ import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { useDayEventPositions } from '@/lib/event';
 import { TimeColumn } from './ui/time-column';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
 

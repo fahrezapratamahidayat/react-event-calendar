@@ -17,7 +17,7 @@ import {
   useMultiDayEventRows,
   useWeekDays,
 } from '@/lib/event';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
 import { Button } from '../ui/button';

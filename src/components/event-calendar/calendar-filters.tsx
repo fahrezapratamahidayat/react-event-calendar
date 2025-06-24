@@ -21,7 +21,7 @@ import { CATEGORY_OPTIONS, EVENT_COLORS } from '@/constants/calendar-constant';
 import { getColorClasses } from '@/lib/event';
 import { EventSearchDialog } from './event-search-dialog';
 import { useShallow } from 'zustand/shallow';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 
 export const EventCalendarFilters = () => {
   const { timeFormat, openEventDialog } = useEventCalendarStore(

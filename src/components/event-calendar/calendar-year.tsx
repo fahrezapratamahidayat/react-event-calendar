@@ -9,7 +9,7 @@ import {
   isSameYear,
   startOfYear,
 } from 'date-fns';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
 import { EventTypes } from '@/db/schema';
 import { CalendarViewType } from '@/types/event';

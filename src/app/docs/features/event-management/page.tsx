@@ -123,45 +123,6 @@ import { createEvent } from '@/app/actions';
             which displays event details and provides edit options.
           </p>
 
-          <h3 className="mt-6 mb-3 text-xl font-semibold">Drag and Resize</h3>
-          <p className="mb-4 leading-7">
-            In Day, Week, and Days views, events can be:
-          </p>
-
-          <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-            <li className="leading-7">Dragged to a different time or day</li>
-            <li className="leading-7">Resized to change the duration</li>
-          </ul>
-
-          <CodeBlock
-            language="tsx"
-            filename="components/event-calendar/event-item.tsx"
-            code={`import { EventItem } from '@/components/event-calendar/event-item';
-import { updateEvent } from '@/app/actions';
-import { EventTypes } from '@/db/schema';
-
-// Example of rendering a draggable event item
-<EventItem
-  event={event}
-  isDraggable={true}
-  isResizable={true}
-  onDragEnd={async (updatedEvent: EventTypes) => {
-    const result = await updateEvent(updatedEvent.id, {
-      startDate: updatedEvent.startDate,
-      endDate: updatedEvent.endDate,
-      startTime: updatedEvent.startTime,
-      endTime: updatedEvent.endTime,
-    });
-  }}
-  onResizeEnd={async (updatedEvent: EventTypes) => {
-    const result = await updateEvent(updatedEvent.id, {
-      endDate: updatedEvent.endDate,
-      endTime: updatedEvent.endTime,
-    });
-  }}
-/>`}
-          />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Edit Form</h3>
           <p className="mb-4 leading-7">
             The same form used for creating events can be used for editing, with

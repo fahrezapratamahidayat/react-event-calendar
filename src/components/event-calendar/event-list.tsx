@@ -13,7 +13,7 @@ import {
 } from 'date-fns';
 import { CalendarViewType, TimeFormatType } from '@/types/event';
 import { EventGroup, NoEvents } from './ui/events';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 import { EventTypes } from '@/db/schema';
 import {
   getLocaleFromCode,

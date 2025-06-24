@@ -4,7 +4,7 @@ import { EventsList } from './event-list';
 import { CalendarDay } from './calendar-day';
 import { CalendarWeek } from './calendar-week';
 import EventDialog from './event-dialog';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 import { CalendarMonth } from './calendar-month';
 import { MonthDayEventsDialog } from './day-events-dialog';
 import EventCreateDialog from './event-create-dialog';

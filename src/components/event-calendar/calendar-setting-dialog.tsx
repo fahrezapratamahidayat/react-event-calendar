@@ -29,7 +29,7 @@ import {
   CalendarDays,
   Sun,
 } from 'lucide-react';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 import {
   CalendarViewConfigs,
   CalendarViewType,

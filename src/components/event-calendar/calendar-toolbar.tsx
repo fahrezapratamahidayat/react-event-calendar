@@ -9,7 +9,7 @@ import { SearchYearPicker } from './ui/search-year-picker';
 import { SearchMonthPicker } from './ui/search-month-picker';
 import { SearchDayPicker } from './ui/search-day-picker';
 import { CalendarViewType, TimeFormatType, ViewModeType } from '@/types/event';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 import { CalendarTabs } from './calendar-tabs';
 import { useShallow } from 'zustand/shallow';
 import { useCallback, useEffect } from 'react';

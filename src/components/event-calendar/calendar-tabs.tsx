@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 
 interface CalendarTabsProps {
   viewType: CalendarViewType;

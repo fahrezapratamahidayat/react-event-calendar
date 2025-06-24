@@ -15,7 +15,7 @@ import { FormFooter } from '@/components/event-calendar/ui/form-footer';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ensureDate } from '@/lib/date';
-import { useEventCalendarStore } from '@/hooks/use-event-calendar';
+import { useEventCalendarStore } from '@/hooks/use-event';
 import { eventFormSchema } from '@/lib/validations';
 import { EventDetailsForm } from './event-detail-form';
 import { toast } from 'sonner';
