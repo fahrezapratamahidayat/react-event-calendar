@@ -146,8 +146,8 @@ export function TableOfContentsMinimal() {
 
   return (
     <div className="space-y-1">
-      <p className="text-muted-foreground mb-3 text-xs font-medium tracking-wide uppercase">
-        Contents
+      <p className="text-muted-foreground mb-3 text-xs font-medium tracking-wide">
+        Table Of Contents
       </p>
       {toc.map((item) => (
         <Link
