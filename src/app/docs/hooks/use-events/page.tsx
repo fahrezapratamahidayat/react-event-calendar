@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
@@ -16,7 +14,6 @@ export default function useEventDocsPage() {
         currentPath="/docs/hooks/use-events"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -34,7 +31,6 @@ export default function useEventDocsPage() {
             solution for the calendar. It handles view types, configurations,
             selected events, and UI states.
           </p>
-
           <CodeBlock
             language="tsx"
             filename="hooks/use-event.tsx"
@@ -126,7 +122,6 @@ export const useEventCalendarStore = create(
 );`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -185,7 +180,6 @@ function CalendarComponent() {
   );
 }`}
           />
-
           <Callout variant="info" className="my-6">
             <p>
               The hook uses Zustand&apos;s{' '}
@@ -196,7 +190,6 @@ function CalendarComponent() {
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -208,7 +201,6 @@ function CalendarComponent() {
             The calendar components use the hook to access and modify the
             calendar state:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar.tsx"
@@ -257,7 +249,6 @@ export function EventCalendar({ initialDate, events }: EventCalendarProps) {
 }`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -269,7 +260,6 @@ export function EventCalendar({ initialDate, events }: EventCalendarProps) {
             The calendar integrates with Next.js Server Components using nuqs
             for URL state management:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/demo/page.tsx"
@@ -308,12 +298,10 @@ export default async function DemoPage(props: DemoPageProps) {
   );
 }`}
           />
-
           <p className="mt-6 leading-7">
             The URL parameters are defined using nuqs in the searchParams.ts
             file:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="lib/searchParams.ts"
@@ -340,7 +328,6 @@ export const searchParamsCache = createSearchParamsCache({
 });`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -351,7 +338,6 @@ export const searchParamsCache = createSearchParamsCache({
           <p className="mb-4 leading-7">
             You can customize various aspects of each calendar view:
           </p>
-
           <CodeBlock
             language="tsx"
             code={`import { useEventCalendarStore } from '@/hooks/use-event';
@@ -376,13 +362,11 @@ useEventCalendarStore.getState().updateMonthViewConfig({
   hideOutsideDays: false,  // Show days from adjacent months
 });`}
           />
-
           <p className="mt-6 leading-7">
             These configurations are persisted in localStorage, so user
             preferences are remembered across sessions.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -393,7 +377,6 @@ useEventCalendarStore.getState().updateMonthViewConfig({
           <p className="mb-4 leading-7">
             The hook provides methods for handling event interactions:
           </p>
-
           <CodeBlock
             language="tsx"
             code={`import { useEventCalendarStore } from '@/hooks/use-event';
@@ -424,7 +407,6 @@ const openDayEventsDialog = (date: Date, events: EventTypes[]) => {
 };`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -435,7 +417,6 @@ const openDayEventsDialog = (date: Date, events: EventTypes[]) => {
           <p className="mb-4 leading-7">
             The hook supports customizing locale and time format:
           </p>
-
           <CodeBlock
             language="tsx"
             code={`import { useEventCalendarStore } from '@/hooks/use-event';
@@ -450,13 +431,11 @@ useEventCalendarStore.getState().setTimeFormat(TimeFormatType.HOUR_12);
 // Set first day of week (0 = Sunday, 1 = Monday, etc.)
 useEventCalendarStore.getState().setFirstDayOfWeek(1);`}
           />
-
           <p className="mt-6 leading-7">
             These settings affect how dates and times are displayed throughout
             the calendar.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -468,7 +447,6 @@ useEventCalendarStore.getState().setFirstDayOfWeek(1);`}
             The hook uses Zustand&apos;s persist middleware to save certain
             parts of the state to localStorage:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="hooks/use-event.tsx"
@@ -493,7 +471,6 @@ useEventCalendarStore.getState().setFirstDayOfWeek(1);`}
   )
 );`}
           />
-
           <p className="mt-6 leading-7">
             This ensures that user preferences like the current view, time
             format, and view settings are remembered across page refreshes and
@@ -504,3 +481,14 @@ useEventCalendarStore.getState().setFirstDayOfWeek(1);`}
     </div>
   );
 }
+
+export const metadata = {
+  title: 'useEventCalendar Hook Documentation',
+  description:
+    'Complete guide for using the core calendar state management hook',
+  keywords: ['zustand', 'calendar hook', 'state management'],
+  openGraph: {
+    title: 'useEventCalendar Hook Guide',
+    url: 'https://shadcn-event-calendar.vercel.app/docs/hooks/use-events',
+  },
+};

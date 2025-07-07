@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
@@ -16,7 +14,6 @@ export default function EventManagementDocPage() {
         currentPath="/docs/features/event-management"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -29,19 +26,16 @@ export default function EventManagementDocPage() {
             React Event Calendar provides multiple ways to create new events,
             making it intuitive for users to schedule activities.
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Click to Create</h3>
           <p className="mb-4 leading-7">
             Users can click on any time slot in Day, Week, or Days views to
             create a new event at that specific time.
           </p>
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Quick Add Dialog</h3>
           <p className="mb-4 leading-7">
             The Quick Add dialog allows users to create events with minimal
             information:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/event-form.tsx"
@@ -58,13 +52,11 @@ useEventCalendarStore.getState().openQuickAddDialog({
 // Render the dialog component
 <QuickAddDialog />`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Full Event Form</h3>
           <p className="mb-4 leading-7">
             For more detailed event creation, the full event form allows users
             to specify all event properties:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">Title and description</li>
             <li className="leading-7">Start and end dates/times</li>
@@ -73,7 +65,6 @@ useEventCalendarStore.getState().openQuickAddDialog({
             <li className="leading-7">Color</li>
             <li className="leading-7">Recurring options</li>
           </ul>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/event-form.tsx"
@@ -104,7 +95,6 @@ import { createEvent } from '@/app/actions';
 />`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -116,19 +106,16 @@ import { createEvent } from '@/app/actions';
             Events can be edited in several ways to provide flexibility and
             convenience.
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Click to Edit</h3>
           <p className="mb-4 leading-7">
             Users can click on any existing event to open the event dialog,
             which displays event details and provides edit options.
           </p>
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Edit Form</h3>
           <p className="mb-4 leading-7">
             The same form used for creating events can be used for editing, with
             pre-filled values:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/event-form.tsx"
@@ -161,7 +148,6 @@ import { EventTypes } from '@/db/schema';
 />`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -173,10 +159,8 @@ import { EventTypes } from '@/db/schema';
             Events can be deleted individually or in bulk, with confirmation to
             prevent accidental deletion.
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Single Event Deletion</h3>
           <p className="mb-4 leading-7">To delete a single event, users can:</p>
-
           <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">
             <li className="leading-7">
               Click on the event to open the event dialog
@@ -184,7 +168,6 @@ import { EventTypes } from '@/db/schema';
             <li className="leading-7">Click the delete button</li>
             <li className="leading-7">Confirm the deletion</li>
           </ol>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/event-dialog.tsx"
@@ -204,7 +187,6 @@ const handleDeleteEvent = async (eventId: string) => {
   }
 };`}
           />
-
           <Callout variant="warning" className="my-6">
             <p>
               Deleting recurring events requires special handling. Users should
@@ -213,7 +195,6 @@ const handleDeleteEvent = async (eventId: string) => {
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -225,7 +206,6 @@ const handleDeleteEvent = async (eventId: string) => {
             React Event Calendar uses Next.js Server Actions to handle event
             CRUD operations with the database.
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Create Event</h3>
           <CodeBlock
             language="tsx"
@@ -293,7 +273,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
   }
 }`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Update Event</h3>
           <CodeBlock
             language="tsx"
@@ -341,7 +320,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
   }
 }`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Delete Event</h3>
           <CodeBlock
             language="tsx"
@@ -372,7 +350,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
 }`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -384,7 +361,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
             React Event Calendar uses Zod for robust event validation, ensuring
             data integrity.
           </p>
-
           <CodeBlock
             language="tsx"
             filename="lib/validations.ts"
@@ -424,9 +400,7 @@ export const createEventSchema = z.object({
   }
 );`}
           />
-
           <p className="mt-6 leading-7">This validation schema ensures that:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               Events have required fields (title, dates, times)
@@ -438,7 +412,6 @@ export const createEventSchema = z.object({
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -449,24 +422,20 @@ export const createEventSchema = z.object({
           <p className="mb-4 leading-7">
             Events are displayed differently depending on the calendar view:
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Day/Week View</h3>
           <p className="mb-4 leading-7">
             In time-based views, events are positioned according to their start
             and end times, with proper handling for:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">Overlapping events</li>
             <li className="leading-7">All-day events</li>
             <li className="leading-7">Multi-day events</li>
           </ul>
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Month View</h3>
           <p className="mb-4 leading-7">
             In month view, events are displayed as compact bars with:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               Color coding based on event category or custom color
@@ -478,7 +447,6 @@ export const createEventSchema = z.object({
             </li>
             <li className="leading-7">Proper spanning for multi-day events</li>
           </ul>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/event-item.tsx"

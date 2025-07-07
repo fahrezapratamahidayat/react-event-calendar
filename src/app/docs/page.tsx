@@ -1,7 +1,37 @@
-'use client';
-
 import { DocsHeader } from '@/components/docs/docs-header';
 import { docsConfig } from '@/configs/docs';
+
+export const metadata = {
+  title: 'Documentation - React Event Calendar | Complete Developer Guide',
+  description:
+    'Comprehensive documentation for React Event Calendar component. Learn installation, customization, API reference, and best practices.',
+  keywords: [
+    'react calendar',
+    'event calendar docs',
+    'calendar component',
+    'react scheduling',
+    'tutorial',
+  ],
+  openGraph: {
+    title: 'React Event Calendar Documentation',
+    description: 'Official documentation for React Event Calendar component',
+    url: 'https://shadcn-event-calendar.vercel.app/docs',
+    images: [
+      {
+        url: 'https://shadcn-event-calendar.vercel.app/og-docs.png',
+        width: 1200,
+        height: 630,
+        alt: 'React Event Calendar Documentation',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'React Event Calendar Documentation',
+    description: 'Complete guide for implementing event calendar in React',
+    images: ['https://shadcn-event-calendar.vercel.app/og-docs.png'],
+  },
+};
 
 export default function DocsPage() {
   const { projectInfo } = docsConfig;
@@ -14,7 +44,6 @@ export default function DocsPage() {
         currentPath="/docs"
         config={docsConfig}
       />
-
       <div className="space-y-4">
         <h2
           id="features"
@@ -30,7 +59,6 @@ export default function DocsPage() {
           ))}
         </ul>
       </div>
-
       <div className="space-y-4">
         <h2
           id="tech-stack"
@@ -49,7 +77,6 @@ export default function DocsPage() {
           ))}
         </div>
       </div>
-
       <div className="space-y-4">
         <h2
           id="getting-started"
@@ -68,7 +95,6 @@ export default function DocsPage() {
           page for step-by-step instructions.
         </p>
       </div>
-
       <div className="space-y-4">
         <h2
           id="architecture"
@@ -89,7 +115,6 @@ export default function DocsPage() {
           section.
         </p>
       </div>
-
       <div className="space-y-4">
         <h2
           id="customization"

@@ -1,21 +1,29 @@
-'use client';
-
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
 import { DocsHeader } from '@/components/docs/docs-header';
 import { docsConfig } from '@/configs/docs';
 
+export const metadata = {
+  title: 'Localization Guide - React Event Calendar',
+  description:
+    'Learn how to implement multi-language support and locale configurations',
+  keywords: ['localization', 'i18n', 'multi-language'],
+  openGraph: {
+    title: 'Localization Documentation',
+    url: 'https://shadcn-event-calendar.vercel.app/docs/customization/localization',
+  },
+};
+
 export default function LocalizationDocsPage() {
   return (
     <div className="space-y-16">
       <DocsHeader
-        title={'Localization'}
-        description={`Customize language and date formats in React Event Calendar.`}
+        title="Localization"
+        description="Implement multi-language support and regional formatting"
         currentPath="/docs/customization/localization"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -31,7 +39,6 @@ export default function LocalizationDocsPage() {
             requirements.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -42,7 +49,6 @@ export default function LocalizationDocsPage() {
           <p className="mb-4 leading-7">
             React Event Calendar supports the following languages by default:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="constants/calendar-constant.ts"
@@ -58,7 +64,6 @@ export default function LocalizationDocsPage() {
 ] as const;
 export type LocaleCode = (typeof LOCALES)[number]['value'];`}
           />
-
           <p className="mt-6 leading-7">
             Each entry in the{' '}
             <code className="bg-muted rounded px-1 py-0.5 font-mono text-sm">
@@ -88,7 +93,6 @@ export type LocaleCode = (typeof LOCALES)[number]['value'];`}
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -100,7 +104,6 @@ export type LocaleCode = (typeof LOCALES)[number]['value'];`}
             Users can change the calendar language through the calendar settings
             dialog:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar-setting-dialog.tsx"
@@ -117,12 +120,10 @@ export type LocaleCode = (typeof LOCALES)[number]['value'];`}
   </SelectContent>
 </Select>`}
           />
-
           <p className="mt-6 leading-7">
             When the language is changed, the calendar will use the appropriate
             locale object to format dates and day/month names:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar-setting-dialog.tsx"
@@ -130,7 +131,6 @@ export type LocaleCode = (typeof LOCALES)[number]['value'];`}
 const localizedDays = getLocalizedDaysOfWeek(localeObj);`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -141,7 +141,6 @@ const localizedDays = getLocalizedDaysOfWeek(localeObj);`}
           <p className="mb-4 leading-7">
             To add a new language to the calendar, follow these steps:
           </p>
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">
             1. Import Day.js Locale
           </h3>
@@ -152,7 +151,6 @@ const localizedDays = getLocalizedDaysOfWeek(localeObj);`}
             </code>{' '}
             file:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="constants/calendar-constant.ts"
@@ -160,7 +158,6 @@ const localizedDays = getLocalizedDaysOfWeek(localeObj);`}
 // Add new locale imports here, for example:
 // import { it } from 'date-fns/locale';`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">
             2. Add to LOCALES Array
           </h3>
@@ -171,7 +168,6 @@ const localizedDays = getLocalizedDaysOfWeek(localeObj);`}
             </code>{' '}
             array:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="constants/calendar-constant.ts"
@@ -186,7 +182,6 @@ const localizedDays = getLocalizedDaysOfWeek(localeObj);`}
   // { value: 'it-IT', label: 'Italiano', locale: it },
 ] as const;`}
           />
-
           <Callout variant="info" className="my-6">
             <p>
               <strong>Note:</strong> Make sure the language code follows the BCP
@@ -195,7 +190,6 @@ const localizedDays = getLocalizedDaysOfWeek(localeObj);`}
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -207,7 +201,6 @@ const localizedDays = getLocalizedDaysOfWeek(localeObj);`}
             You can customize date formats by modifying the formatting functions
             in your application:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="lib/event.ts"
@@ -233,7 +226,6 @@ export const getLocalizedDaysOfWeek = (locale: Locale) => {
 };`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -245,7 +237,6 @@ export const getLocalizedDaysOfWeek = (locale: Locale) => {
             Here are some best practices when implementing localization in your
             application:
           </p>
-
           <ul className="my-4 list-disc space-y-2 pl-6">
             <li>
               Always use the{' '}
@@ -268,7 +259,6 @@ export const getLocalizedDaysOfWeek = (locale: Locale) => {
               experience
             </li>
           </ul>
-
           <Callout variant="warning" className="my-6">
             <p>
               <strong>Important:</strong> When adding new languages, ensure all

@@ -1,10 +1,18 @@
-'use client';
-
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
 import { DocsHeader } from '@/components/docs/docs-header';
 import { docsConfig } from '@/configs/docs';
+
+export const metadata = {
+  title: 'Theming Guide - React Event Calendar',
+  description: 'Learn how to customize calendar themes and styling',
+  keywords: ['theme customization', 'color schemes', 'UI styling'],
+  openGraph: {
+    title: 'Theme Customization Documentation',
+    url: 'https://shadcn-event-calendar.vercel.app/docs/customization/theming',
+  },
+};
 
 export default function ThemingDocsPage() {
   return (
@@ -15,7 +23,6 @@ export default function ThemingDocsPage() {
         currentPath="/docs/customization/theming"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -29,7 +36,6 @@ export default function ThemingDocsPage() {
             customizable. You can modify colors, spacing, typography, and more
             to match your application&apos;s design system.
           </p>
-
           <Callout variant="info" className="my-6">
             <p>
               For advanced theming options and inspiration, we recommend
@@ -47,7 +53,6 @@ export default function ThemingDocsPage() {
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -63,7 +68,6 @@ export default function ThemingDocsPage() {
             </code>{' '}
             file. Modify these variables to change the overall color scheme.
           </p>
-
           <CodeBlock
             language="css"
             filename="src/styles/globals.css"
@@ -112,14 +116,12 @@ export default function ThemingDocsPage() {
   --ring: oklch(0.68 0.16 243.35);
 }`}
           />
-
           <p className="mt-6 leading-7">
             Notice how we&apos;re using the modern OKLCH color space instead of
             HSL. This provides better color consistency and perceptual
             uniformity across different hues.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -131,12 +133,10 @@ export default function ThemingDocsPage() {
             Customizing event colors requires changes in{' '}
             <strong>two places</strong>:
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">1. Calendar Constants</h3>
           <p className="mb-4 leading-7">
             First, define the color options in the calendar constants file:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="constants/calendar-constant.ts"
@@ -154,7 +154,6 @@ export default function ThemingDocsPage() {
   // Add your custom colors here
 ];`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">
             2. Color Classes Definition
           </h3>
@@ -162,7 +161,6 @@ export default function ThemingDocsPage() {
             <strong>Important:</strong> You must also define the corresponding
             Tailwind classes for each color in the COLOR_CLASSES object:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="lib/event.ts"
@@ -235,7 +233,6 @@ export const getColorClasses = (color: string) =>
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -247,7 +244,6 @@ export const getColorClasses = (color: string) =>
             To add a new custom color to your calendar events, follow these
             steps:
           </p>
-
           <ol className="my-6 ml-6 list-decimal [&>li]:mt-3">
             <li className="leading-7">
               <strong>Add the color to EVENT_COLORS</strong> in
@@ -262,11 +258,9 @@ export const getColorClasses = (color: string) =>
               definitions
             </li>
           </ol>
-
           <p className="mb-4 leading-7">
             Example of adding a new &quot;Violet&quot; color:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="constants/calendar-constant.ts"
@@ -275,9 +269,7 @@ export const getColorClasses = (color: string) =>
   { label: 'Violet', value: 'oklch(0.60 0.24 300)' },
 ];`}
           />
-
           <p className="mt-4 mb-4 leading-7">And then in COLOR_CLASSES:</p>
-
           <CodeBlock
             language="tsx"
             filename="lib/event.ts"
@@ -295,7 +287,6 @@ export const getColorClasses = (color: string) =>
 };`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -316,7 +307,6 @@ export const getColorClasses = (color: string) =>
             Customize the Calendar Navigate components by modifying the
             component styles:
           </p>
-
           <CodeBlock
             language="tsx"
             code={`<div className="flex w-full items-center justify-around sm:hidden">
@@ -338,12 +328,10 @@ export const getColorClasses = (color: string) =>
   </Button>
 </div>`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Event Card</h3>
           <p className="mb-4 leading-7">
             Event Card use the color classes defined in COLOR_CLASSES:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/ui/event.tsx"
@@ -361,7 +349,6 @@ export const getColorClasses = (color: string) =>
     >`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -373,7 +360,6 @@ export const getColorClasses = (color: string) =>
             Create a comprehensive theme switcher that supports multiple custom
             themes:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="components/theme-switcher.tsx"

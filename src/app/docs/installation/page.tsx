@@ -5,6 +5,22 @@ import { PackageManager } from '@/components/docs/package-manager';
 import { DocsHeader } from '@/components/docs/docs-header';
 import { docsConfig } from '@/configs/docs';
 
+export const metadata = {
+  title: 'Installation Guide - React Event Calendar Docs',
+  description:
+    'Step-by-step installation guide for React Event Calendar. Learn how to set up the component in your React project.',
+  keywords: ['installation', 'setup guide', 'npm install'],
+  openGraph: {
+    title: 'Installation Guide',
+    url: 'https://shadcn-event-calendar.vercel.app/docs/installation',
+  },
+  alternates: {
+    canonical: 'https://shadcn-event-calendar.vercel.app/docs/installation',
+  },
+};
+
+// ... existing page content ...
+
 export default function InstallationPage() {
   return (
     <div className="space-y-16">
@@ -16,7 +32,6 @@ export default function InstallationPage() {
         currentPath="/docs/installation"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -34,7 +49,6 @@ export default function InstallationPage() {
             <li>Git for cloning the repository</li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -67,7 +81,6 @@ export default function InstallationPage() {
             code="cd my-calendar-app"
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -85,7 +98,6 @@ export default function InstallationPage() {
             defaults.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -101,7 +113,6 @@ export default function InstallationPage() {
             isExecuteCommand={true}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -114,7 +125,6 @@ export default function InstallationPage() {
           </p>
           <PackageManager name="npm install date-fns framer-motion nuqs zod react-hook-form @hookform/resolvers" />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -131,7 +141,6 @@ export default function InstallationPage() {
             code="git clone https://github.com/username/react-event-calendar.git"
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -139,7 +148,6 @@ export default function InstallationPage() {
           >
             Copy Required Files and Folders
           </h2>
-
           <div className="space-y-6">
             <div>
               <h3 className="mb-3 text-xl font-semibold">
@@ -167,7 +175,6 @@ export default function InstallationPage() {
                 ./src/components/"
               />
             </div>
-
             <div>
               <h3 className="mb-3 text-xl font-semibold">
                 Copy Additional Folders
@@ -198,7 +205,6 @@ cp -r react-event-calendar/src/db ./src/
 cp -r react-event-calendar/src/hooks ./src/`}
               />
             </div>
-
             <div>
               <h3 className="mb-3 text-xl font-semibold">Copy Actions File</h3>
               <p className="mb-4 leading-7">
@@ -220,7 +226,6 @@ cp -r react-event-calendar/src/hooks ./src/`}
             </div>
           </div>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -296,7 +301,6 @@ cp -r react-event-calendar/src/hooks ./src/`}
             />
           </div>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -350,7 +354,6 @@ export default async function EventCalendarPage(props: DemoPageProps) {
 }`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -374,7 +377,6 @@ export default async function EventCalendarPage(props: DemoPageProps) {
             in your browser to see the application running.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -382,7 +384,6 @@ export default async function EventCalendarPage(props: DemoPageProps) {
           >
             Troubleshooting
           </h2>
-
           <div className="space-y-4">
             <div>
               <h3 className="mb-2 text-lg font-semibold">
@@ -399,7 +400,6 @@ export default async function EventCalendarPage(props: DemoPageProps) {
                 <li>Import paths in the code match your folder structure</li>
               </ul>
             </div>
-
             <div>
               <h3 className="mb-2 text-lg font-semibold">TypeScript Errors</h3>
               <p className="leading-7">If you get TypeScript errors, ensure:</p>
@@ -408,7 +408,6 @@ export default async function EventCalendarPage(props: DemoPageProps) {
                 <li>TypeScript configuration supports path aliases (@/)</li>
               </ul>
             </div>
-
             <div>
               <h3 className="mb-2 text-lg font-semibold">Styling Issues</h3>
               <p className="leading-7">

@@ -1,11 +1,22 @@
-'use client';
-
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
 import FileTree from '@/components/docs/file-tree';
 import { DocsHeader } from '@/components/docs/docs-header';
 import { docsConfig } from '@/configs/docs';
+
+export const metadata = {
+  title: 'Architecture Overview - React Event Calendar Docs',
+  description:
+    'Technical architecture documentation for React Event Calendar. Learn about state management, component structure, and data flow.',
+  openGraph: {
+    title: 'System Architecture | React Event Calendar',
+    url: 'https://shadcn-event-calendar.vercel.app/docs/architecture',
+  },
+  alternates: {
+    canonical: 'https://shadcn-event-calendar.vercel.app/docs/architecture',
+  },
+};
 
 export default function ArchitecturePage() {
   return (
@@ -17,7 +28,6 @@ export default function ArchitecturePage() {
         currentPath="/docs/architecture"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -33,7 +43,6 @@ export default function ArchitecturePage() {
             persistence. The calendar supports multiple views (day, week, month,
             year) with customizable configurations.
           </p>
-
           <div className="my-10">
             <FileTree
               tree={[
@@ -96,7 +105,6 @@ export default function ArchitecturePage() {
             />
           </div>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -109,13 +117,11 @@ export default function ArchitecturePage() {
             management and URL state management with nuqs to enable shareable
             calendar views.
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">URL State with nuqs</h3>
           <p className="mb-4 leading-7">
             URL parameters are managed with nuqs to enable shareable calendar
             views and bookmarking:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="lib/searchParams.ts"
@@ -147,7 +153,6 @@ export const searchParamsCache = createSearchParamsCache({
             The core state is managed by a Zustand store that handles view
             configurations, selected events, and UI states:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="hooks/use-event-calendar.tsx"
@@ -208,7 +213,6 @@ export const useEventCalendarStore = create(
 );`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -221,7 +225,6 @@ export const useEventCalendarStore = create(
             The schema is designed to support various event properties including
             recurring events.
           </p>
-
           <CodeBlock
             language="tsx"
             filename="db/schema.ts"
@@ -261,13 +264,11 @@ export const events = pgTable('events', {
 export type EventTypes = typeof events.$inferSelect;
 export type newEvent = typeof events.$inferInsert;`}
           />
-
           <h3 className="mt-8 mb-3 text-xl font-semibold">Server Actions</h3>
           <p className="mb-4 leading-7">
             Next.js Server Actions are used to interact with the database,
             providing type-safe data fetching and mutations:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/actions.ts"
@@ -390,7 +391,6 @@ export const getEvents = cache(
 );`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -402,7 +402,6 @@ export const getEvents = cache(
             The calendar is built with a modular component architecture that
             separates concerns:
           </p>
-
           <div className="space-y-6">
             <div>
               <h3 className="mb-3 text-xl font-semibold">Main Components</h3>
@@ -437,7 +436,6 @@ export const getEvents = cache(
                 </li>
               </ul>
             </div>
-
             <CodeBlock
               language="tsx"
               filename="components/event-calendar/calendar.tsx"
@@ -481,7 +479,6 @@ export function EventCalendar({ events, initialDate }: EventCalendarProps) {
             />
           </div>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -493,7 +490,6 @@ export function EventCalendar({ events, initialDate }: EventCalendarProps) {
             The calendar follows a unidirectional data flow pattern with Next.js
             App Router and Server Actions:
           </p>
-
           <ol className="my-6 ml-6 list-decimal [&>li]:mt-3">
             <li>
               <strong>URL State</strong>: User interactions update URL
@@ -516,7 +512,6 @@ export function EventCalendar({ events, initialDate }: EventCalendarProps) {
               via Server Actions and the UI is updated
             </li>
           </ol>
-
           <CodeBlock
             language="tsx"
             filename="app/page.tsx"
@@ -555,7 +550,6 @@ export default async function CalendarPage({ searchParams }) {
   );
 }`}
           />
-
           <Callout variant="info">
             <p className="font-medium">Server-Side Rendering and Caching</p>
             <p className="mt-2">
@@ -566,7 +560,6 @@ export default async function CalendarPage({ searchParams }) {
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -577,7 +570,6 @@ export default async function CalendarPage({ searchParams }) {
           <p className="mb-4 leading-7">
             The calendar supports advanced filtering and search capabilities:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
             <li>
               <strong>Date Range Filtering</strong>: Events are filtered based
@@ -603,14 +595,12 @@ export default async function CalendarPage({ searchParams }) {
               description, or location
             </li>
           </ul>
-
           <p className="mt-6 leading-7">
             All filters can be combined to create complex queries, and the
             results are efficiently fetched from the database using Drizzle
             ORM&apos;s query builder.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -621,7 +611,6 @@ export default async function CalendarPage({ searchParams }) {
           <p className="mb-4 leading-7">
             The calendar supports recurring events with different patterns:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
             <li>
               <strong>Daily</strong>: Events that repeat every day
@@ -635,7 +624,6 @@ export default async function CalendarPage({ searchParams }) {
               month
             </li>
           </ul>
-
           <p className="mt-6 leading-7">
             Recurring events are stored in the database with a flag indicating
             their recurring status and the type of recurrence. The calendar
@@ -643,7 +631,6 @@ export default async function CalendarPage({ searchParams }) {
             in different views.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -654,7 +641,6 @@ export default async function CalendarPage({ searchParams }) {
           <p className="mb-4 leading-7">
             The calendar implements several performance optimizations:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
             <li>
               <strong>Server-Side Rendering</strong>: Initial data is rendered

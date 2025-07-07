@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
@@ -16,7 +14,6 @@ export default function SchemaDocsPage() {
         currentPath="/docs/db/schema"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -30,7 +27,6 @@ export default function SchemaDocsPage() {
             persistence. The schema defines the structure of events and related
             data.
           </p>
-
           <CodeBlock
             language="tsx"
             filename="db/schema.ts"
@@ -71,7 +67,6 @@ export type EventTypes = typeof events.$inferSelect;
 export type newEvent = typeof events.$inferInsert;`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -83,7 +78,6 @@ export type newEvent = typeof events.$inferInsert;`}
             The core of the database is the Events table, which stores all
             calendar events with their properties.
           </p>
-
           <div className="overflow-x-auto">
             <table className="my-6 w-full border-collapse">
               <thead>
@@ -241,12 +235,10 @@ export type newEvent = typeof events.$inferInsert;`}
               </tbody>
             </table>
           </div>
-
           <h3 className="mt-8 mb-3 text-xl font-semibold">Type Definitions</h3>
           <p className="mb-4 leading-7">
             Drizzle ORM generates TypeScript types from the schema definition:
           </p>
-
           <CodeBlock
             language="tsx"
             code={`// For selecting events from the database
@@ -255,13 +247,11 @@ export type EventTypes = typeof events.$inferSelect;
 // For inserting new events
 export type newEvent = typeof events.$inferInsert;`}
           />
-
           <p className="mt-6 leading-7">
             These types are used throughout the application to ensure type
             safety when working with event data.
           </p>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -280,7 +270,6 @@ export type newEvent = typeof events.$inferInsert;`}
             </code>{' '}
             fields:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               <strong>Daily</strong>: Events that repeat every day
@@ -294,7 +283,6 @@ export type newEvent = typeof events.$inferInsert;`}
               month
             </li>
           </ul>
-
           <Callout variant="info" className="my-6">
             <p>
               Recurring events are stored once in the database with their
@@ -303,7 +291,6 @@ export type newEvent = typeof events.$inferInsert;`}
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -315,7 +302,6 @@ export type newEvent = typeof events.$inferInsert;`}
             To set up the database with this schema, you need to run migrations
             using Drizzle ORM:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="db/index.ts"
@@ -340,7 +326,6 @@ export const db = drizzle(queryClient, { schema });`}
           <p className="mb-4 leading-7">
             Create and run migrations to set up your database tables:
           </p>
-
           <CodeBlock
             language="bash"
             code={`# Generate migrations
@@ -350,7 +335,6 @@ npx drizzle-kit generate:pg --schema=./src/db/schema.ts
 npx drizzle-kit push:pg`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -361,7 +345,6 @@ npx drizzle-kit push:pg`}
           <p className="mb-4 leading-7">
             Here are some examples of how to use the schema with Drizzle ORM:
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Querying Events</h3>
           <CodeBlock
             language="tsx"
@@ -386,7 +369,6 @@ const eventsInRange = await db.select().from(events).where(
 // Get events by category
 const categoryEvents = await db.select().from(events).where(eq(events.category, 'Meeting'));`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Creating Events</h3>
           <CodeBlock
             language="tsx"
@@ -408,7 +390,6 @@ await db.insert(events).values({
   color: '#3b82f6',
 });`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Updating Events</h3>
           <CodeBlock
             language="tsx"
@@ -425,7 +406,6 @@ await db.update(events)
   })
   .where(eq(events.id, eventId));`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">Deleting Events</h3>
           <CodeBlock
             language="tsx"
@@ -437,7 +417,6 @@ import { eq } from 'drizzle-orm';
 await db.delete(events).where(eq(events.id, eventId));`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -449,7 +428,6 @@ await db.delete(events).where(eq(events.id, eventId));`}
             As your application grows, you may need to evolve your schema.
             Here&apos;s how to handle schema changes:
           </p>
-
           <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">
             <li className="leading-7">
               Update the schema.ts file with your changes
@@ -462,11 +440,9 @@ await db.delete(events).where(eq(events.id, eventId));`}
               Update any affected TypeScript types and queries
             </li>
           </ol>
-
           <p className="mt-6 leading-7">
             Example of adding a new field to the events table:
           </p>
-
           <CodeBlock
             language="tsx"
             code={`// Updated schema.ts with a new field

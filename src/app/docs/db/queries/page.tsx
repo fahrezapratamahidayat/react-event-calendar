@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
@@ -15,7 +13,6 @@ export default function QueriesDocsPage() {
         currentPath="/docs/db/queries"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -29,7 +26,6 @@ export default function QueriesDocsPage() {
             PostgreSQL database. This documentation covers how to query, insert,
             update, and delete event data.
           </p>
-
           <Callout variant="info" className="my-6">
             <p>
               All database operations are performed through Server Actions in
@@ -37,7 +33,6 @@ export default function QueriesDocsPage() {
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -52,7 +47,6 @@ export default function QueriesDocsPage() {
             </code>
             , which supports filtering by various criteria:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/actions.ts"
@@ -190,7 +184,6 @@ export const getEvents = cache(
   }
 );`}
           />
-
           <p className="mt-6 leading-7">
             Key features of the{' '}
             <code className="bg-muted rounded px-1 py-0.5 font-mono text-sm">
@@ -198,7 +191,6 @@ export const getEvents = cache(
             </code>{' '}
             function:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               <strong>Caching</strong> - Results are cached for 1 hour using
@@ -225,7 +217,6 @@ export const getEvents = cache(
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -240,7 +231,6 @@ export const getEvents = cache(
             </code>{' '}
             server action:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/actions.ts"
@@ -306,9 +296,7 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
   }
 }`}
           />
-
           <p className="mt-6 leading-7">This function:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">Validates input data using Zod schema</li>
             <li className="leading-7">
@@ -321,7 +309,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
             <li className="leading-7">Returns success or error information</li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -336,7 +323,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
             </code>{' '}
             server action:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/actions.ts"
@@ -383,9 +369,7 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
   }
 }`}
           />
-
           <p className="mt-6 leading-7">This function:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               Accepts partial updates (only fields that need to change)
@@ -406,7 +390,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -421,7 +404,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
             </code>{' '}
             server action:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/actions.ts"
@@ -450,9 +432,7 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
   }
 }`}
           />
-
           <p className="mt-6 leading-7">This function:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               Checks if the event exists before deletion
@@ -463,7 +443,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -474,7 +453,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
           <p className="mb-4 leading-7">
             To retrieve all unique categories used in events:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/actions.ts"
@@ -503,7 +481,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
 }`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -518,7 +495,6 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
             </code>{' '}
             function:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/actions.ts"
@@ -610,9 +586,7 @@ export const searchEvents = cache(
   }
 );`}
           />
-
           <p className="mt-6 leading-7">This search function supports:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               Full-text search across title, description, and location
@@ -627,7 +601,6 @@ export const searchEvents = cache(
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -639,7 +612,6 @@ export const searchEvents = cache(
             For development and testing, you can seed the database with sample
             events:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="db/seed.ts"
@@ -730,11 +702,8 @@ export async function seedEvents() {
 
 seedEvents();`}
           />
-
           <p className="mt-6 leading-7">To run the seed script:</p>
-
           <CodeBlock language="bash" code={`npx tsx src/db/seed.ts`} />
-
           <Callout variant="info" className="my-6">
             <p>
               The seed script is useful for development and testing but should
@@ -742,7 +711,6 @@ seedEvents();`}
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -753,7 +721,6 @@ seedEvents();`}
           <p className="mb-4 leading-7">
             When working with database queries in React Event Calendar:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
             <li className="leading-7">
               <strong>Use Server Actions</strong> - Keep all database operations
@@ -792,3 +759,23 @@ seedEvents();`}
     </div>
   );
 }
+
+export const metadata = {
+  title: 'Database Queries Guide - React Event Calendar',
+  description: 'Complete reference for event data querying and management',
+  keywords: ['drizzle orm', 'postgresql', 'database queries'],
+  openGraph: {
+    title: 'Database Operations Documentation',
+    url: 'https://shadcn-event-calendar.vercel.app/docs/db/queries',
+  },
+};
+
+// Penambahan diagram ERD
+<Callout variant="info">
+  <p>Entity Relationship Diagram (ERD) for Event Calendar Database:</p>
+  <img
+    src="/erd-diagram.svg"
+    alt="Database ERD Diagram"
+    className="mt-4 rounded-lg border"
+  />
+</Callout>;

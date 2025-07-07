@@ -1,10 +1,24 @@
-'use client';
-
 import React from 'react';
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
 import { DocsHeader } from '@/components/docs/docs-header';
 import { docsConfig } from '@/configs/docs';
+
+export const metadata = {
+  title: 'Database Migrations Guide - React Event Calendar',
+  description:
+    'Step-by-step guide for managing database schema changes using Drizzle ORM migrations',
+  keywords: [
+    'database migrations',
+    'drizzle orm',
+    'schema changes',
+    'postgresql',
+  ],
+  openGraph: {
+    title: 'Database Migration Documentation',
+    url: 'https://shadcn-event-calendar.vercel.app/docs/db/migrations',
+  },
+};
 
 export default function MigrationsDocsPage() {
   return (
@@ -15,7 +29,6 @@ export default function MigrationsDocsPage() {
         currentPath="/docs/db/migrations"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -29,7 +42,6 @@ export default function MigrationsDocsPage() {
             in a controlled, versioned manner. React Event Calendar uses Drizzle
             ORM&apos;s migration system to handle schema changes safely.
           </p>
-
           <Callout variant="info" className="my-6">
             <p>
               Migrations allow you to track changes to your database schema,
@@ -38,7 +50,6 @@ export default function MigrationsDocsPage() {
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -53,7 +64,6 @@ export default function MigrationsDocsPage() {
             </code>
             :
           </p>
-
           <CodeBlock
             language="tsx"
             filename="db/migrate.ts"
@@ -75,9 +85,7 @@ async function runMigrations() {
 
 runMigrations();`}
           />
-
           <p className="mt-6 leading-7">This script:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               Imports the migration utilities from Drizzle ORM
@@ -100,7 +108,6 @@ runMigrations();`}
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -111,7 +118,6 @@ runMigrations();`}
           <p className="mb-4 leading-7">
             The typical workflow for managing database schema changes is:
           </p>
-
           <ol className="my-6 ml-6 list-decimal [&>li]:mt-3">
             <li className="leading-7">
               <strong>Update schema definition</strong> - Modify your{' '}
@@ -138,7 +144,6 @@ runMigrations();`}
             </li>
           </ol>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -149,15 +154,12 @@ runMigrations();`}
           <p className="mb-4 leading-7">
             To generate migration files based on your schema changes:
           </p>
-
           <CodeBlock
             language="bash"
             code={`# Generate SQL migration files
 npx drizzle-kit generate:pg --schema=./src/db/schema.ts --out=./drizzle`}
           />
-
           <p className="mt-6 leading-7">This command:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
               Analyzes your current{' '}
@@ -180,11 +182,9 @@ npx drizzle-kit generate:pg --schema=./src/db/schema.ts --out=./drizzle`}
               Creates a timestamp-based migration name for versioning
             </li>
           </ul>
-
           <p className="mt-6 leading-7">
             Example of a generated migration file:
           </p>
-
           <CodeBlock
             language="sql"
             filename="drizzle/0001_initial_migration.sql"
@@ -206,7 +206,6 @@ npx drizzle-kit generate:pg --schema=./src/db/schema.ts --out=./drizzle`}
 );`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -217,31 +216,26 @@ npx drizzle-kit generate:pg --schema=./src/db/schema.ts --out=./drizzle`}
           <p className="mb-4 leading-7">
             There are two ways to apply migrations to your database:
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">
             1. Using the Migration Script
           </h3>
           <p className="mb-4 leading-7">Run the migration script directly:</p>
-
           <CodeBlock
             language="bash"
             code={`# Run migrations using the script
 npx tsx src/db/migrate.ts`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">
             2. Using Drizzle Kit
           </h3>
           <p className="mb-4 leading-7">
             Use the Drizzle Kit CLI to push migrations:
           </p>
-
           <CodeBlock
             language="bash"
             code={`# Apply migrations using Drizzle Kit
 npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
           />
-
           <Callout variant="warning" className="my-6">
             <p>
               Always back up your database before applying migrations in
@@ -250,7 +244,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -262,7 +255,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             Here are some common schema changes and how they appear in
             migrations:
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Adding a New Column</h3>
           <CodeBlock
             language="tsx"
@@ -272,15 +264,12 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
   priority: integer('priority').default(0).notNull(),
 });`}
           />
-
           <p className="mt-4 mb-2 leading-7">Generated migration:</p>
-
           <CodeBlock
             language="sql"
             filename="drizzle/0002_add_priority.sql"
             code={`ALTER TABLE "events" ADD COLUMN "priority" integer DEFAULT 0 NOT NULL;`}
           />
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">
             Creating a New Table
           </h3>
@@ -299,9 +288,7 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });`}
           />
-
           <p className="mt-4 mb-2 leading-7">Generated migration:</p>
-
           <CodeBlock
             language="sql"
             filename="drizzle/0003_create_attendees.sql"
@@ -316,7 +303,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
 );`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -332,9 +318,7 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             </code>
             .
           </p>
-
           <p className="mb-4 leading-7">This table stores:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">Migration ID (based on the filename)</li>
             <li className="leading-7">Hash of the migration content</li>
@@ -342,9 +326,7 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
               Timestamp when the migration was applied
             </li>
           </ul>
-
           <p className="mt-6 leading-7">This tracking ensures that:</p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">Each migration is applied only once</li>
             <li className="leading-7">
@@ -356,7 +338,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -367,7 +348,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
           <p className="mb-4 leading-7">
             Follow these best practices for smooth database migrations:
           </p>
-
           <ul className="my-6 ml-6 list-disc [&>li]:mt-3">
             <li className="leading-7">
               <strong>Make small, incremental changes</strong> - Smaller
@@ -395,7 +375,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             </li>
           </ul>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -407,7 +386,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             When deploying to production, consider these approaches for running
             migrations:
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">
             1. Pre-deployment Migrations
           </h3>
@@ -416,7 +394,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             code. This is suitable for changes that are backward compatible with
             the current application version.
           </p>
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">
             2. Post-deployment Migrations
           </h3>
@@ -425,7 +402,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             suitable for changes that require the new application code to
             function correctly.
           </p>
-
           <h3 className="mt-6 mb-3 text-xl font-semibold">
             3. Automated Migrations
           </h3>
@@ -434,7 +410,6 @@ npx drizzle-kit push:pg --schema=./src/db/schema.ts`}
             implemented by adding the migration code to your application&apos;s
             initialization process:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="app/db-init.ts"

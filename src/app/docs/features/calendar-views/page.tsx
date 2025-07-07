@@ -1,5 +1,3 @@
-'use client';
-
 import { CodeBlock } from '@/components/docs/code-block';
 import { Callout } from '@/components/docs/callout';
 import dynamic from 'next/dynamic';
@@ -58,12 +56,10 @@ export default function CalendarViewsDocPage() {
     <div className="space-y-16">
       <DocsHeader
         title="Calendar Views"
-        description="React Event Calendar offers multiple view options to display and
-          interact with events."
+        description="Explore various calendar display modes and their configurations"
         currentPath="/docs/features/calendar-views"
         config={docsConfig}
       />
-
       <div className="space-y-12">
         <section className="space-y-6">
           <h2
@@ -76,7 +72,6 @@ export default function CalendarViewsDocPage() {
             The Day View displays a detailed timeline for a single day, showing
             all events with precise time slots.
           </p>
-
           <div className="my-8 rounded-md border p-4">
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg shadow-xl">
               <div className="from-primary/20 to-background/10 absolute inset-0 rounded-lg bg-gradient-to-br backdrop-blur-sm"></div>
@@ -87,7 +82,6 @@ export default function CalendarViewsDocPage() {
               </div>
             </div>
           </div>
-
           <h3 className="mb-3 text-xl font-semibold">Features</h3>
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
@@ -104,7 +98,6 @@ export default function CalendarViewsDocPage() {
               Hover time indicator for precise scheduling
             </li>
           </ul>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar.tsx"
@@ -120,7 +113,6 @@ useEventCalendarStore.getState().setView(CalendarViewType.DAY);
 <EventCalendar events={events} initialDate={new Date()} />`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -132,7 +124,6 @@ useEventCalendarStore.getState().setView(CalendarViewType.DAY);
             The Week View displays a 7-day period with hourly time slots,
             allowing you to see your entire week at a glance.
           </p>
-
           <div className="my-8 rounded-md border p-4">
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg shadow-xl">
               <div className="relative flex h-full w-full items-center justify-center p-4">
@@ -142,7 +133,6 @@ useEventCalendarStore.getState().setView(CalendarViewType.DAY);
               </div>
             </div>
           </div>
-
           <h3 className="mb-3 text-xl font-semibold">Features</h3>
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
@@ -155,7 +145,6 @@ useEventCalendarStore.getState().setView(CalendarViewType.DAY);
               Current time indicator across the week
             </li>
           </ul>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar.tsx"
@@ -174,7 +163,6 @@ useEventCalendarStore.getState().setFirstDayOfWeek(1);
 <EventCalendar events={events} initialDate={new Date()} />`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -186,7 +174,6 @@ useEventCalendarStore.getState().setFirstDayOfWeek(1);
             The Custom Days View allows you to display any number of consecutive
             days with hourly time slots.
           </p>
-
           <Callout variant="info">
             <p>
               This view is perfect for organizations that operate on
@@ -194,7 +181,6 @@ useEventCalendarStore.getState().setFirstDayOfWeek(1);
               institutions with custom schedules.
             </p>
           </Callout>
-
           <h3 className="mb-3 text-xl font-semibold">Features</h3>
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
@@ -206,7 +192,6 @@ useEventCalendarStore.getState().setFirstDayOfWeek(1);
               Ideal for 3-day, 4-day, or 10-day views
             </li>
           </ul>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar.tsx"
@@ -225,7 +210,6 @@ useEventCalendarStore.getState().setDaysCount(3);
 <EventCalendar events={events} initialDate={new Date()} />`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -237,7 +221,6 @@ useEventCalendarStore.getState().setDaysCount(3);
             The Month View displays a traditional calendar grid showing all days
             in the selected month.
           </p>
-
           <div className="my-8 rounded-md border">
             <div className="relative w-full overflow-hidden rounded-lg shadow-xl">
               <div className="relative flex h-full w-full items-center justify-center">
@@ -247,7 +230,6 @@ useEventCalendarStore.getState().setDaysCount(3);
               </div>
             </div>
           </div>
-
           <h3 className="mb-3 text-xl font-semibold">Features</h3>
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">Full month grid with weeks as rows</li>
@@ -262,7 +244,6 @@ useEventCalendarStore.getState().setDaysCount(3);
               Option to hide/show days from adjacent months
             </li>
           </ul>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar.tsx"
@@ -285,7 +266,6 @@ useEventCalendarStore.getState().updateMonthViewConfig({
 <EventCalendar events={events} initialDate={new Date()} />`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -297,7 +277,6 @@ useEventCalendarStore.getState().updateMonthViewConfig({
             The Year View provides an overview of the entire year with all
             months displayed in a grid.
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Features</h3>
           <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li className="leading-7">
@@ -312,7 +291,6 @@ useEventCalendarStore.getState().updateMonthViewConfig({
               Click on any month to navigate to Month View
             </li>
           </ul>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar.tsx"
@@ -337,7 +315,6 @@ useEventCalendarStore.getState().updateYearViewConfig({
 <EventCalendar events={events} initialDate={new Date()} />`}
           />
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -349,7 +326,6 @@ useEventCalendarStore.getState().updateYearViewConfig({
             React Event Calendar provides easy ways to switch between different
             views:
           </p>
-
           <h3 className="mb-3 text-xl font-semibold">Programmatic Switching</h3>
           <CodeBlock
             language="tsx"
@@ -363,12 +339,10 @@ useEventCalendarStore.getState().setView(CalendarViewType.MONTH);
 // Switch to Week View
 useEventCalendarStore.getState().setView(CalendarViewType.WEEK);`}
           />
-
           <h3 className="mt-8 mb-3 text-xl font-semibold">UI Components</h3>
           <p className="mb-4 leading-7">
             The calendar includes built-in view switching components:
           </p>
-
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/calendar-tabs.tsx"
@@ -379,7 +353,6 @@ useEventCalendarStore.getState().setView(CalendarViewType.WEEK);`}
 
 // This renders a tab interface with Day, Week, Month, and Year options`}
           />
-
           <Callout variant="info">
             <p>
               View state is automatically persisted in both the URL (using nuqs)
@@ -388,7 +361,6 @@ useEventCalendarStore.getState().setView(CalendarViewType.WEEK);`}
             </p>
           </Callout>
         </section>
-
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -400,7 +372,6 @@ useEventCalendarStore.getState().setView(CalendarViewType.WEEK);`}
             Each view type can be customized with specific configuration
             options:
           </p>
-
           <CodeBlock
             language="tsx"
             code={`// Customize Day View
@@ -423,7 +394,6 @@ useEventCalendarStore.getState().updateMonthViewConfig({
   hideOutsideDays: false,  // Show days from adjacent months
 });`}
           />
-
           <p className="mt-6 leading-7">
             These configurations allow you to tailor the calendar experience to
             your specific needs and user preferences.
@@ -433,3 +403,20 @@ useEventCalendarStore.getState().updateMonthViewConfig({
     </div>
   );
 }
+
+export const metadata = {
+  title: 'Calendar Views Documentation - React Event Calendar',
+  description:
+    'Learn about different calendar view modes: Day, Week, Month and custom views configuration',
+  keywords: [
+    'calendar views',
+    'day view',
+    'week view',
+    'month view',
+    'custom views',
+  ],
+  openGraph: {
+    title: 'Calendar Views Guide',
+    url: 'https://shadcn-event-calendar.vercel.app/docs/features/calendar-views',
+  },
+};
