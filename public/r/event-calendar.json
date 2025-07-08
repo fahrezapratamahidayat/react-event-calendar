@@ -1,0 +1,283 @@
+{
+    "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+    "name": "event-calendar",
+    "type": "registry:component",
+    "title": "Event Calendar",
+    "description": "react event calendar component",
+    "dependencies": [
+        "lucide-react",
+        "nuqs",
+        "react-hook-form",
+        "zod",
+        "motion",
+        "use-sync-external-store",
+        "zustand",
+        "vaul",
+        "react-hotkeys-hook"
+    ],
+    "registryDependencies": [
+        "badge",
+        "button",
+        "calendar",
+        "command",
+        "dropdown-menu",
+        "input",
+        "popover",
+        "select",
+        "separator",
+        "slider",
+        "table"
+    ],
+    "files": [
+        {
+            "path": "src/components/event-calendar/calendar.tsx",
+            "type": "registry:component",
+            "target": "src/components/event-calendar/calendar.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-day.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/calendar-day.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-days-view.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/calendar-days-view.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-filters.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/calendar-filters.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-month.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/calendar-month.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-setting-dialog.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/calendar-setting-dialog.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-tabs.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/calendar-tabs.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-toolbar.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/calendar-toolbar.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-week.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/calendar-week.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/calendar-year.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/calendar-year.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/day-events-dialog.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/day-events-dialog.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/event-create-dialog.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/event-create-dialog.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/event-detail-form.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/event-detail-form.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/event-dialog.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/event-dialog.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/event-dialog-trigger.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/event-dialog-trigger.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/event-list.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/event-list.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/event-preview-calendar.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/event-preview-calendar.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/event-search-dialog.tsx",
+            "type": "registry:block",
+            "target": "src/components/event-calendar/event-search-dialog.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/color-option-item.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/color-option-item.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/current-time-indicator.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/current-time-indicator.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/date-picker.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/date-picker.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/date-selector.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/date-selector.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/day-cell.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/day-cell.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/delete-alert.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/delete-alert.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/events.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/events.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/form-footer.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/form-footer.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/fullscreen-toggle.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/fullscreen-toggle.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/hover-time-indicator.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/hover-time-indicator.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/month-card.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/month-card.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/multi-day-event.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/multi-day-event.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/search-day-picker.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/search-day-picker.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/search-month-picker.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/search-month-picker.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/search-year-picker.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/search-year-picker.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/time-column.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/time-column.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/time-format-toggel.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/time-format-toggel.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/time-grid.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/time-grid.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/time-selector.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/time-selector.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/today-button.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/today-button.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/view-mode-toggle.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/view-mode-toggle.tsx"
+        },
+        {
+            "path": "src/components/event-calendar/ui/week-days-header.tsx",
+            "type": "registry:ui",
+            "target": "src/components/event-calendar/ui/week-days-header.tsx"
+        },
+        {
+            "path": "src/constants/calendar-constant.ts",
+            "type": "registry:lib",
+            "target": "src/constants/calendar-constant.ts"
+        },
+        {
+            "path": "src/hooks/use-mounted.tsx",
+            "type": "registry:hook",
+            "target": "src/hooks/use-mounted.tsx"
+        },
+        {
+            "path": "src/hooks/use-event.ts",
+            "type": "registry:hook",
+            "target": "src/hooks/use-event.ts"
+        },
+        {
+            "path": "src/hooks/use-debounce.ts",
+            "type": "registry:hook",
+            "target": "src/hooks/use-debounce.ts"
+        },
+        {
+            "path": "src/lib/validations.ts",
+            "type": "registry:lib",
+            "target": "src/lib/validations.ts"
+        },
+        {
+            "path": "src/lib/searchParams.ts",
+            "type": "registry:lib",
+            "target": "src/lib/searchParams.ts"
+        },
+        {
+            "path": "src/lib/event.ts",
+            "type": "registry:lib",
+            "target": "src/lib/event.ts"
+        },
+        {
+            "path": "src/lib/date.ts",
+            "type": "registry:lib",
+            "target": "src/lib/date.ts"
+        },
+        {
+            "path": "src/lib/utils.ts",
+            "type": "registry:lib",
+            "target": "src/lib/utils.ts"
+        },
+        {
+            "path": "src/types/event.ts",
+            "type": "registry:lib",
+            "target": "src/types/event.ts"
+        }
+    ]
+}
