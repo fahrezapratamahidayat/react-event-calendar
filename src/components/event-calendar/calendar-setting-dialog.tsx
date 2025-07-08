@@ -423,10 +423,7 @@ const CalendarSettings = ({
         />
       </ConfigRow>
     </ConfigSection>
-
     <Separator />
-
-    {/* Tambah Days View Section */}
     <ConfigSection title="Days View" icon={CalendarDays}>
       <ConfigRow
         label="Highlight today"
@@ -495,9 +492,7 @@ const CalendarSettings = ({
         />
       </ConfigRow>
     </ConfigSection>
-
     <Separator />
-
     <ConfigSection title="Week View" icon={CalendarDays}>
       <ConfigRow
         label="Highlight today"
@@ -566,9 +561,7 @@ const CalendarSettings = ({
         />
       </ConfigRow>
     </ConfigSection>
-
     <Separator />
-
     <ConfigSection title="Month View" icon={CalendarDays}>
       <ConfigRow
         label="Events per day limit"
@@ -608,9 +601,7 @@ const CalendarSettings = ({
         />
       </ConfigRow>
     </ConfigSection>
-
     <Separator />
-
     <ConfigSection title="Year View" icon={Sun}>
       <ConfigRow
         label="Show month labels"

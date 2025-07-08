@@ -167,7 +167,6 @@ export const EventSearchDialog = ({
         <DialogHeader>
           <DialogTitle>Search Events</DialogTitle>
         </DialogHeader>
-
         <div className="flex-1 space-y-4 overflow-hidden">
           <div className="relative">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />

@@ -285,7 +285,7 @@ export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
                   if (!position) return null;
 
                   // Calculate width and horizontal position
-                  const OVERLAP_FACTOR = 0.5; // Nilai positif
+                  const OVERLAP_FACTOR = 0.5;
                   const columnWidth =
                     (DAY_WIDTH_PERCENT +
                       OVERLAP_FACTOR / position.totalColumns) /

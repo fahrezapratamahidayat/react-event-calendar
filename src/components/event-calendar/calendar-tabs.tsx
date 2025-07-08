@@ -444,7 +444,6 @@ export function CalendarTabs({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-
         <AnimatePresence>
           {dropdownRect && mobileNavRect && isSecondaryTabActive && (
             <motion.div
