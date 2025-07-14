@@ -1,4 +1,4 @@
-import { EventCalendar } from '@/components/event-calendar/calendar';
+import { EventCalendar } from '@/components/event-calendar/event-calendar';
 import { getEvents } from '../actions';
 import { SearchParams } from 'nuqs';
 import { searchParamsCache } from '@/lib/searchParams';
