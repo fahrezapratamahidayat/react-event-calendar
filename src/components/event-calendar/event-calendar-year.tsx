@@ -11,12 +11,11 @@ import {
 } from 'date-fns';
 import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
-import { EventTypes } from '@/db/schema';
-import { CalendarViewType } from '@/types/event';
+import { CalendarViewType, Events } from '@/types/event';
 import { MonthCard } from './ui/month-card';
 
 interface CalendarYearProps {
-  events: EventTypes[];
+  events: Events[];
   currentDate: Date;
 }
 
@@ -44,7 +43,7 @@ export function EventCalendarYear({ events, currentDate }: CalendarYearProps) {
   }, [currentDate]);
 
   const { eventsByDate, eventCountByMonth } = useMemo(() => {
-    const groupedEvents: Record<string, EventTypes[]> = {};
+    const groupedEvents: Record<string, Events[]> = {};
     const counts = new Array(12).fill(0);
 
     events.forEach((event) => {
