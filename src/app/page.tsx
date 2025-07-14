@@ -303,7 +303,7 @@ export default function IndexPage() {
           </div>
           <div className="flex items-center gap-6">
             <a
-              href="https://github.com/fahrezapratamahidayat/react-event-calendar"
+              href="https://github.com/fahrezapratamahidayat/shadcn-event-calendar"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground text-sm"
