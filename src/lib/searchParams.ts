@@ -2,6 +2,7 @@ import { CalendarViewType } from '@/types/event';
 import {
   createSearchParamsCache,
   parseAsArrayOf,
+  parseAsBoolean,
   parseAsInteger,
   parseAsIsoDate,
   parseAsString,
@@ -17,5 +18,7 @@ export const searchParamsCache = createSearchParamsCache({
   colors: parseAsArrayOf(parseAsString).withDefault([]),
   locations: parseAsArrayOf(parseAsString).withDefault([]),
   repeatingTypes: parseAsArrayOf(parseAsString).withDefault([]),
-  isRepeating: parseAsString.withDefault(''),
+  isRepeating: parseAsBoolean.withDefault(false),
+  limit: parseAsInteger.withDefault(50),
+  offset: parseAsInteger.withDefault(0),
 });

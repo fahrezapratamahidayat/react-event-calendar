@@ -6,6 +6,23 @@ export interface HoverPositionType {
   dayIndex?: number;
 }
 
+export interface Events {
+  id: string;
+  title: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  startTime: string;
+  endTime: string;
+  isRepeating: boolean;
+  repeatingType: 'daily' | 'weekly' | 'monthly' | null;
+  location: string;
+  category: string;
+  color: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface MultiDayEventRowType {
   startIndex: number;
   endIndex: number;

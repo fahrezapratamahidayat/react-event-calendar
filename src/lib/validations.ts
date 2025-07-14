@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { validateTimeOrder } from './date';
+import { CalendarViewType } from '@/types/event';
 
 const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
 
@@ -58,6 +59,40 @@ export const eventFormSchema = baseEventSchema
   );
 
 export const UpdateEventSchema = createEventSchema.partial();
+
+export const eventFilterSchema = z.object({
+  title: z.string().optional(),
+  categories: z.array(z.string()).default([]),
+  daysCount: z.number().optional(),
+  view: z
+    .enum([
+      CalendarViewType.DAY,
+      CalendarViewType.DAYS,
+      CalendarViewType.WEEK,
+      CalendarViewType.MONTH,
+      CalendarViewType.YEAR,
+    ])
+    .optional(),
+  date: z.date(),
+  colors: z.array(z.string()).default([]),
+  locations: z.array(z.string()).default([]),
+  repeatingTypes: z.array(z.string()).default([]),
+  isRepeating: z.boolean().optional(),
+});
+
+export const searchEventFilterSchema = z.object({
+  search: z.string().min(1, 'Search query is required'),
+  categories: z.array(z.string()).default([]),
+  colors: z.array(z.string()).default([]),
+  locations: z.array(z.string()).default([]),
+  repeatingTypes: z.array(z.string()).default([]),
+  isRepeating: z.string().optional(),
+  limit: z.number().default(50),
+  offset: z.number().default(0),
+});
+
+export type EventFilter = z.infer<typeof eventFilterSchema>;
+export type SearchEventFilter = z.infer<typeof searchEventFilterSchema>;
 
 export type CreateTaskSchema = z.infer<typeof createEventSchema>;
 export type UpdateTaskSchema = z.infer<typeof UpdateEventSchema>;
