@@ -37,7 +37,8 @@
         "scroll-area",
         "tabs",
         "tooltip",
-        "sonner"
+        "sonner",
+        "skeleton"
     ],
     "files": [
         {
