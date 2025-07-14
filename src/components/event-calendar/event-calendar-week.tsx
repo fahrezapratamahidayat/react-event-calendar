@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { formatDate, generateTimeSlots, isSameDay } from '@/lib/date';
 import { ScrollArea } from '../ui/scroll-area';
-import { HoverPositionType } from '@/types/event';
+import { Events, HoverPositionType } from '@/types/event';
 import { WeekDayHeaders } from './ui/week-days-header';
 import { TimeColumn } from './ui/time-column';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
@@ -19,7 +19,6 @@ import {
 } from '@/lib/event';
 import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
-import { EventTypes } from '@/db/schema';
 import { Button } from '../ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { MultiDayEventSection } from './ui/multi-day-event';
@@ -34,7 +33,7 @@ const DAY_WIDTH_PERCENT = 100 / DAYS_IN_WEEK;
 const MULTI_DAY_ROW_HEIGHT = 64;
 
 interface CalendarWeekProps {
-  events: EventTypes[];
+  events: Events[];
   currentDate: Date;
 }
 
@@ -131,7 +130,7 @@ export function EventCalendarWeek({ events, currentDate }: CalendarWeekProps) {
   ]);
 
   const showEventDetail = useCallback(
-    (_event: EventTypes) => {
+    (_event: Events) => {
       openEventDialog(_event);
     },
     [openEventDialog],
