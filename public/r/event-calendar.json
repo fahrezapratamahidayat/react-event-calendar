@@ -14,7 +14,7 @@
         "zustand",
         "vaul",
         "react-hotkeys-hook",
-        "@hookform/resolvers/zod"
+        "@hookform/resolvers"
     ],
     "registryDependencies": [
         "badge",
