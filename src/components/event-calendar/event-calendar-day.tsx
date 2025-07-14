@@ -5,7 +5,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { isSameDay } from 'date-fns';
 import { generateTimeSlots } from '@/lib/date';
 import { cn } from '@/lib/utils';
-import { HoverPositionType } from '@/types/event';
+import { Events, HoverPositionType } from '@/types/event';
 import { EventDialogTrigger } from './event-dialog-trigger';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
@@ -13,7 +13,6 @@ import { useDayEventPositions } from '@/lib/event';
 import { TimeColumn } from './ui/time-column';
 import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
-import { EventTypes } from '@/db/schema';
 
 const HOUR_HEIGHT = 64; // Height in pixels for 1 hour
 const START_HOUR = 0; // 00:00
@@ -21,7 +20,7 @@ const END_HOUR = 23; // 23:00
 const COLUMN_WIDTH_TOTAL = 99.5; // Total width percentage for columns
 
 interface CalendarDayProps {
-  events: EventTypes[];
+  events: Events[];
   currentDate: Date;
 }
 export function EventCalendarDay({ events, currentDate }: CalendarDayProps) {
