@@ -11,15 +11,15 @@ import {
 } from 'date-fns';
 import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
-import { EventTypes } from '@/db/schema';
 import { DayCell } from './ui/day-cell';
 import { WeekDayHeaders } from './ui/week-days-header';
 import { getLocaleFromCode, useWeekDays } from '@/lib/event';
 import { formatDate } from '@/lib/date';
+import { Events } from '@/types/event';
 
 const DAYS_IN_WEEK = 7;
 interface CalendarMonthProps {
-  events: EventTypes[];
+  events: Events[];
   baseDate: Date;
 }
 
@@ -67,7 +67,7 @@ export function EventCalendarMonth({ events, baseDate }: CalendarMonthProps) {
 
   // Groups events by their start date
   const eventsGroupedByDate = useMemo(() => {
-    const groupedEvents: Record<string, EventTypes[]> = {};
+    const groupedEvents: Record<string, Events[]> = {};
 
     visibleDays.forEach((day) => {
       groupedEvents[format(day, 'yyyy-MM-dd')] = [];
