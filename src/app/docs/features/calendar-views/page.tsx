@@ -9,8 +9,8 @@ import { docsConfig } from '@/configs/docs';
 export default function CalendarViewsDocPage() {
   const CalendarDay = dynamic(
     () =>
-      import('@/components/event-calendar/calendar-day').then((mod) => ({
-        default: mod.CalendarDay,
+      import('@/components/event-calendar/event-calendar-day').then((mod) => ({
+        default: mod.EventCalendarDay,
       })),
     {
       ssr: true,
@@ -24,8 +24,8 @@ export default function CalendarViewsDocPage() {
 
   const CalendarWeek = dynamic(
     () =>
-      import('@/components/event-calendar/calendar-week').then((mod) => ({
-        default: mod.CalendarWeek,
+      import('@/components/event-calendar/event-calendar-week').then((mod) => ({
+        default: mod.EventCalendarWeek,
       })),
     {
       ssr: true,
@@ -39,9 +39,11 @@ export default function CalendarViewsDocPage() {
 
   const CalendarMonth = dynamic(
     () =>
-      import('@/components/event-calendar/calendar-month').then((mod) => ({
-        default: mod.CalendarMonth,
-      })),
+      import('@/components/event-calendar/event-calendar-month').then(
+        (mod) => ({
+          default: mod.EventCalendarMonth,
+        }),
+      ),
     {
       ssr: true,
       loading: () => (
