@@ -11,10 +11,9 @@ import {
   isWithinInterval,
   startOfDay,
 } from 'date-fns';
-import { CalendarViewType, TimeFormatType } from '@/types/event';
+import { CalendarViewType, Events, TimeFormatType } from '@/types/event';
 import { EventGroup, NoEvents } from './ui/events';
 import { useEventCalendarStore } from '@/hooks/use-event';
-import { EventTypes } from '@/db/schema';
 import {
   getLocaleFromCode,
   useEventFilter,
@@ -23,7 +22,7 @@ import {
 import { useShallow } from 'zustand/shallow';
 
 interface EventsListProps {
-  events: EventTypes[];
+  events: Events[];
   currentDate: Date;
 }
 
@@ -72,9 +71,9 @@ const EventSection = ({
 }: {
   title: string;
   timeKey: string;
-  events: EventTypes[];
+  events: Events[];
   timeFormat: TimeFormatType;
-  onEventClick: (event: EventTypes) => void;
+  onEventClick: (event: Events) => void;
 }) => (
   <div className="space-y-2">
     <h3 className="text-muted-foreground text-sm font-medium">{title}</h3>
@@ -109,7 +108,7 @@ export function EventsList({ events, currentDate }: EventsListProps) {
   );
 
   const handleEventClick = useCallback(
-    (event: EventTypes) => {
+    (event: Events) => {
       openEventDialog(event);
     },
     [openEventDialog],
