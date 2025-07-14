@@ -20,7 +20,7 @@ interface CalendarYearProps {
   currentDate: Date;
 }
 
-export function CalendarYear({ events, currentDate }: CalendarYearProps) {
+export function EventCalendarYear({ events, currentDate }: CalendarYearProps) {
   const {
     openQuickAddDialog,
     openEventDialog,

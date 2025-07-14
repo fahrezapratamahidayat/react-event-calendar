@@ -37,7 +37,7 @@ interface CalendarDayViewProps {
   daysCount: number;
 }
 
-export function CalendarDaysView({
+export function EventCalendarDays({
   events,
   currentDate,
   daysCount = 16,

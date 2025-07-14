@@ -38,7 +38,7 @@ interface CalendarWeekProps {
   currentDate: Date;
 }
 
-export function CalendarWeek({ events, currentDate }: CalendarWeekProps) {
+export function EventCalendarWeek({ events, currentDate }: CalendarWeekProps) {
   const {
     timeFormat,
     locale,

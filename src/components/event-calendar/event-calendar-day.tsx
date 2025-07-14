@@ -24,7 +24,7 @@ interface CalendarDayProps {
   events: EventTypes[];
   currentDate: Date;
 }
-export function CalendarDay({ events, currentDate }: CalendarDayProps) {
+export function EventCalendarDay({ events, currentDate }: CalendarDayProps) {
   const { timeFormat, viewSettings, openQuickAddDialog, openEventDialog } =
     useEventCalendarStore(
       useShallow((state) => ({

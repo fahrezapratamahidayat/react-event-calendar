@@ -118,7 +118,7 @@ interface GeneralSettingsProps {
   setFirstDayOfWeek: (value: 0 | 1 | 2 | 3 | 4 | 5 | 6) => void;
 }
 
-export default function CalendarSettingsDialog() {
+export default function EventCalendarSettingsDialog() {
   const {
     currentView,
     viewMode,

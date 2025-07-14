@@ -10,7 +10,7 @@ import { SearchMonthPicker } from './ui/search-month-picker';
 import { SearchDayPicker } from './ui/search-day-picker';
 import { CalendarViewType, TimeFormatType, ViewModeType } from '@/types/event';
 import { useEventCalendarStore } from '@/hooks/use-event';
-import { CalendarTabs } from './calendar-tabs';
+import { EventCalendarTabs } from './event-calendar-tabs';
 import { useShallow } from 'zustand/shallow';
 import { useCallback, useEffect } from 'react';
 import {
@@ -25,11 +25,11 @@ import {
 } from 'date-fns';
 import { useQueryState } from 'nuqs';
 import { parseAsIsoDate } from 'nuqs/server';
-import { EventCalendarFilters } from './calendar-filters';
-import CalendarSettingsDialog from './calendar-setting-dialog';
+import { EventCalendarFilters } from './event-calendar-filters';
+import CalendarSettingsDialog from './event-calendar-setting-dialog';
 import { getLocaleFromCode } from '@/lib/event';
 
-export default function CalendarToolbar() {
+export default function EventCalendarToolbar() {
   const [date, setDate] = useQueryState(
     'date',
     parseAsIsoDate.withDefault(new Date()).withOptions({
@@ -200,7 +200,10 @@ export default function CalendarToolbar() {
       </div>
       <EventCalendarFilters />
       <div className="bg-muted/30 flex items-center justify-between border-b px-4 py-2">
-        <CalendarTabs viewType={currentView} onChange={handleViewTypeChange} />
+        <EventCalendarTabs
+          viewType={currentView}
+          onChange={handleViewTypeChange}
+        />
         <div className="flex items-center sm:space-x-2">
           <TimeFormatToggle
             format={timeFormat}

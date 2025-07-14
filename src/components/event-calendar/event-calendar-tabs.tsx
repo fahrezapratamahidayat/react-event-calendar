@@ -66,7 +66,7 @@ const getHoverAnimationProps = (hoveredRect: DOMRect, navRect: DOMRect) => ({
   height: hoveredRect.height + 8,
 });
 
-export function CalendarTabs({
+export function EventCalendarTabs({
   viewType,
   onChange,
   className = '',

@@ -23,7 +23,7 @@ interface CalendarMonthProps {
   baseDate: Date;
 }
 
-export function CalendarMonth({ events, baseDate }: CalendarMonthProps) {
+export function EventCalendarMonth({ events, baseDate }: CalendarMonthProps) {
   const {
     timeFormat,
     firstDayOfWeek,
