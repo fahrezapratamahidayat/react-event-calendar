@@ -28,8 +28,8 @@ import Navbar from '@/components/navbar';
 
 const CalendarDay = dynamic(
   () =>
-    import('@/components/event-calendar/calendar-day').then((mod) => ({
-      default: mod.CalendarDay,
+    import('@/components/event-calendar/event-calendar-day').then((mod) => ({
+      default: mod.EventCalendarDay,
     })),
   {
     ssr: true,
