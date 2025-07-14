@@ -177,29 +177,6 @@ export const searchEvents = cache(
         ),
       );
 
-      if (filter.dateFrom && filter.dateTo) {
-        conditions.push(
-          or(
-            and(
-              between(events.startDate, filter.dateFrom, filter.dateTo),
-              between(events.endDate, filter.dateFrom, filter.dateTo),
-            ),
-            or(
-              between(events.startDate, filter.dateFrom, filter.dateTo),
-              between(events.endDate, filter.dateFrom, filter.dateTo),
-              and(
-                lte(events.startDate, filter.dateFrom),
-                gte(events.endDate, filter.dateTo),
-              ),
-            ),
-          ),
-        );
-      } else if (filter.dateFrom) {
-        conditions.push(gte(events.startDate, filter.dateFrom));
-      } else if (filter.dateTo) {
-        conditions.push(lte(events.endDate, filter.dateTo));
-      }
-
       if (filter.categories.length > 0) {
         const categoryConditions = filter.categories.map((category) =>
           eq(events.category, category),
