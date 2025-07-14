@@ -15,10 +15,9 @@ import {
 } from '@/lib/event';
 import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
-import { EventTypes } from '@/db/schema';
 import { MultiDayEventSection } from './ui/multi-day-event';
 import { TimeColumn } from './ui/time-column';
-import { HoverPositionType } from '@/types/event';
+import { Events, HoverPositionType } from '@/types/event';
 import { CurrentTimeIndicator } from './ui/current-time-indicator';
 import { HoverTimeIndicator } from './ui/hover-time-indicator';
 import { cn } from '@/lib/utils';
@@ -32,7 +31,7 @@ const END_HOUR = 23;
 const MULTI_DAY_ROW_HEIGHT = 65;
 
 interface CalendarDayViewProps {
-  events: EventTypes[];
+  events: Events[];
   currentDate: Date;
   daysCount: number;
 }
@@ -136,7 +135,7 @@ export function EventCalendarDays({
   ]);
 
   const showEventDetail = useCallback(
-    (_event: EventTypes) => {
+    (_event: Events) => {
       openEventDialog(_event);
     },
     [openEventDialog],
