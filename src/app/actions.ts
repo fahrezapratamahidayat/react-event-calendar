@@ -17,45 +17,15 @@ import {
 import { z } from 'zod';
 import { unstable_cache as cache, revalidatePath } from 'next/cache';
 import { combineDateAndTime } from '@/lib/date';
-import { createEventSchema } from '@/lib/validations';
+import {
+  createEventSchema,
+  EventFilter,
+  eventFilterSchema,
+  SearchEventFilter,
+  searchEventFilterSchema,
+} from '@/lib/validations';
 
 const REVALIDATE_TIME = 3600;
-
-const eventFilterSchema = z.object({
-  title: z.string().optional(),
-  categories: z.array(z.string()).default([]),
-  daysCount: z.number().optional(),
-  view: z
-    .enum([
-      CalendarViewType.DAY,
-      CalendarViewType.DAYS,
-      CalendarViewType.WEEK,
-      CalendarViewType.MONTH,
-      CalendarViewType.YEAR,
-    ])
-    .optional(),
-  date: z.date(),
-  colors: z.array(z.string()).default([]),
-  locations: z.array(z.string()).default([]),
-  repeatingTypes: z.array(z.string()).default([]),
-  isRepeating: z.string().optional(),
-});
-
-const searchEventFilterSchema = z.object({
-  search: z.string().min(1, 'Search query is required'),
-  categories: z.array(z.string()).default([]),
-  colors: z.array(z.string()).default([]),
-  locations: z.array(z.string()).default([]),
-  repeatingTypes: z.array(z.string()).default([]),
-  isRepeating: z.string().optional(),
-  dateFrom: z.date().optional(),
-  dateTo: z.date().optional(),
-  limit: z.number().default(50),
-  offset: z.number().default(0),
-});
-
-export type EventFilter = z.infer<typeof eventFilterSchema>;
-export type SearchEventFilter = z.infer<typeof searchEventFilterSchema>;
 
 export const getEvents = cache(
   async (filterParams: EventFilter) => {
@@ -159,7 +129,7 @@ export const getEvents = cache(
       //   }
 
       if (filter.isRepeating) {
-        conditions.push(eq(events.isRepeating, filter.isRepeating === 'true'));
+        conditions.push(eq(events.isRepeating, filter.isRepeating));
       }
 
       const result = await db
