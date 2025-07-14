@@ -9,7 +9,7 @@
         "nuqs",
         "react-hook-form",
         "zod",
-        "motion^12.9.1",
+        "motion",
         "use-sync-external-store",
         "zustand",
         "vaul",
