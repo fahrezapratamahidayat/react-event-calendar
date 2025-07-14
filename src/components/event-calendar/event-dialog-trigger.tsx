@@ -1,18 +1,17 @@
-import { EventPosition } from '@/types/event';
+import { EventPosition, Events } from '@/types/event';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { calculateDuration, formatTimeDisplay } from '@/lib/date';
-import { EventTypes } from '@/db/schema';
 import { getColorClasses } from '@/lib/event';
 import { AnimatePresence, motion } from 'framer-motion';
 
 type EventDialogTriggerProps = {
-  event: EventTypes;
+  event: Events;
   position: EventPosition;
   leftOffset: number;
   rightOffset: number;
   onClick: (
-    event: EventTypes,
+    event: Events,
     position: EventPosition,
     leftOffset: number,
     rightOffset: number,
