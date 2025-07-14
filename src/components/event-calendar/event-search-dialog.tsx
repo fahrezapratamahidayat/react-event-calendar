@@ -1,10 +1,9 @@
-import { EventTypes } from '@/db/schema';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Loader2, Search } from 'lucide-react';
 import { Input } from '../ui/input';
 import { EventCard } from './ui/events';
-import { TimeFormatType } from '@/types/event';
+import { Events, TimeFormatType } from '@/types/event';
 import { ScrollArea } from '../ui/scroll-area';
 import { SearchEventFilter } from '@/lib/validations';
 import { searchEvents } from '@/app/actions';
@@ -13,7 +12,7 @@ interface EventSearchDialogProps {
   onOpenChange: (open: boolean) => void;
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
-  onEventSelect: (event: EventTypes) => void;
+  onEventSelect: (event: Events) => void;
   timeFormat: TimeFormatType;
 }
 
@@ -26,7 +25,7 @@ export const EventSearchDialog = ({
   timeFormat,
 }: EventSearchDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<EventTypes[]>([]);
+  const [searchResults, setSearchResults] = useState<Events[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
