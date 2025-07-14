@@ -11,9 +11,8 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEventCalendarStore } from '@/hooks/use-event';
 import { formatDate } from '@/lib/date';
-import { EventTypes } from '@/db/schema';
 import { useMemo } from 'react';
-import { TimeFormatType } from '@/types/event';
+import { Events, TimeFormatType } from '@/types/event';
 import { EventCard } from './ui/events';
 import { getLocaleFromCode } from '@/lib/event';
 import { useShallow } from 'zustand/shallow';
@@ -29,9 +28,9 @@ const EventListContent = ({
   timeFormat,
   onEventClick,
 }: {
-  events: EventTypes[];
+  events: Events[];
   timeFormat: TimeFormatType;
-  onEventClick: (event: EventTypes) => void;
+  onEventClick: (event: Events) => void;
 }) => (
   <ScrollArea className="h-[400px] w-full rounded-md">
     <div className="flex flex-col gap-2">
