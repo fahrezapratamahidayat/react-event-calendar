@@ -3,11 +3,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Loader2, Search } from 'lucide-react';
 import { Input } from '../ui/input';
-import { searchEvents, SearchEventFilter } from '@/app/actions';
 import { EventCard } from './ui/events';
 import { TimeFormatType } from '@/types/event';
 import { ScrollArea } from '../ui/scroll-area';
-
+import { SearchEventFilter } from '@/lib/validations';
+import { searchEvents } from '@/app/actions';
 interface EventSearchDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -68,8 +68,6 @@ export const EventSearchDialog = ({
             limit: 20,
             offset: 0,
             isRepeating: options?.isRepeating,
-            dateFrom: options?.dateFrom,
-            dateTo: options?.dateTo,
           };
 
           const result = await searchEvents(searchParams);
