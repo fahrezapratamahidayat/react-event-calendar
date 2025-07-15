@@ -45,7 +45,10 @@ export default function InstallationPage() {
             required dependencies and copy the component files into your
             project.
           </p>
-          <PackageManager name='npx shadcn@2.4.0-canary.12 add "https://shadcn-event-calendar.vercel.app/r/event-calendar.json"' />
+          <PackageManager
+            isExecuteCommand={true}
+            name='npx shadcn@2.4.0-canary.12 add "https://shadcn-event-calendar.vercel.app/r/event-calendar.json"'
+          />
         </section>
 
         <hr />
