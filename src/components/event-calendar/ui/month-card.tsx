@@ -4,7 +4,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { EventTypes } from '@/db/schema';
 import { isSameDay } from '@/lib/date';
 import { getColorClasses } from '@/lib/event';
 import { cn } from '@/lib/utils';
@@ -20,23 +19,23 @@ import {
 } from 'date-fns';
 import { ChevronRight, Plus } from 'lucide-react';
 import { memo, useMemo } from 'react';
-import { YearViewConfig } from '@/types/event';
+import { Events, YearViewConfig } from '@/types/event';
 import { parseAsIsoDate, useQueryState } from 'nuqs';
 
 interface MonthCardProps {
   month: Date;
-  eventsByDate: Record<string, EventTypes[]>;
+  eventsByDate: Record<string, Events[]>;
   eventCount: number;
   yearViewConfig: YearViewConfig;
   onMonthClick: (month: Date) => void;
-  onEventClick: (event: EventTypes) => void;
+  onEventClick: (event: Events) => void;
   onDateClick: (date: Date) => void;
   onQuickAdd: (date: Date) => void;
 }
 
 interface DayCellProps {
   day: Date;
-  events: EventTypes[];
+  events: Events[];
   isToday: boolean;
   onClick: () => void;
 }
@@ -85,7 +84,7 @@ const MonthDaysGrid = memo(
     onDateClick,
   }: {
     month: Date;
-    eventsByDate: Record<string, EventTypes[]>;
+    eventsByDate: Record<string, Events[]>;
     onDateClick: (date: Date) => void;
   }) => {
     const daysInMonth = eachDayOfInterval({
