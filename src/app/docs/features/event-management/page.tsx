@@ -24,7 +24,7 @@ export default function EventManagementDocPage() {
           <p className="mb-4 leading-7">
             React Event Calendar provides multiple ways to create new events,
             making it intuitive for users to schedule activities. Clicking a
-            time slot or the "Add Event" button opens the{' '}
+            time slot or the &quot;Add Event&quot; button opens the{' '}
             <strong>EventCreateDialog</strong>.
           </p>
           <p className="mb-4 leading-7">
@@ -161,7 +161,7 @@ export default function EventCreateDialog() {
           <p className="mb-4 leading-7">
             To edit an event, users can click on it to open the{' '}
             <strong>EventDialog</strong>. This dialog comes pre-filled with the
-            event's data, ready for modification.
+            event&apos;s data, ready for modification.
           </p>
           <CodeBlock
             language="tsx"
