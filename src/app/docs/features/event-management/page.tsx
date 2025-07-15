@@ -9,8 +9,7 @@ export default function EventManagementDocPage() {
     <div className="space-y-16">
       <DocsHeader
         title="Event Management"
-        description="Create, edit, delete, and manage calendar events with React Event
-          Calendar."
+        description="Create, edit, delete, and manage calendar events with React Event Calendar."
         currentPath="/docs/features/event-management"
         config={docsConfig}
       />
@@ -24,77 +23,134 @@ export default function EventManagementDocPage() {
           </h2>
           <p className="mb-4 leading-7">
             React Event Calendar provides multiple ways to create new events,
-            making it intuitive for users to schedule activities.
+            making it intuitive for users to schedule activities. Clicking a
+            time slot or the "Add Event" button opens the{' '}
+            <strong>EventCreateDialog</strong>.
           </p>
-          <h3 className="mb-3 text-xl font-semibold">Click to Create</h3>
           <p className="mb-4 leading-7">
-            Users can click on any time slot in Day, Week, or Days views to
-            create a new event at that specific time.
-          </p>
-          <h3 className="mt-6 mb-3 text-xl font-semibold">Quick Add Dialog</h3>
-          <p className="mb-4 leading-7">
-            The Quick Add dialog allows users to create events with minimal
-            information:
+            The full event form allows users to specify all event properties,
+            including title, dates, location, recurring options, and more.
           </p>
           <CodeBlock
             language="tsx"
-            filename="components/event-calendar/event-form.tsx"
-            code={`import { useEventCalendarStore } from '@/hooks/use-event-calendar';
-import { QuickAddDialog } from '@/components/event-calendar/quick-add-dialog';
+            filename="components/event-calendar/event-create-dialog.tsx"
+            code={`'use client';
 
-// Open the Quick Add dialog
-useEventCalendarStore.getState().openQuickAddDialog({
-  date: new Date(),
-  startTime: '09:00',
-  endTime: '10:00',
-});
-
-// Render the dialog component
-<QuickAddDialog />`}
-          />
-          <h3 className="mt-6 mb-3 text-xl font-semibold">Full Event Form</h3>
-          <p className="mb-4 leading-7">
-            For more detailed event creation, the full event form allows users
-            to specify all event properties:
-          </p>
-          <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-            <li className="leading-7">Title and description</li>
-            <li className="leading-7">Start and end dates/times</li>
-            <li className="leading-7">Location</li>
-            <li className="leading-7">Category</li>
-            <li className="leading-7">Color</li>
-            <li className="leading-7">Recurring options</li>
-          </ul>
-          <CodeBlock
-            language="tsx"
-            filename="components/event-calendar/event-form.tsx"
-            code={`import { EventForm } from '@/components/event-calendar/event-form';
+import { Button } from '@/components/ui/button';
+import { useEventCalendarStore } from '@/hooks/use-event';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Save } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import { ScrollArea } from '../ui/scroll-area';
+import { EventDetailsForm } from './event-detail-form';
+import { createEventSchema } from '@/lib/validations';
+import { EVENT_DEFAULTS } from '@/constants/calendar-constant';
+import { useShallow } from 'zustand/shallow';
+import { toast } from 'sonner';
 import { createEvent } from '@/app/actions';
+import { getLocaleFromCode } from '@/lib/event';
 
-// Example of rendering the event form
-<EventForm
-  mode="create"
-  onSubmit={async (data) => {
-    const result = await createEvent(data);
-    if (result.success) {
-      // Handle success
+type EventFormValues = z.infer<typeof createEventSchema>;
+
+const DEFAULT_FORM_VALUES: EventFormValues = {
+  title: '',
+  description: '',
+  startDate: new Date(),
+  endDate: new Date(),
+  category: EVENT_DEFAULTS.CATEGORY,
+  startTime: EVENT_DEFAULTS.START_TIME,
+  endTime: EVENT_DEFAULTS.END_TIME,
+  location: '',
+  color: EVENT_DEFAULTS.COLOR,
+  isRepeating: false,
+};
+
+export default function EventCreateDialog() {
+  const {
+    isQuickAddDialogOpen,
+    closeQuickAddDialog,
+    timeFormat,
+    locale,
+    quickAddData,
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      isQuickAddDialogOpen: state.isQuickAddDialogOpen,
+      closeQuickAddDialog: state.closeQuickAddDialog,
+      timeFormat: state.timeFormat,
+      locale: state.locale,
+      quickAddData: state.quickAddData,
+    })),
+  );
+  const form = useForm<EventFormValues>({
+    resolver: zodResolver(createEventSchema),
+    defaultValues: DEFAULT_FORM_VALUES,
+    mode: 'onChange',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const localeObj = getLocaleFromCode(locale);
+
+  const handleSubmit = async (formValues: EventFormValues) => {
+    setIsSubmitting(true);
+    toast.promise(createEvent(formValues), {
+      loading: 'Creating Event...',
+      success: (result) => {
+        if (!result.success) {
+          throw new Error(result.error || 'Error Creating Event');
+        }
+        form.reset(DEFAULT_FORM_VALUES);
+        setIsSubmitting(false);
+        closeQuickAddDialog();
+        return 'Event Succesfully created';
+      },
+      error: (error) => {
+        console.error('Error:', error);
+        return 'Oops! Something went wrong.';
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (isQuickAddDialogOpen && quickAddData.date) {
+      form.reset({
+        ...DEFAULT_FORM_VALUES,
+        startDate: quickAddData.date,
+        endDate: quickAddData.date,
+        startTime: quickAddData.startTime,
+        endTime: quickAddData.endTime,
+      });
     }
-  }}
-  defaultValues={{
-    title: '',
-    description: '',
-    startDate: new Date(),
-    endDate: new Date(),
-    startTime: '09:00',
-    endTime: '10:00',
-    location: '',
-    category: 'Meeting',
-    color: '#3b82f6',
-    isRepeating: false,
-  }}
-/>`}
+  }, [isQuickAddDialogOpen, quickAddData, form]);
+
+  return (
+    <Dialog open={isQuickAddDialogOpen} onOpenChange={closeQuickAddDialog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create New Event</DialogTitle>
+        </DialogHeader>
+        <ScrollArea className="max-h-[70vh]">
+          <div className="p-4">
+            <EventDetailsForm form={form} timeFormat={timeFormat} locale={localeObj} />
+          </div>
+        </ScrollArea>
+        <DialogFooter>
+          <Button variant="outline" onClick={closeQuickAddDialog}>Cancel</Button>
+          <Button onClick={form.handleSubmit(handleSubmit)} disabled={isSubmitting}>
+            <Save className="mr-2 h-4 w-4" />
+            Save Event
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}`}
           />
         </section>
+
+        <hr />
+
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -103,51 +159,131 @@ import { createEvent } from '@/app/actions';
             Editing Events
           </h2>
           <p className="mb-4 leading-7">
-            Events can be edited in several ways to provide flexibility and
-            convenience.
-          </p>
-          <h3 className="mb-3 text-xl font-semibold">Click to Edit</h3>
-          <p className="mb-4 leading-7">
-            Users can click on any existing event to open the event dialog,
-            which displays event details and provides edit options.
-          </p>
-          <h3 className="mt-6 mb-3 text-xl font-semibold">Edit Form</h3>
-          <p className="mb-4 leading-7">
-            The same form used for creating events can be used for editing, with
-            pre-filled values:
+            To edit an event, users can click on it to open the{' '}
+            <strong>EventDialog</strong>. This dialog comes pre-filled with the
+            event's data, ready for modification.
           </p>
           <CodeBlock
             language="tsx"
-            filename="components/event-calendar/event-form.tsx"
-            code={`import { EventForm } from '@/components/event-calendar/event-form';
-import { updateEvent } from '@/app/actions';
-import { EventTypes } from '@/db/schema';
+            filename="components/event-calendar/event-dialog.tsx"
+            code={`'use client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ScrollArea } from '../ui/scroll-area';
+import { DeleteAlert } from '@/components/event-calendar/ui/delete-alert';
+import { FormFooter } from '@/components/event-calendar/ui/form-footer';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { ensureDate } from '@/lib/date';
+import { useEventCalendarStore } from '@/hooks/use-event';
+import { eventFormSchema } from '@/lib/validations';
+import { EventDetailsForm } from './event-detail-form';
+import { toast } from 'sonner';
+import { deleteEvent, updateEvent } from '@/app/actions';
+import { useShallow } from 'zustand/shallow';
+import { getLocaleFromCode } from '@/lib/event';
 
-// Example of rendering the event form in edit mode
-<EventForm
-  mode="edit"
-  onSubmit={async (data) => {
-    const result = await updateEvent(event.id, data);
-    if (result.success) {
-      // Handle success
+type EventFormValues = z.infer<typeof eventFormSchema>;
+
+export default function EventDialog() {
+  const {
+    locale,
+    selectedEvent,
+    isDialogOpen,
+    closeEventDialog,
+    isSubmitting,
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      locale: state.locale,
+      selectedEvent: state.selectedEvent,
+      isDialogOpen: state.isDialogOpen,
+      closeEventDialog: state.closeEventDialog,
+      isSubmitting: state.isSubmitting,
+    })),
+  );
+  const localeObj = getLocaleFromCode(locale);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState<boolean>(false);
+
+  const form = useForm<EventFormValues>({
+    resolver: zodResolver(eventFormSchema),
+    mode: 'onChange',
+  });
+
+  useEffect(() => {
+    if (selectedEvent) {
+      const startDate = ensureDate(selectedEvent.startDate);
+      const endDate = ensureDate(selectedEvent.endDate);
+      form.reset({
+        ...selectedEvent,
+        startDate,
+        endDate,
+      });
     }
-  }}
-  defaultValues={{
-    title: event.title,
-    description: event.description,
-    startDate: new Date(event.startDate),
-    endDate: new Date(event.endDate),
-    startTime: event.startTime,
-    endTime: event.endTime,
-    location: event.location,
-    category: event.category,
-    color: event.color,
-    isRepeating: event.isRepeating,
-    repeatingType: event.repeatingType,
-  }}
-/>`}
+  }, [selectedEvent, form]);
+
+  const handleUpdate = async (values: EventFormValues) => {
+    if (!selectedEvent?.id) return;
+
+    toast.promise(updateEvent(selectedEvent.id, values), {
+      loading: 'Updating event...',
+      success: (result) => {
+        if (!result.success) throw new Error(result.error);
+        closeEventDialog();
+        return 'Event updated successfully!';
+      },
+      error: (err) => err.message || 'Oops! Something went wrong.',
+    });
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!selectedEvent?.id) return;
+    setIsDeleteAlertOpen(false);
+
+    toast.promise(deleteEvent(selectedEvent.id), {
+      loading: 'Deleting event...',
+      success: (result) => {
+        if (!result.success) throw new Error(result.error);
+        closeEventDialog();
+        return 'Event deleted successfully!';
+      },
+      error: (err) => err.message || 'Oops! Something went wrong.',
+    });
+  };
+
+  return (
+    <>
+      <Dialog open={isDialogOpen} onOpenChange={closeEventDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Event</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="max-h-[70vh]">
+            <div className="p-4">
+              <EventDetailsForm form={form} locale={localeObj} />
+            </div>
+          </ScrollArea>
+          <FormFooter
+            onCancel={closeEventDialog}
+            onDelete={() => setIsDeleteAlertOpen(true)}
+            onSubmit={form.handleSubmit(handleUpdate)}
+            isSubmitting={isSubmitting}
+          />
+        </DialogContent>
+      </Dialog>
+      <DeleteAlert
+        isOpen={isDeleteAlertOpen}
+        onClose={() => setIsDeleteAlertOpen(false)}
+        onConfirm={handleDeleteEvent}
+      />
+    </>
+  );
+}`}
           />
         </section>
+
+        <hr />
+
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -156,36 +292,110 @@ import { EventTypes } from '@/db/schema';
             Deleting Events
           </h2>
           <p className="mb-4 leading-7">
-            Events can be deleted individually or in bulk, with confirmation to
-            prevent accidental deletion.
+            The same <strong>EventDialog</strong> provides the functionality to
+            delete an event. A confirmation dialog is used to prevent accidental
+            deletions.
           </p>
-          <h3 className="mb-3 text-xl font-semibold">Single Event Deletion</h3>
-          <p className="mb-4 leading-7">To delete a single event, users can:</p>
-          <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">
-            <li className="leading-7">
-              Click on the event to open the event dialog
-            </li>
-            <li className="leading-7">Click the delete button</li>
-            <li className="leading-7">Confirm the deletion</li>
-          </ol>
           <CodeBlock
             language="tsx"
             filename="components/event-calendar/event-dialog.tsx"
-            code={`import { deleteEvent } from '@/app/actions';
+            code={`'use client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ScrollArea } from '../ui/scroll-area';
+import { DeleteAlert } from '@/components/event-calendar/ui/delete-alert';
+import { FormFooter } from '@/components/event-calendar/ui/form-footer';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { ensureDate } from '@/lib/date';
+import { useEventCalendarStore } from '@/hooks/use-event';
+import { eventFormSchema } from '@/lib/validations';
+import { EventDetailsForm } from './event-detail-form';
+import { toast } from 'sonner';
+import { deleteEvent, updateEvent } from '@/app/actions';
+import { useShallow } from 'zustand/shallow';
+import { getLocaleFromCode } from '@/lib/event';
 
-// Example of handling event deletion
-const handleDeleteEvent = async (eventId: string) => {
-  if (confirm('Are you sure you want to delete this event?')) {
-    const result = await deleteEvent(eventId);
-    if (result.success) {
-      // Handle successful deletion
-      toast.success('Event deleted successfully');
-    } else {
-      // Handle error
-      toast.error('Failed to delete event');
+type EventFormValues = z.infer<typeof eventFormSchema>;
+
+export default function EventDialog() {
+  const {
+    locale,
+    selectedEvent,
+    isDialogOpen,
+    closeEventDialog,
+    isSubmitting,
+  } = useEventCalendarStore(
+    useShallow((state) => ({
+      locale: state.locale,
+      selectedEvent: state.selectedEvent,
+      isDialogOpen: state.isDialogOpen,
+      closeEventDialog: state.closeEventDialog,
+      isSubmitting: state.isSubmitting,
+    })),
+  );
+  const localeObj = getLocaleFromCode(locale);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState<boolean>(false);
+
+  const form = useForm<EventFormValues>({
+    resolver: zodResolver(eventFormSchema),
+    mode: 'onChange',
+  });
+
+  useEffect(() => {
+    if (selectedEvent) {
+      const startDate = ensureDate(selectedEvent.startDate);
+      const endDate = ensureDate(selectedEvent.endDate);
+      form.reset({
+        ...selectedEvent,
+        startDate,
+        endDate,
+      });
     }
-  }
-};`}
+  }, [selectedEvent, form]);
+
+  const handleUpdate = async (values: EventFormValues) => {
+    if (!selectedEvent?.id) return;
+    // ... update logic
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!selectedEvent?.id) return;
+    setIsDeleteAlertOpen(false);
+
+    toast.promise(deleteEvent(selectedEvent.id), {
+      loading: 'Deleting event...',
+      success: (result) => {
+        if (!result.success) throw new Error(result.error);
+        closeEventDialog();
+        return 'Event deleted successfully!';
+      },
+      error: (err) => err.message || 'Oops! Something went wrong.',
+    });
+  };
+
+  return (
+    <>
+      <Dialog open={isDialogOpen} onOpenChange={closeEventDialog}>
+        <DialogContent>
+          {/* ... Dialog Content for Editing */}
+          <FormFooter
+            onCancel={closeEventDialog}
+            onDelete={() => setIsDeleteAlertOpen(true)}
+            onSubmit={form.handleSubmit(handleUpdate)}
+            isSubmitting={isSubmitting}
+          />
+        </DialogContent>
+      </Dialog>
+      <DeleteAlert
+        isOpen={isDeleteAlertOpen}
+        onClose={() => setIsDeleteAlertOpen(false)}
+        onConfirm={handleDeleteEvent}
+      />
+    </>
+  );
+}`}
           />
           <Callout variant="warning" className="my-6">
             <p>
@@ -195,6 +405,9 @@ const handleDeleteEvent = async (eventId: string) => {
             </p>
           </Callout>
         </section>
+
+        <hr />
+
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -208,7 +421,7 @@ const handleDeleteEvent = async (eventId: string) => {
           </p>
           <h3 className="mb-3 text-xl font-semibold">Create Event</h3>
           <CodeBlock
-            language="tsx"
+            language="typescript"
             filename="app/actions.ts"
             code={`'use server';
 
@@ -229,35 +442,8 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
       };
     }
 
-    const {
-      title,
-      description,
-      startDate,
-      endDate,
-      startTime,
-      endTime,
-      location,
-      category,
-      color,
-      isRepeating,
-      repeatingType,
-    } = validatedFields.data;
-
-    const startDateTime = combineDateAndTime(startDate, startTime);
-    const endDateTime = combineDateAndTime(endDate, endTime);
-
     await db.insert(events).values({
-      title,
-      description,
-      startDate: startDateTime,
-      endDate: endDateTime,
-      startTime,
-      endTime,
-      location,
-      category,
-      color,
-      isRepeating: isRepeating ?? false,
-      repeatingType: repeatingType ?? null,
+      ...validatedFields.data,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -268,14 +454,14 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
     console.error('Error creating event:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create event',
+      error: 'Failed to create event',
     };
   }
 }`}
           />
           <h3 className="mt-6 mb-3 text-xl font-semibold">Update Event</h3>
           <CodeBlock
-            language="tsx"
+            language="typescript"
             filename="app/actions.ts"
             code={`export async function updateEvent(
   id: string,
@@ -285,20 +471,7 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
     const validatedFields = createEventSchema.partial().safeParse(values);
 
     if (!validatedFields.success) {
-      return {
-        error: 'Invalid fields',
-        details: validatedFields.error.flatten().fieldErrors,
-      };
-    }
-
-    const existingEvent = await db
-      .select()
-      .from(events)
-      .where(and(eq(events.id, id)))
-      .limit(1);
-
-    if (!existingEvent.length) {
-      throw new Error('Event not found or unauthorized');
+      return { error: 'Invalid fields' };
     }
 
     await db
@@ -307,49 +480,35 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
         ...validatedFields.data,
         updatedAt: new Date(),
       })
-      .where(and(eq(events.id, id)));
+      .where(eq(events.id, id));
 
     revalidatePath('/');
     return { success: true };
   } catch (error) {
     console.error('Error updating event:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to update event',
-    };
+    return { success: false, error: 'Failed to update event' };
   }
 }`}
           />
           <h3 className="mt-6 mb-3 text-xl font-semibold">Delete Event</h3>
           <CodeBlock
-            language="tsx"
+            language="typescript"
             filename="app/actions.ts"
             code={`export async function deleteEvent(id: string) {
   try {
-    const existingEvent = await db
-      .select()
-      .from(events)
-      .where(and(eq(events.id, id)))
-      .limit(1);
-
-    if (!existingEvent.length) {
-      throw new Error('Event not found or unauthorized');
-    }
-
-    await db.delete(events).where(and(eq(events.id, id)));
-
+    await db.delete(events).where(eq(events.id, id));
     revalidatePath('/');
     return { success: true };
   } catch (error) {
     console.error('Error deleting event:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to delete event',
-    };
+    return { success: false, error: 'Failed to delete event' };
   }
 }`}
           />
         </section>
+
+        <hr />
+
         <section className="space-y-6">
           <h2
             className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
@@ -362,30 +521,20 @@ export async function createEvent(values: z.infer<typeof createEventSchema>) {
             data integrity.
           </p>
           <CodeBlock
-            language="tsx"
+            language="typescript"
             filename="lib/validations.ts"
             code={`import { z } from 'zod';
 
 export const createEventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
-  startDate: z.date({
-    required_error: 'Start date is required',
-  }),
-  endDate: z.date({
-    required_error: 'End date is required',
-  }),
-  startTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, {
-    message: 'Start time must be in HH:MM format',
-  }),
-  endTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, {
-    message: 'End time must be in HH:MM format',
-  }),
+  startDate: z.date({ required_error: 'Start date is required' }),
+  endDate: z.date({ required_error: 'End date is required' }),
+  startTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
+  endTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
   location: z.string().optional(),
   category: z.string().optional(),
-  color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
-    message: 'Color must be a valid hex color code',
-  }).optional(),
+  color: z.string().optional(),
   isRepeating: z.boolean().optional(),
   repeatingType: z.enum(['daily', 'weekly', 'monthly']).optional(),
 }).refine(
@@ -399,107 +548,6 @@ export const createEventSchema = z.object({
     path: ['endDate'],
   }
 );`}
-          />
-          <p className="mt-6 leading-7">This validation schema ensures that:</p>
-          <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-            <li className="leading-7">
-              Events have required fields (title, dates, times)
-            </li>
-            <li className="leading-7">Time formats are valid (HH:MM)</li>
-            <li className="leading-7">Colors are valid hex codes</li>
-            <li className="leading-7">
-              End date/time is after start date/time
-            </li>
-          </ul>
-        </section>
-        <section className="space-y-6">
-          <h2
-            className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight"
-            id="event-display"
-          >
-            Event Display
-          </h2>
-          <p className="mb-4 leading-7">
-            Events are displayed differently depending on the calendar view:
-          </p>
-          <h3 className="mb-3 text-xl font-semibold">Day/Week View</h3>
-          <p className="mb-4 leading-7">
-            In time-based views, events are positioned according to their start
-            and end times, with proper handling for:
-          </p>
-          <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-            <li className="leading-7">Overlapping events</li>
-            <li className="leading-7">All-day events</li>
-            <li className="leading-7">Multi-day events</li>
-          </ul>
-          <h3 className="mt-6 mb-3 text-xl font-semibold">Month View</h3>
-          <p className="mb-4 leading-7">
-            In month view, events are displayed as compact bars with:
-          </p>
-          <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-            <li className="leading-7">
-              Color coding based on event category or custom color
-            </li>
-            <li className="leading-7">Truncated titles for space efficiency</li>
-            <li className="leading-7">
-              &quot;More events&quot; indicator when there are too many to
-              display
-            </li>
-            <li className="leading-7">Proper spanning for multi-day events</li>
-          </ul>
-          <CodeBlock
-            language="tsx"
-            filename="components/event-calendar/event-item.tsx"
-            code={`import { cn } from '@/lib/utils';
-import { EventTypes } from '@/db/schema';
-
-interface EventItemProps {
-  event: EventTypes;
-  view: CalendarViewType;
-  // Other props
-}
-
-export function EventItem({ event, view }: EventItemProps) {
-  // Different rendering based on view type
-  if (view === CalendarViewType.MONTH) {
-    return (
-      <div
-        className={cn(
-          'rounded-sm px-2 py-1 text-xs font-medium',
-          'truncate overflow-hidden',
-        )}
-        style={{ backgroundColor: event.color + '40', borderLeft: \`3px solid \${event.color}\` }}
-      >
-        {event.title}
-      </div>
-    );
-  }
-
-  // Day/Week view rendering with proper positioning
-  return (
-    <div
-      className={cn(
-        'absolute rounded-md px-2 py-1',
-        'flex flex-col overflow-hidden',
-      )}
-      style={{
-        backgroundColor: event.color + '40',
-        borderLeft: \`3px solid \${event.color}\`,
-        top: \`\${topPosition}px\`,
-        height: \`\${eventHeight}px\`,
-        left: \`\${leftPosition}%\`,
-        width: \`\${widthPercentage}%\`,
-      }}
-    >
-      <div className="font-medium">{event.title}</div>
-      {showTime && (
-        <div className="text-xs opacity-80">
-          {formatTime(event.startTime)} - {formatTime(event.endTime)}
-        </div>
-      )}
-    </div>
-  );
-}`}
           />
         </section>
       </div>
