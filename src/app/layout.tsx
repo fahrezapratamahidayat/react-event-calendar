@@ -13,7 +13,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: 'React Event Calendar',
+    default: 'Shadcn Event Calendar',
     template: '%s | React Event Calendar',
   },
   description:
@@ -27,12 +27,12 @@ export const metadata: Metadata = {
   ],
   authors: [
     {
-      name: 'Your Name/Team',
+      name: 'fahrezapratamahidayat',
       url: 'https://shadcn-event-calendar.vercel.app/',
     },
   ],
   openGraph: {
-    title: 'React Event Calendar',
+    title: 'Shadcn Event Calendar',
     description: 'Modern event scheduling solution with advanced features',
     url: 'https://shadcn-event-calendar.vercel.app/',
     siteName: 'React Event Calendar',
