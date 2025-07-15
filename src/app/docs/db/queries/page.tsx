@@ -759,23 +759,3 @@ seedEvents();`}
     </div>
   );
 }
-
-export const metadata = {
-  title: 'Database Queries Guide - React Event Calendar',
-  description: 'Complete reference for event data querying and management',
-  keywords: ['drizzle orm', 'postgresql', 'database queries'],
-  openGraph: {
-    title: 'Database Operations Documentation',
-    url: 'https://shadcn-event-calendar.vercel.app/docs/db/queries',
-  },
-};
-
-// Penambahan diagram ERD
-<Callout variant="info">
-  <p>Entity Relationship Diagram (ERD) for Event Calendar Database:</p>
-  <img
-    src="/erd-diagram.svg"
-    alt="Database ERD Diagram"
-    className="mt-4 rounded-lg border"
-  />
-</Callout>;
