@@ -4,15 +4,14 @@ import { Clock, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatTimeDisplay } from '@/lib/date';
 import { Button } from '@/components/ui/button';
-import { EventTypes } from '@/db/schema';
 import { format, isSameDay, isSameMonth, Locale } from 'date-fns';
-import { MonthViewConfig, TimeFormatType } from '@/types/event';
+import { Events, MonthViewConfig, TimeFormatType } from '@/types/event';
 import { getColorClasses } from '@/lib/event';
 
 interface DayCellProps {
   date: Date;
   baseDate: Date;
-  eventsByDate: Record<string, EventTypes[]>;
+  eventsByDate: Record<string, Events[]>;
   locale: Locale;
   timeFormat: TimeFormatType;
   monthViewConfig: MonthViewConfig;
@@ -20,7 +19,7 @@ interface DayCellProps {
   onQuickAdd: (date: Date) => void;
   onFocusDate: (date: Date) => void;
   onShowDayEvents: (date: Date) => void;
-  onOpenEvent: (event: EventTypes) => void;
+  onOpenEvent: (event: Events) => void;
 }
 
 export function DayCell({
