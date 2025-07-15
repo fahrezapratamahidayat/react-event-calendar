@@ -129,6 +129,7 @@ export default function ArchitecturePage() {
 import {
   createSearchParamsCache,
   parseAsArrayOf,
+  parseAsBoolean,
   parseAsInteger,
   parseAsIsoDate,
   parseAsString,
@@ -144,8 +145,11 @@ export const searchParamsCache = createSearchParamsCache({
   colors: parseAsArrayOf(parseAsString).withDefault([]),
   locations: parseAsArrayOf(parseAsString).withDefault([]),
   repeatingTypes: parseAsArrayOf(parseAsString).withDefault([]),
-  isRepeating: parseAsString.withDefault(''),
-});`}
+  isRepeating: parseAsBoolean.withDefault(false),
+  limit: parseAsInteger.withDefault(50),
+  offset: parseAsInteger.withDefault(0),
+});
+`}
           />
 
           <h3 className="mt-8 mb-3 text-xl font-semibold">Zustand Store</h3>
