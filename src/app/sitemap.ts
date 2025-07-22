@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://shadcn-event-calendar.vercel.app';
+  const baseUrl = process.env.BASE_URL!;
 
   return [
     {
