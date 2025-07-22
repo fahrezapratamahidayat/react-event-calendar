@@ -13,6 +13,7 @@ import { useEventCalendarStore } from '@/hooks/use-event';
 import { useShallow } from 'zustand/shallow';
 import { CalendarViewType, Events } from '@/types/event';
 import { MonthCard } from './ui/month-card';
+import { parseAsIsoDate, useQueryState } from 'nuqs';
 
 interface CalendarYearProps {
   events: Events[];
@@ -34,6 +35,13 @@ export function EventCalendarYear({ events, currentDate }: CalendarYearProps) {
       setView: state.setView,
       viewSettings: state.viewSettings.year,
     })),
+  );
+
+  const [, setDate] = useQueryState(
+    'date',
+    parseAsIsoDate.withDefault(new Date()).withOptions({
+      shallow: false,
+    }),
   );
 
   const monthsInYear = useMemo(() => {
@@ -61,10 +69,16 @@ export function EventCalendarYear({ events, currentDate }: CalendarYearProps) {
   }, [events, currentDate]);
 
   const handleMonthClick = useCallback(
-    (_month: Date) => {
+    (month: Date) => {
       setView(CalendarViewType.MONTH);
+      const newDate = new Date(
+        month.getFullYear(),
+        month.getMonth(),
+        currentDate.getDate(),
+      );
+      setDate(newDate);
     },
-    [setView],
+    [setDate, setView, currentDate],
   );
 
   const handleDateClick = useCallback(
