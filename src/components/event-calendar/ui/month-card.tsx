@@ -20,7 +20,6 @@ import {
 import { ChevronRight, Plus } from 'lucide-react';
 import { memo, useMemo } from 'react';
 import { Events, YearViewConfig } from '@/types/event';
-import { parseAsIsoDate, useQueryState } from 'nuqs';
 
 interface MonthCardProps {
   month: Date;
@@ -137,12 +136,6 @@ const MonthCard = memo(
     const isCurrentMonth =
       isSameMonth(month, today) && isSameYear(month, today);
     const hasEvents = eventCount > 0;
-    const [, setDate] = useQueryState(
-      'date',
-      parseAsIsoDate.withOptions({
-        shallow: false,
-      }),
-    );
 
     return (
       <div
@@ -165,9 +158,6 @@ const MonthCard = memo(
                   'transition-all hover:translate-x-0.5',
                 )}
                 onClick={() => {
-                  const dateForQuery = new Date(month);
-                  dateForQuery.setHours(12, 0, 0, 0);
-                  setDate(dateForQuery);
                   onMonthClick(month);
                 }}
               >
@@ -235,7 +225,11 @@ const MonthCard = memo(
                 variant="ghost"
                 size="sm"
                 className="hover:bg-accent/40 mt-1 h-7 w-full justify-between px-2 py-1 text-xs"
-                onClick={() => onMonthClick(month)}
+                onClick={() =>
+                  onMonthClick(
+                    new Date(month.getFullYear(), month.getMonth(), 30),
+                  )
+                }
               >
                 <span>View all {eventCount} events</span>
                 <ChevronRight className="h-3 w-3" />
